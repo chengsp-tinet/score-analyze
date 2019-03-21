@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>查询cdr</title>
+    <link rel="stylesheet" href="../static/lib/layui/css/layui.css" th:href="@{/lib/layui/css/layui.css}" media="all">
+    <link rel="stylesheet" href="../static/css/admin/admin.css" th:href="@{/css/admin/admin.css}" media="all" >
+    <link rel="stylesheet" href="../static/lib/layui/css/layer.css" th:href="@{/lib/layui/css/layer.css}" media="all">
+    <script type="text/javascript" src="../static/lib/jquery/jquery-3.2.1.min.js" th:src="@{/lib/jquery/jquery-3.2.1.min.js}"></script>
+    <script src="../static/lib/layui/layui.js" th:src="@{/lib/layui/layui.js}" charset="utf-8"></script>
+</head>
+<body class="layui-layout-body" layadmin-themealias="default">
+<form class="layui-form" action="" id="searchForm">
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">callee</label>
+            <div class="layui-input-inline">
+                <input type="text" name="callee"  autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">caller</label>
+            <div class="layui-input-inline">
+                <input type="text" name="caller"  autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">测试</label>
+            <div class="layui-input-inline">
+                <input type="radio" name="test"  autocomplete="off" value="11" title="11" checked class="layui-input">
+                <input type="radio" name="test"  autocomplete="off" value="22" title="22" class="layui-input">
+                <input type="radio" name="test"  autocomplete="off" value="33"  title="33" class="layui-input">
+            </div>
+        </div>
+        <p class="layui-btn" lay-submit="" lay-filter="sreach" id="searchBtn"><i class="layui-icon"></i></p>
+    </div>
+</form>
+<table id="account" lay-filter="account">
+
+</table>
+<script type="text/javascript" th:inline="none">
+
+(function () {
+    $.fn.serializeObject = function () {
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function () {
+            if(this.value && this.value != ''){
+                o[this.name]=this.value;
+            }
+        });
+        return o;
+    };
+    layui.use('form', function () {
+        var form = layui.form;
+
+    });
+    bindAction();
+    function constructArgs(target) {
+        var inputs = target.find('input');
+        console.log(inputs);
+        var args = {};
+        inputs.each(function (i, index) {
+            if ($(this).val() != '') {
+                args[$(this).attr('name')] = $(this).val();
+            }
+        })
+        return args;
+    }
+    function bindAction() {
+        $('#searchBtn').click(function () {
+            searchLog($('#searchForm').serializeObject());
+        });
+    }
+    function searchLog(data) {
+        console.log(data);
+        $.ajax({
+            url: '/cdr/queryByEntity',
+            type: 'get',
+            data: data,
+            success: function (data) {
+                var result = JSON.parse(data);
+                if (result.status == 0) {
+                    render(result.data);
+                } else {
+                    layer.alert(result.description);
+                    render([]);
+                }
+            },
+            error: function () {
+            }
+        })
+    }
+    function render(data) {
+        var table = null;
+        layui.use('table', function () {
+            table = layui.table;
+            table.render({
+                elem: '#account'
+                //,width: 900
+                //,height: 274
+                , cellMinWidth: 100
+                , cols: [[
+                    {field: 'id', title: 'id', align: 'center'}
+                    , {field: 'callee', title: 'callee', align: 'center'}
+                    , {field: 'caller', title: 'caller', align: 'center'}
+                    , {field: 'startTime', title: 'startTime', align: 'center'}
+                    , {field: 'endTime', title: 'endTime', align: 'center'}
+                    , {field: 'callDuration', title: 'callDuration', align: 'center'}
+                    , {field: 'billDuration', title: 'billDuration', align: 'center'}
+                    , {field: 'stopReason', title: 'stopReason', align: 'center'}
+                    , {field: 'hungup', title: 'hungup', align: 'center'}
+                    , {field: 'name', title: 'name', align: 'center'}
+                    , {field: 'appId', title: 'appId', align: 'center'}
+                    , {field: 'areaName', title: 'areaName', align: 'center'}
+                ]]
+                , data: data
+
+                , skin: 'row' //表格风格
+                , even: true
+                //,size: 'lg' //尺寸
+
+                , page: true //是否显示分页
+                //, limits: [3, 5, 10]
+                , limit: 10 //每页默认显示的数量
+                //,loading: false //请求数据时，是否显示loading
+            });
+            /*table.on('tool(account)', function (obj) {
+                var  data = obj.data //得到所在行所有键值
+                    , field = obj.field; //得到字段
+                var layEvent = obj.event;
+                layer.confirm('确定更改?',function () {
+                    var actoinType;
+                    if(layEvent=='enable'){
+                        actoinType='0';
+                    }else if(layEvent='pause'){
+                        actoinType='1';
+                    }else {
+                        actoinType='2';
+                    }
+                    operateTemplate({
+                        templateid: data['template_id'],
+                        actiontype: actoinType
+                    })
+                })
+
+            })*/
+        });
+    };
+})()
+</script>
+</body>
+</html>
