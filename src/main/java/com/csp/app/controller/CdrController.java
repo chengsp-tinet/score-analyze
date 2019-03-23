@@ -2,6 +2,9 @@ package com.csp.app.controller;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.csp.app.common.ResponseBuilder;
+import com.csp.app.common.es.EsQueryCondition;
+import com.csp.app.common.es.EsQueryResult;
+import com.csp.app.common.es.JestService;
 import com.csp.app.entity.Cdr;
 import com.csp.app.service.CdrService;
 import com.csp.app.util.MyExcelExportUtil;
@@ -15,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-import redis.clients.jedis.JedisPool;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +32,8 @@ import java.util.Map;
 @RequestMapping("/cdr")
 @Controller
 public class CdrController {
-    JedisPool jedisPool;
+    @Autowired
+    private JestService jestService;
     private final static Logger logger = LoggerFactory.getLogger(CdrController.class);
     @Autowired
     private CdrService cdrService;
@@ -73,6 +76,7 @@ public class CdrController {
     @RequestMapping("/queryByEntity")
     @ResponseBody
     public String queryByEntity(Cdr cdr) {
+        Integer.toString(1);
         List<Cdr> cdrs = cdrService.selectList(new EntityWrapper<>(cdr));
         return ResponseBuilder.buildSuccess("成功!", cdrs).toString();
     }
@@ -86,7 +90,19 @@ public class CdrController {
 
     @RequestMapping("/test")
     @ResponseBody
-    public String test() {
+    public List<HashMap> test() {
+
+        EsQueryCondition condition = EsQueryCondition.newEsQueryCondition();
+        condition.setClasz(HashMap.class);
+        EsQueryResult<Object> tempResult = jestService.search(condition);
+        condition.setLimit(tempResult.getTotal());
+        EsQueryResult<HashMap> result = jestService.search(condition);
+        List<HashMap> searchResult = result.getResult();
+        return searchResult;
+    }
+    @RequestMapping("/test2")
+    @ResponseBody
+    public String test2() {
         logger.info("向redis里缓存哈希表....");
         Map<String,Object> map = new HashMap<>();
         for (int i = 0; i <50000; i++) {

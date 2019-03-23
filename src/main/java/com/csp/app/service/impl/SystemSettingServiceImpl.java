@@ -24,7 +24,6 @@ public class SystemSettingServiceImpl extends ServiceImpl<SystemSettingMapper, S
     @Autowired
     private RedisUtil redisUtil;
 
-    @Override
     public void redisLoadAll() {
         redisUtil.set("systemSetting.all", JSON.toJSONString(systemSettingMapper.selectList(new EntityWrapper<>(new SystemSetting()))), 1);
     }
@@ -41,5 +40,11 @@ public class SystemSettingServiceImpl extends ServiceImpl<SystemSettingMapper, S
     @Override
     public List<SystemSetting> selectList(Wrapper<SystemSetting> wrapper) {
         return JSONArray.parseArray(redisUtil.getString("systemSetting.all", 1), SystemSetting.class);
+    }
+
+    @Override
+    public void redisLoad(SystemSetting systemSetting) {
+
+
     }
 }

@@ -24,6 +24,13 @@ spring:
         max-idle: 80
         min-idle: 50
         max-total: 100
+#jest
+jest:
+  host: http://localhost:9200
+  maxTotalConnectionPerRoute: 150
+  maxTotalConnection: 150
+  userName:
+  password:
 #自动建表配置
   jpa:
     hibernate:
