@@ -5,15 +5,23 @@ server:
     min-response-size: 20480
     mime-types: text/html,text/xml,text/plain,text/css,application/javascript
   tomcat:
-    uri-encoding: utf-8
+    uri-encodin g: utf-8
 spring:
   datasource:
+    name: druidDataSource
+    type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: org.postgresql.Driver
+    filters: stat,wall,config,slf4j
+    max-active: 50
+    initial-size: 1
+    max-wait: 60000
+    min-idle: 10
     url: jdbc:postgresql://118.25.218.204:5432/dev
     username: postgres
     password: 45625891
+
   redis:
-#    host: 118.25.218.204
+#host: 118.25.218.204
     host: 39.105.100.109
     port: 6379
     password:
@@ -27,8 +35,8 @@ spring:
 #jest
 jest:
   host: http://localhost:9200
-  maxTotalConnectionPerRoute: 150
-  maxTotalConnection: 150
+  maxTotalConnectionPerRoute: 100
+  maxTotalConnection: 100
   userName:
   password:
 #自动建表配置
@@ -38,6 +46,7 @@ jest:
       show-sql: true
 mybatis:
   type-aliases-package: com.csp.app.entity
+  #mapper-locations: classpath:mapper/*.xml
   configuration:
     map-underscore-to-camel-case: true
 #常用sql查询

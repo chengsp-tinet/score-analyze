@@ -23,8 +23,8 @@ public class RedisDataLoad implements CommandLineRunner {
     @Override
     public void run(String... arg0) {
         logger.info("加载数据库数据到缓存...");
-        SystemSettingService systemSettingService = ContextUtil.getBean(SystemSettingService.class);
-        systemSettingService.redisLoad();
+        /*SystemSettingService systemSettingService = ContextUtil.getBean(SystemSettingService.class);
+        systemSettingService.redisLoad(null);*/
 
     }
 

@@ -1,6 +1,7 @@
 package com.csp.app.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -47,26 +48,24 @@ public class RedisConfiguration {
 	private int maxTotal;
 
 	@Bean
+	@ConfigurationProperties(prefix = "spring.redis.jedis.pool")
 	public JedisPoolConfig jedisPoolConfig() {
 		JedisPoolConfig poolConfig = new JedisPoolConfig();
-		poolConfig.setMaxIdle(maxIdle);
-		poolConfig.setMinIdle(minIdle);
-		poolConfig.setMaxTotal(maxTotal);
-
 		return poolConfig;
 	}
 
 	@Bean
-	public JedisPool jedisPool() {
+	public JedisPool jedisPool(JedisPoolConfig jedisPoolConfig) {
 		JedisPool jedisPool;
 		if(StringUtil.isNotEmpty(password)){
-			jedisPool = new JedisPool(jedisPoolConfig(), host, port, timeout,password,database);
+			jedisPool = new JedisPool(jedisPoolConfig, host, port, timeout,password,database);
 		}else {
-			jedisPool = new JedisPool(jedisPoolConfig(), host, port, timeout);
+			jedisPool = new JedisPool(jedisPoolConfig, host, port, timeout);
 		}
 		return jedisPool;
 	}
 
+	@ConfigurationProperties(prefix = "spring.redis")
 	@Bean
 	public RedisConnectionFactory redisConnectionFactory() {
 		JedisConnectionFactory connectionFactory = new JedisConnectionFactory();
@@ -85,17 +84,14 @@ public class RedisConfiguration {
 
 	@Bean
 	public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
-
 		GenericJackson2JsonRedisSerializer jsonRedisSerializer = new GenericJackson2JsonRedisSerializer();
 		StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
-
 		RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
 		redisTemplate.setConnectionFactory(connectionFactory);
 		redisTemplate.setKeySerializer(stringRedisSerializer);
 		redisTemplate.setValueSerializer(jsonRedisSerializer);
 		redisTemplate.setHashKeySerializer(stringRedisSerializer);
 		redisTemplate.setHashValueSerializer(jsonRedisSerializer);
-
 		return redisTemplate;
 	}
 

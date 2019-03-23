@@ -9,6 +9,8 @@ import com.csp.app.entity.SystemSetting;
 import com.csp.app.mapper.SystemSettingMapper;
 import com.csp.app.service.SystemSettingService;
 import com.csp.app.util.RedisUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ import java.util.List;
  */
 @Service
 public class SystemSettingServiceImpl extends ServiceImpl<SystemSettingMapper, SystemSetting> implements SystemSettingService {
+    private final static Logger logger = LoggerFactory.getLogger(SystemSettingServiceImpl.class);
     @Autowired
     private SystemSettingMapper systemSettingMapper;
     @Autowired
@@ -44,7 +47,7 @@ public class SystemSettingServiceImpl extends ServiceImpl<SystemSettingMapper, S
 
     @Override
     public void redisLoad(SystemSetting systemSetting) {
-
+        logger.info(getClass()+"  加载缓存...");
 
     }
 }
