@@ -173,7 +173,7 @@ public class DateUtil {
 
     public static final String FMT_DATE_dd = "dd";
 
-    private static String defaultDatePattern = "yyyy-MM-dd";
+    private static final String defaultDatePattern = "yyyy-MM-dd hh:mm:ss";
 
     public static String FMT_DATE_YYYY_MM_DD_00_00_00 = "yyyy-MM-dd 00:00:00";
     public static String FMT_DATE_YYYY_MM_DD_23_59_59 = "yyyy-MM-dd 23:59:59";

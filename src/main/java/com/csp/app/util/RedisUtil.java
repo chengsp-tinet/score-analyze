@@ -280,7 +280,6 @@ public class RedisUtil {
             connection.select(db);
             byte[] bytes = connection.hGet(key.getBytes(ENCODING), field.getBytes(ENCODING));
             if (bytes != null) {
-                logger.info(String.valueOf(jedisPool.getNumIdle()));
                 return new String(bytes, ENCODING);
             }
         } catch (UnsupportedEncodingException e) {

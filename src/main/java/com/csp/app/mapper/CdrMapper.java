@@ -9,7 +9,7 @@ import java.util.List;
 
 @Mapper
 public interface CdrMapper extends BaseMapper<Cdr> {
-    @Select("select * from cdr limit 100")
+    @Select("select * from cdr limit 500")
     public List<Cdr> selectPart();
 
 }

@@ -28,6 +28,7 @@ public class AplicationEvent {
     @PostConstruct
     private void doAfterStart(){
         logger.info("项目启动时执行的操作");
+        logger.info("CacheService个数:{}",cacheServices.size());
         druidDataSource.setProxyFilters(Lists.newArrayList(sqlFilter));
         for (CacheService cacheService : cacheServices){
             cacheService.redisLoad(null);

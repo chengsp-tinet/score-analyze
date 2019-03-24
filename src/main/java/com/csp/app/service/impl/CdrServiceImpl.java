@@ -28,7 +28,6 @@ public class CdrServiceImpl extends ServiceImpl<CdrMapper, Cdr> implements CdrSe
     @Autowired
     private RedisUtil redisUtil;
 
-    @Cacheable(value = "cdrCache")
     @Override
     public List<Cdr> selectList(Wrapper<Cdr> wrapper) {
         return super.selectList(wrapper);
@@ -37,5 +36,10 @@ public class CdrServiceImpl extends ServiceImpl<CdrMapper, Cdr> implements CdrSe
     @Override
     public List<Cdr> selectPart() {
         return cdrMapper.selectPart();
+    }
+
+    @Override
+    public void redisLoad(Cdr cdr) {
+
     }
 }

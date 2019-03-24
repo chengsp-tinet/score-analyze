@@ -4,35 +4,85 @@ import com.csp.app.common.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import java.util.Date;
 
+/**
+ * @author chengsp on 2019年3月24日17:40:23
+ */
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Cdr extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "JDBC")
-    private Integer	id;
     @Column
-    private String callee;
+    private Integer id;
     @Column
-    private String caller;
+    private String clid;
+
     @Column
-    private String startTime;
+    private String detailClid;
+
     @Column
-    private String endTime;
+    private String customerNumber;
     @Column
-    private String callDuration;
+    private String customerProvince;
+
     @Column
-    private String billDuration;
+    private String customerCity;
+
     @Column
-    private String stopReason;
+    private String calleeNumber;
+
     @Column
-    private String hungup;
+    private String calleeAreaCode;
+
     @Column
-    private String name;
+    private Long requestTime;
+
     @Column
-    private String appId;
+    private Long startTime;
+
     @Column
-    private String areaName;
+    private Long answerTime;
+
+    @Column
+    private Long dialTime;
+
+    @Column
+    private Long bridgeTime;
+
+    @Column
+    private Long endTime;
+
+    @Column
+    private Integer monitorDuration;
+
+    @Column
+    private Integer billDuration;
+
+    @Column
+    private Integer bridgeDuration;
+
+    @Column
+    private Integer totalDuration;
+
+    @Column
+    private Integer callType;
+
+    @Column
+    private Integer status;
+
+    @Column
+    private Integer mark;
+
+    @Column
+    private Integer endReason;
+
+    @Column
+    private String userField;
+
+    @Column
+    private Date createTime;
 
     @Override
     public Integer getId() {
@@ -44,91 +94,190 @@ public class Cdr extends BaseEntity {
         this.id = id;
     }
 
-    public String getCallee() {
-        return callee;
+
+    public String getClid() {
+        return clid;
     }
 
-    public void setCallee(String callee) {
-        this.callee = callee;
+    public void setClid(String clid) {
+        this.clid = clid;
     }
 
-    public String getCaller() {
-        return caller;
+    public String getDetailClid() {
+        return detailClid;
     }
 
-    public void setCaller(String caller) {
-        this.caller = caller;
+    public void setDetailClid(String detailClid) {
+        this.detailClid = detailClid;
     }
 
-    public String getStartTime() {
+    public String getCustomerNumber() {
+        return customerNumber;
+    }
+
+    public void setCustomerNumber(String customerNumber) {
+        this.customerNumber = customerNumber;
+    }
+
+
+    public String getCustomerProvince() {
+        return customerProvince;
+    }
+
+    public void setCustomerProvince(String customerProvince) {
+        this.customerProvince = customerProvince;
+    }
+
+    public String getCustomerCity() {
+        return customerCity;
+    }
+
+    public void setCustomerCity(String customerCity) {
+        this.customerCity = customerCity;
+    }
+
+    public String getCalleeNumber() {
+        return calleeNumber;
+    }
+
+    public void setCalleeNumber(String calleeNumber) {
+        this.calleeNumber = calleeNumber;
+    }
+
+    public String getCalleeAreaCode() {
+        return calleeAreaCode;
+    }
+
+    public void setCalleeAreaCode(String calleeAreaCode) {
+        this.calleeAreaCode = calleeAreaCode;
+    }
+
+    public Long getRequestTime() {
+        return requestTime;
+    }
+
+    public void setRequestTime(Long requestTime) {
+        this.requestTime = requestTime;
+    }
+
+    public Long getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(String startTime) {
+    public void setStartTime(Long startTime) {
         this.startTime = startTime;
     }
 
-    public String getEndTime() {
+    public Long getAnswerTime() {
+        return answerTime;
+    }
+
+    public void setAnswerTime(Long answerTime) {
+        this.answerTime = answerTime;
+    }
+
+    public Long getDialTime() {
+        return dialTime;
+    }
+
+    public void setDialTime(Long dialTime) {
+        this.dialTime = dialTime;
+    }
+
+    public Long getBridgeTime() {
+        return bridgeTime;
+    }
+
+    public void setBridgeTime(Long bridgeTime) {
+        this.bridgeTime = bridgeTime;
+    }
+
+    public Long getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(String endTime) {
+    public void setEndTime(Long endTime) {
         this.endTime = endTime;
     }
 
-    public String getCallDuration() {
-        return callDuration;
+    public Integer getMonitorDuration() {
+        return monitorDuration;
     }
 
-    public void setCallDuration(String callDuration) {
-        this.callDuration = callDuration;
+    public void setMonitorDuration(Integer monitorDuration) {
+        this.monitorDuration = monitorDuration;
     }
 
-    public String getBillDuration() {
+    public Integer getBillDuration() {
         return billDuration;
     }
 
-    public void setBillDuration(String billDuration) {
+    public void setBillDuration(Integer billDuration) {
         this.billDuration = billDuration;
     }
 
-    public String getStopReason() {
-        return stopReason;
+    public Integer getBridgeDuration() {
+        return bridgeDuration;
     }
 
-    public void setStopReason(String stopReason) {
-        this.stopReason = stopReason;
+    public void setBridgeDuration(Integer bridgeDuration) {
+        this.bridgeDuration = bridgeDuration;
     }
 
-    public String getHungup() {
-        return hungup;
+    public Integer getTotalDuration() {
+        return totalDuration;
     }
 
-    public void setHungup(String hungup) {
-        this.hungup = hungup;
+    public void setTotalDuration(Integer totalDuration) {
+        this.totalDuration = totalDuration;
     }
 
-    public String getName() {
-        return name;
+    public Integer getCallType() {
+        return callType;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setCallType(Integer callType) {
+        this.callType = callType;
     }
 
-    public String getAppId() {
-        return appId;
+    public Integer getStatus() {
+        return status;
     }
 
-    public void setAppId(String appId) {
-        this.appId = appId;
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
-    public String getAreaName() {
-        return areaName;
+    public Integer getMark() {
+        return mark;
     }
 
-    public void setAreaName(String areaName) {
-        this.areaName = areaName;
+    public void setMark(Integer mark) {
+        this.mark = mark;
+    }
+
+    public Integer getEndReason() {
+        return endReason;
+    }
+
+    public void setEndReason(Integer endReason) {
+        this.endReason = endReason;
+    }
+
+
+    public String getUserField() {
+        return userField;
+    }
+
+    public void setUserField(String userField) {
+        this.userField = userField;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 }
