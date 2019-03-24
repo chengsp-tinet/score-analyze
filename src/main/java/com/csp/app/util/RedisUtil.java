@@ -22,16 +22,14 @@ import java.util.Map;
  */
 @Service
 public class RedisUtil {
+    private Logger logger = LoggerFactory.getLogger(RedisUtil.class);
     @Autowired
     private JedisPool jedisPool;
     private static final String ENCODING = "UTF-8";
     @Autowired
     private RedisTemplate redisTemplate;
 
-    protected Logger logger = LoggerFactory.getLogger(RedisUtil.class);
-
     private ObjectMapper objectMapper = new ObjectMapper();
-
 
     public long incrUntil(String key, int db) {
         RedisConnection connection = getConnection();
