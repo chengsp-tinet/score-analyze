@@ -309,7 +309,7 @@ public class ExcelUtil {
     }
 
     /**
-     * 导出bea数据为Csv
+     * 导出bean数据为Csv
      *
      * @param data
      * @param fields
