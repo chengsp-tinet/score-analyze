@@ -25,6 +25,56 @@ import java.util.*;
  * @author chengsp on 2019年3月24日22:35:23
  */
 public class ExcelUtil {
+    /**
+     * 分批导出数据,适合导出数据量特别大的情况
+     * @param <T>
+     */
+    public static class ExportByPageHelper<T> {
+        private BufferedWriter br;
+        private String[] tempFields;
+        private String[] tempHeaders;
+
+        public ExportByPageHelper(BufferedWriter br) {
+            this.br = br;
+        }
+
+        public void exportAsCscByPage(List<T> data, BufferedWriter br, String[] fields, String[] headers) {
+            if (tempFields == null) {
+                if (fields == null || fields.length == 0) {
+                    tempFields = getKeysOrFieldsFromBean(data.get(0));
+                } else {
+                    tempFields = fields;
+                }
+            }
+            if (tempHeaders == null) {
+                exportByBufferedWriter(data, br, tempFields, tempFields);
+            } else {
+                exportByBufferedWriter(data, br, tempFields, null);
+            }
+
+            if (tempHeaders == null) {
+                if (headers == null || headers.length == 0) {
+                    tempHeaders = tempFields;
+                } else {
+                    tempHeaders = headers;
+                }
+            }
+        }
+
+        public void close() {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * 字段排序
+     */
     static class Com implements Comparator<String> {
 
         @Override
@@ -32,9 +82,17 @@ public class ExcelUtil {
             return o1.compareTo(o2);
         }
     }
+    // 字段排序比较器
+    private final static Com com = new Com();
 
-    private static Com com = new Com();
-
+    /**
+     * 同意导出方法
+     * @param data
+     * @param fields
+     * @param headers
+     * @param out
+     * @param <T>
+     */
     public static <T> void exportAsExcel(List<T> data, String[] fields, String[] headers, OutputStream out) {
         if (fields == null || headers == null) {
             throw new RuntimeException("fields or header can'selectPart be null.");
@@ -188,7 +246,7 @@ public class ExcelUtil {
         return heads;
     }
 
-    /**
+    /**将sheet转化为bean
      * @param sheet
      * @param heads
      * @param resultType
@@ -263,26 +321,39 @@ public class ExcelUtil {
      * @param csvWriter
      * @throws IOException
      */
-    private static void writeRow(List<Object> row, BufferedWriter csvWriter) throws IOException {
-        // 写入文件头部
-        for (Object data : row) {
-            StringBuffer sb = new StringBuffer();
-            String rowStr = sb.append("\"").append(data).append("\",").toString();
-            csvWriter.write(rowStr);
+    private static void writeRow(List<Object> row, BufferedWriter csvWriter) {
+        try {
+            // 写入文件头部
+            for (Object data : row) {
+                StringBuffer sb = new StringBuffer();
+                String rowStr = sb.append("\"").append(data).append("\",").toString();
+                csvWriter.write(rowStr);
+            }
+            csvWriter.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        csvWriter.newLine();
     }
 
-    private static void writeHead(String[] row, BufferedWriter csvWriter) throws IOException {
-        // 写入文件头部
-        for (String data : row) {
-            StringBuffer sb = new StringBuffer();
-            String rowStr = sb.append("\"").append(data).append("\",").toString();
-            csvWriter.write(rowStr);
+    private static void writeHead(String[] row, BufferedWriter csvWriter) {
+        try {
+            // 写入文件头部
+            for (String data : row) {
+                StringBuffer sb = new StringBuffer();
+                String rowStr = sb.append("\"").append(data).append("\",").toString();
+                csvWriter.write(rowStr);
+            }
+            csvWriter.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        csvWriter.newLine();
     }
 
+    /**
+     * 获取bean的属性
+     * @param target
+     * @return
+     */
     private static String[] getKeysOrFieldsFromBean(Object target) {
         if (target != null) {
             if (target instanceof Map) {
@@ -333,20 +404,7 @@ public class ExcelUtil {
                 tempHeaders = tempFields;
             }
             br = new BufferedWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
-            writeHead(tempHeaders, br);
-            for (T row : data) {
-                List<Object> rowData = new LinkedList<>();
-                for (String field : tempFields) {
-                    Object value = getValueByNameOrKey(row, field);
-                    if (value instanceof Date) {
-                        Date date = (Date) value;
-                        rowData.add(DateUtil.format(date));
-                    } else {
-                        rowData.add(value);
-                    }
-                }
-                writeRow(rowData, br);
-            }
+            exportByBufferedWriter(data, br, tempFields, tempHeaders);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -357,6 +415,34 @@ public class ExcelUtil {
                     e.printStackTrace();
                 }
             }
+        }
+    }
+
+    /**
+     * 不关闭流导出为csv
+     * @param data
+     * @param br
+     * @param tempFields
+     * @param tempHeaders
+     * @param <T>
+     */
+    private static <T> void exportByBufferedWriter(List<T> data, BufferedWriter br, String[] tempFields, String[] tempHeaders) {
+        if (tempHeaders != null) {
+
+            writeHead(tempHeaders, br);
+        }
+        for (T row : data) {
+            List<Object> rowData = new LinkedList<>();
+            for (String field : tempFields) {
+                Object value = getValueByNameOrKey(row, field);
+                if (value instanceof Date) {
+                    Date date = (Date) value;
+                    rowData.add(DateUtil.format(date));
+                } else {
+                    rowData.add(value);
+                }
+            }
+            writeRow(rowData, br);
         }
     }
 

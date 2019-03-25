@@ -22,11 +22,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +56,7 @@ public class CdrController {
             cdrService.insertBatch(cdrs);
             logger.info("导入成功!");
         } catch (Exception e) {
-            logger.error("导入发生异常:{}", e );
+            logger.error("导入发生异常:{}", e);
         } finally {
             if (is != null) {
                 is.close();
@@ -79,21 +79,37 @@ public class CdrController {
         List<Cdr> cdrs = cdrService.selectPart();
         return ResponseBuilder.buildSuccess("成功!", cdrs).toString();
     }
+
     @RequestMapping("/export")
     @ResponseBody
     public void export(HttpServletResponse response) {
+
+        int size = 50;
         EntityWrapper<Cdr> wrapper = new EntityWrapper<>();
         Cdr entity = new Cdr();
-        entity.setStatus(22);
+        entity.setStatus(21);
         wrapper.setEntity(entity);
-        List<Cdr> cdrs = cdrService.selectList(wrapper);
-
+        //List<Cdr> cdrs = cdrService.selectList(wrapper);
         try {
             // 告诉浏览器用什么软件可以打开此文件
             response.setHeader("content-Type", "application/vnd.ms-excel");
             // 下载文件的默认名称
-            response.setHeader("Content-Disposition", "attachment;filename="+ URLEncoder.encode("test.csv", "utf-8"));
-            ExcelUtil.exportAsCsv(cdrs,null,null,response.getOutputStream());
+            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode("test.csv", "utf-8"));
+            ServletOutputStream out = response.getOutputStream();
+            BufferedWriter br = new BufferedWriter(new OutputStreamWriter(out));
+            ExcelUtil.ExportByPageHelper<Cdr> exportByPageHelper = new ExcelUtil.ExportByPageHelper<>(br);
+            int total = cdrService.selectCount(wrapper);
+            wrapper.orderBy("start_time");
+            int pageNum = 1;
+            while ((pageNum - 1) * size < total) {
+                Page<Cdr> page = new Page<>(pageNum, size);
+//                page.setAscs(Arrays.asList("start_time"));
+                cdrService.selectPage(page,wrapper);
+                pageNum++;
+                exportByPageHelper.exportAsCscByPage(page.getRecords(), br, null, null);
+            }
+            exportByPageHelper.close();
+//            ExcelUtil.exportAsCsv(cdrs, null, null, response.getOutputStream());
         } catch (IOException e) {
             e.printStackTrace();
         }
