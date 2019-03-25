@@ -33,7 +33,7 @@ public class SqlFilter extends FilterEventAdapter {
     @Override
     protected void statementExecuteAfter(StatementProxy statement, String sql, boolean result) {
         //查询返回true，更新或插入返回false
-        logger.info("执行sql:{}",sql);
+//        logger.info("执行sql:{}",sql);
         if(result == false){
             sql = sql.toLowerCase();
             if((sql.contains("insert") || sql.contains("update") ||  sql.contains("delete")) && !sql.contains("select")){

@@ -173,7 +173,7 @@ public class DateUtil {
 
     public static final String FMT_DATE_dd = "dd";
 
-    private static final String defaultDatePattern = "yyyy-MM-dd hh:mm:ss";
+    private static final String defaultDatePattern = "yyyy-MM-dd";
 
     public static String FMT_DATE_YYYY_MM_DD_00_00_00 = "yyyy-MM-dd 00:00:00";
     public static String FMT_DATE_YYYY_MM_DD_23_59_59 = "yyyy-MM-dd 23:59:59";
@@ -215,7 +215,7 @@ public class DateUtil {
      * 使用默认Format格式化Date成字符串。
      */
     public static String format(Date date) {
-        return date == null ? "" : format(date, getDatePattern());
+        return date == null ? "" : format(date, getDateTimePattern());
     }
 
     /**

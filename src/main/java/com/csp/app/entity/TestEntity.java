@@ -11,7 +11,7 @@ import java.util.Date;
  */
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Cdr extends BaseEntity {
+public class TestEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "JDBC")
     @Column

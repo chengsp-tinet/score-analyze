@@ -6,15 +6,13 @@ import com.csp.app.common.ResponseBuilder;
 import com.csp.app.common.es.EsQueryCondition;
 import com.csp.app.common.es.EsQueryResult;
 import com.csp.app.common.es.JestService;
-import com.csp.app.entity.Cdr;
-import com.csp.app.service.CdrService;
+import com.csp.app.entity.TestEntity;
+import com.csp.app.service.TestService;
 import com.csp.app.util.ExcelUtil;
 import com.csp.app.util.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +24,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,12 +33,12 @@ import java.util.Map;
  */
 @RequestMapping("/cdr")
 @Controller
-public class CdrController {
+public class TestController {
     @Autowired
     private JestService jestService;
-    private final static Logger logger = LoggerFactory.getLogger(CdrController.class);
+    private final static Logger logger = LoggerFactory.getLogger(TestController.class);
     @Autowired
-    private CdrService cdrService;
+    private TestService cdrService;
     @Autowired
     private RedisUtil redisUtil;
 
@@ -49,11 +46,11 @@ public class CdrController {
     @ResponseBody
     public String importCdr(@RequestParam("file") MultipartFile file) throws IOException {
         InputStream is = null;
-        List<Cdr> cdrs = null;
+        List<TestEntity> testEntities = null;
         try {
             is = file.getInputStream();
-            cdrs = ExcelUtil.read(is, 0, file.getOriginalFilename(), null, Cdr.class);
-            cdrService.insertBatch(cdrs);
+            testEntities = ExcelUtil.read(is, 0, file.getOriginalFilename(), null, TestEntity.class);
+            cdrService.insertBatch(testEntities);
             logger.info("导入成功!");
         } catch (Exception e) {
             logger.error("导入发生异常:{}", e);
@@ -62,22 +59,22 @@ public class CdrController {
                 is.close();
             }
         }
-        return ResponseBuilder.buildSuccess("成功", cdrs).toString();
+        return ResponseBuilder.buildSuccess("成功", testEntities).toString();
     }
 
     @RequestMapping("/queryByEntity")
     @ResponseBody
-    public String queryByEntity(Cdr cdr) {
+    public String queryByEntity(TestEntity testEntity) {
         Integer.toString(1);
-        List<Cdr> cdrs = cdrService.selectList(new EntityWrapper<>(cdr));
-        return ResponseBuilder.buildSuccess("成功!", cdrs).toString();
+        List<TestEntity> testEntities = cdrService.selectList(new EntityWrapper<>(testEntity));
+        return ResponseBuilder.buildSuccess("成功!", testEntities).toString();
     }
 
     @RequestMapping("/queryPart")
     @ResponseBody
     public String queryAll() {
-        List<Cdr> cdrs = cdrService.selectPart();
-        return ResponseBuilder.buildSuccess("成功!", cdrs).toString();
+        List<TestEntity> testEntities = cdrService.selectPart();
+        return ResponseBuilder.buildSuccess("成功!", testEntities).toString();
     }
 
     @RequestMapping("/export")
@@ -85,11 +82,11 @@ public class CdrController {
     public void export(HttpServletResponse response) {
 
         int size = 50;
-        EntityWrapper<Cdr> wrapper = new EntityWrapper<>();
-        Cdr entity = new Cdr();
+        EntityWrapper<TestEntity> wrapper = new EntityWrapper<>();
+        TestEntity entity = new TestEntity();
         entity.setStatus(21);
         wrapper.setEntity(entity);
-        //List<Cdr> cdrs = cdrService.selectList(wrapper);
+        //List<TestEntity> cdrs = cdrService.selectList(wrapper);
         try {
             // 告诉浏览器用什么软件可以打开此文件
             response.setHeader("content-Type", "application/vnd.ms-excel");
@@ -97,12 +94,12 @@ public class CdrController {
             response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode("test.csv", "utf-8"));
             ServletOutputStream out = response.getOutputStream();
             BufferedWriter br = new BufferedWriter(new OutputStreamWriter(out));
-            ExcelUtil.ExportByPageHelper<Cdr> exportByPageHelper = new ExcelUtil.ExportByPageHelper<>(br);
+            ExcelUtil.ExportByPageHelper<TestEntity> exportByPageHelper = new ExcelUtil.ExportByPageHelper<>(br);
             int total = cdrService.selectCount(wrapper);
             wrapper.orderBy("start_time");
             int pageNum = 1;
             while ((pageNum - 1) * size < total) {
-                Page<Cdr> page = new Page<>(pageNum, size);
+                Page<TestEntity> page = new Page<>(pageNum, size);
 //                page.setAscs(Arrays.asList("start_time"));
                 cdrService.selectPage(page,wrapper);
                 pageNum++;
