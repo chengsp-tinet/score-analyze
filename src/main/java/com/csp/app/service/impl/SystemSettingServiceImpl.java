@@ -46,7 +46,7 @@ public class SystemSettingServiceImpl extends ServiceImpl<SystemSettingMapper, S
     }
 
     @Override
-    public void redisLoad(SystemSetting systemSetting) {
+    public void loadCache(SystemSetting systemSetting) {
         logger.info(getClass()+"  加载缓存...");
 
     }

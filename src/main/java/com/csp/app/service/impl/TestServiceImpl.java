@@ -38,7 +38,7 @@ public class TestServiceImpl extends ServiceImpl<TestMapper, TestEntity> impleme
     }
 
     @Override
-    public void redisLoad(TestEntity testEntity) {
+    public void loadCache(TestEntity testEntity) {
 
     }
 }

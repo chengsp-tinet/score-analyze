@@ -107,7 +107,7 @@ public class MD5Encoder {
             //默认32位，截取为16位
             result = buf.toString().substring(8, 24);
         } catch (NoSuchAlgorithmException e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
         return result;
     }

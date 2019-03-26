@@ -533,7 +533,7 @@ public class DateUtil {
         try {
             d = sdf.parse(dStr);
         } catch (ParseException pe) {
-            System.out.println(pe.getMessage());
+            pe.printStackTrace();
         }
 
         return dateToString(d, outFormat);

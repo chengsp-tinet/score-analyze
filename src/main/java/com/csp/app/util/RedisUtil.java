@@ -1,5 +1,6 @@
 package com.csp.app.util;
 
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -22,7 +23,7 @@ import java.util.Map;
  */
 @Service
 public class RedisUtil {
-    private Logger logger = LoggerFactory.getLogger(RedisUtil.class);
+    private static Logger logger = LoggerFactory.getLogger(RedisUtil.class);
     @Autowired
     private JedisPool jedisPool;
     private static final String ENCODING = "UTF-8";
@@ -227,7 +228,6 @@ public class RedisUtil {
     }
 
     private RedisConnection getConnection() {
-
         return this.redisTemplate.getConnectionFactory().getConnection();
     }
 
@@ -291,5 +291,7 @@ public class RedisUtil {
         }
         return null;
     }
-
+    public void sendMessage(String channel, Object message){
+        redisTemplate.convertAndSend(channel, JSON.toJSON(message));
+    }
 }

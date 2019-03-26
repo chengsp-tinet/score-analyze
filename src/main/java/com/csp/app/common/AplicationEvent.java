@@ -31,7 +31,7 @@ public class AplicationEvent {
         logger.info("CacheService个数:{}",cacheServices.size());
         druidDataSource.setProxyFilters(Lists.newArrayList(sqlFilter));
         for (CacheService cacheService : cacheServices){
-            cacheService.redisLoad(null);
+            cacheService.loadCache(null);
         }
     }
 }

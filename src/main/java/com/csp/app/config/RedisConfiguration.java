@@ -46,7 +46,6 @@ public class RedisConfiguration {
     @Bean
     public JedisPool jedisPool(JedisPoolConfig jedisPoolConfig) {
         JedisPool jedisPool;
-        System.out.println(jedisPoolConfig == null);
         if (StringUtil.isNotEmpty(password)) {
             jedisPool = new JedisPool(jedisPoolConfig, host, port, timeout, password, database);
         } else {

@@ -23,7 +23,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     private RedisUtil redisUtil;
 
     @Override
-    public void redisLoad(Score score) {
+    public void loadCache(Score score) {
         logger.info(getClass()+"  加载缓存...");
     }
 }

@@ -86,7 +86,7 @@ public class ExcelUtil {
     private final static Com com = new Com();
 
     /**
-     * 同意导出方法
+     * 统一导出方法
      * @param data
      * @param fields
      * @param headers
