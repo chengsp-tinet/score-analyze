@@ -5,12 +5,6 @@ package com.csp.app.common;
  * @author chengsp 2019年3月23日11:39:57
  */
 public interface CacheService<T> {
-    /**
-     * 缓存单条记录
-     * @param t
-     */
-    default void loadCache(T t) {
-    }
 
     /**
      * 缓存所有记录
@@ -21,20 +15,20 @@ public interface CacheService<T> {
     /**
      * 通过key从缓存获取单个实体
      *
-     * @param args
+     * @param key
      * @return
      */
-    default T getEntityFromCacheByKey(Object... args) {
+    default T getEntityFromCacheByKey(String key) {
         return null;
     }
 
     /**
      * 通过key从本地缓存获取单个实体
      *
-     * @param args
+     * @param key
      * @return
      */
-    default T getEntityFromLocalCacheByKey(Object... args) {
+    default T getEntityFromLocalCacheByKey(String key) {
         return null;
     }
 
@@ -43,13 +37,15 @@ public interface CacheService<T> {
      * @param args
      * @return
      */
-    default String getKey(String... args) {
+    default String getKey(Object... args) {
         return null;
     }
 
     /**
-     * 更新本地缓存
-     * @param key
+     * 刷新本地缓存
      */
-    default void loadLocalCacheFromRedis(String key){}
+    default void flushLocalCache(){
+        System.out.println("刷新本地缓存...");
+    }
+
 }

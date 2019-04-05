@@ -2,6 +2,7 @@ package com.csp.app.common;
 
 import com.alibaba.druid.filter.FilterEventAdapter;
 import com.alibaba.druid.proxy.jdbc.StatementProxy;
+import com.csp.app.util.CommUtil;
 import com.csp.app.util.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,7 @@ public class SqlFilter extends FilterEventAdapter {
 
     /**
      * 根据sql执行结果判定是否更新缓存，做pub广播
+     *
      * @param statement
      * @param sql
      * @param result
@@ -33,23 +35,20 @@ public class SqlFilter extends FilterEventAdapter {
     @Override
     protected void statementExecuteAfter(StatementProxy statement, String sql, boolean result) {
         //查询返回true，更新或插入返回false
-//        logger.info("执行sql:{}",sql);
-        if(result == false){
+        if (result == false) {
             sql = sql.toLowerCase();
-            if((sql.contains("insert") || sql.contains("update") ||  sql.contains("delete")) && !sql.contains("select")){
-                for (CacheService cacheService : cacheServiceList){
-                   /* //去掉clid表自动load缓存
-                    if("clid".equals(cacheService.getTableName())){
-                        continue;
+            if ((sql.contains("insert") || sql.contains("update") || sql.contains("delete")) && !sql.contains("select")) {
+                for (CacheService cacheService : cacheServiceList) {
+
+                    String classFullName = cacheService.getClass().getName();
+                    String className = classFullName.substring(classFullName.lastIndexOf(".") + 1);
+                    String entityName = className.substring(0, className.lastIndexOf("ServiceImpl"));
+                    String tableName = CommUtil.humpToLine(entityName);
+                    if (sql.contains(tableName)) {
+                        cacheService.loadCache();
+                        String beanName = entityName.substring(0, 1).toLowerCase() + entityName.substring(1) + "ServiceImpl";
+                        redisService.publish(Const.DEFAULT_CHANNEL, beanName);
                     }
-                    if(sql.contains(cacheService.getTableName())){
-                        logger.info("sql:{}",sql);
-                        logger.info("table:{}",cacheService.getTableName());
-                        Set<String> keys = cacheService.reloadCache();
-                        if(CollectionUtils.isNotEmpty(keys)){
-                            redisService.convertAndSend(CacheKey.REDIS_PUB_SUB_DB_CACHE, Strings.join(keys ,','));
-                        }
-                    }*/
                 }
             }
         }

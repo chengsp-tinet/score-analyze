@@ -28,8 +28,8 @@ public class SystemSettingController {
 
     @RequestMapping("queryByEntity")
     @ResponseBody
-    public Page<SystemSetting> queryByEntity(SystemSetting systemSetting, int current, int size){
-        return systemSettingService.selectPage(new Page<>(current,size),new EntityWrapper<>(systemSetting));
+    public SystemSetting queryByEntity(String name){
+        return systemSettingService.getEntityFromLocalCacheByKey(systemSettingService.getKey(name));
     }
 
     @RequestMapping("queryAll")

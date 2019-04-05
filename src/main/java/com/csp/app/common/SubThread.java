@@ -1,20 +1,18 @@
 package com.csp.app.common;
 
 import com.csp.app.util.ContextUtil;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
+import com.csp.app.util.RedisUtil;
 
+/**
+ * @author chengsp on 2019年4月5日15:01:18
+ */
 public class SubThread extends Thread {
-    private JedisPool jedisPool = ContextUtil.getBean(JedisPool.class);
     public SubThread(String name) {
         super(name);
     }
 
     @Override
     public void run() {
-        Jedis jedis = jedisPool.getResource();
-        Subscriber subscriber = new Subscriber();
-        jedis.subscribe(subscriber, Const.DEFAULT_CHANNEL);
-        jedis.close();
+        ContextUtil.getBean(RedisUtil.class).subscribe(new Subscriber(), Const.DEFAULT_CHANNEL);
     }
 }

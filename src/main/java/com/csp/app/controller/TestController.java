@@ -65,7 +65,6 @@ public class TestController {
     @RequestMapping("/queryByEntity")
     @ResponseBody
     public String queryByEntity(TestEntity testEntity) {
-        Integer.toString(1);
         List<TestEntity> testEntities = cdrService.selectList(new EntityWrapper<>(testEntity));
         return ResponseBuilder.buildSuccess("成功!", testEntities).toString();
     }
@@ -139,18 +138,17 @@ public class TestController {
 
     @RequestMapping("/get")
     @ResponseBody
-    public String test(String key) {
-        long n1 = System.currentTimeMillis();
+    public int test(String key) {
+       /* long n1 = System.currentTimeMillis();
         long m = 0;
         for (int i = 0; i < 20000000; i++) {
             m += i;
         }
         long n2 = System.currentTimeMillis();
-        logger.info("耗时:" + String.valueOf(n2 - n1));
-        /*String num = redisUtil.hget("num", String.valueOf(key), 0);
+        logger.info("耗时:" + String.valueOf(n2 - n1));*/
+        String num = redisUtil.hget("num", String.valueOf(key), 0);
         logger.info("读取哈希表值:{}",num);
-        return num;*/
-        return m + "";
+        return Integer.parseInt(num);
     }
 
 }

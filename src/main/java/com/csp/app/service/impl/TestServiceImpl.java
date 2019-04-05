@@ -36,9 +36,4 @@ public class TestServiceImpl extends ServiceImpl<TestMapper, TestEntity> impleme
     public List<TestEntity> selectPart() {
         return testMapper.selectPart();
     }
-
-    @Override
-    public void loadCache(TestEntity testEntity) {
-
-    }
 }

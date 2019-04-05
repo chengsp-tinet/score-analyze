@@ -16,7 +16,7 @@ public class AplicationEvent {
     @Autowired
     private DruidDataSource druidDataSource;
     @Autowired
-    List<CacheService> cacheServices;
+    private List<CacheService> cacheServices;
     @Autowired
     private SqlFilter sqlFilter;
 
@@ -31,7 +31,7 @@ public class AplicationEvent {
         logger.info("CacheService个数:{}",cacheServices.size());
         druidDataSource.setProxyFilters(Lists.newArrayList(sqlFilter));
         for (CacheService cacheService : cacheServices){
-            cacheService.loadCache(null);
+            cacheService.loadCache();
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.csp.app.controller;
+package com.csp.app.page;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,4 +25,12 @@ public class PageShowController {
         return "listCdr";
     }
 
+    @RequestMapping("/showLogin")
+    public String showLogin(){
+        return "login";
+    }
+    @RequestMapping("/request")
+    public String request(){
+        return "request";
+    }
 }

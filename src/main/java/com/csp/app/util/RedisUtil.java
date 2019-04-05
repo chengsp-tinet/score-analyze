@@ -11,6 +11,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPubSub;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
@@ -291,7 +292,58 @@ public class RedisUtil {
         }
         return null;
     }
-    public void sendMessage(String channel, Object message){
-        redisTemplate.convertAndSend(channel, JSON.toJSON(message));
+
+    /**
+     * 订阅多个频道
+     *
+     * @param jedisPubSub
+     * @param channelName
+     * @return
+     */
+    public boolean subscribe(JedisPubSub jedisPubSub, String... channelName) {
+        Jedis jedis = this.jedisPool.getResource();
+        try {
+            jedis.subscribe(jedisPubSub, channelName);
+            return true;
+        } catch (Exception e) {
+            logger.error("订阅频道异常:{}", e);
+        } finally {
+            jedis.close();
+        }
+        return false;
+    }
+
+    /**
+     * 发布消息
+     *
+     * @param channelName
+     * @param msg
+     * @return
+     */
+    public Long publish(String channelName, String msg) {
+        Long result = -1L;
+        Jedis jedis = this.jedisPool.getResource();
+        try {
+            result = jedis.publish(channelName, msg);
+        } catch (Exception e) {
+            logger.error("发布消息异常:{}", e);
+        } finally {
+            jedis.close();
+        }
+        return result;
+    }
+
+    /**
+     * 发布消息
+     *
+     * @param channel
+     * @param message
+     */
+    public void sendMessage(String channel, Object message) {
+        if (message instanceof String) {
+            redisTemplate.convertAndSend(channel, ((String) message));
+        } else {
+            redisTemplate.convertAndSend(channel, JSON.toJSON(message));
+        }
     }
 }

@@ -21,9 +21,4 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     private SystemSettingMapper systemSettingMapper;
     @Autowired
     private RedisUtil redisUtil;
-
-    @Override
-    public void loadCache(Score score) {
-        logger.info(getClass()+"  加载缓存...");
-    }
 }

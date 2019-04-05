@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @EnableTransactionManagement
 @SpringBootApplication
-//@EnableScheduling
+@EnableScheduling
 @EnableCaching
 public class Application {
 

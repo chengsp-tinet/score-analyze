@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSON;
 import java.io.Serializable;
 import java.util.Comparator;
 
-public abstract class BaseEntity implements Serializable, Comparator {
+public abstract class BaseEntity implements Serializable {
     private Integer id;
     public Integer getId() {
         return id;
