@@ -2,8 +2,8 @@ package com.csp.app.common;
 
 import com.alibaba.druid.filter.FilterEventAdapter;
 import com.alibaba.druid.proxy.jdbc.StatementProxy;
+import com.csp.app.service.RedisService;
 import com.csp.app.util.CommUtil;
-import com.csp.app.util.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ public class SqlFilter extends FilterEventAdapter {
     private List<CacheService> cacheServiceList;
 
     @Autowired
-    private RedisUtil redisService;
+    private RedisService redisService;
 
     /**
      * 根据sql执行结果判定是否更新缓存，做pub广播

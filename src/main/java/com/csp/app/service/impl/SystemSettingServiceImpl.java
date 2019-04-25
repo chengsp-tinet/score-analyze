@@ -5,8 +5,8 @@ import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.csp.app.entity.SystemSetting;
 import com.csp.app.mapper.SystemSettingMapper;
+import com.csp.app.service.RedisService;
 import com.csp.app.service.SystemSettingService;
-import com.csp.app.util.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +28,11 @@ public class SystemSettingServiceImpl extends ServiceImpl<SystemSettingMapper, S
     @Autowired
     private SystemSettingMapper systemSettingMapper;
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisService redisService;
 
     @Override
     public List<SystemSetting> selectList(Wrapper<SystemSetting> wrapper) {
-        return JSONArray.parseArray(redisUtil.getString("systemSetting.all", 1), SystemSetting.class);
+        return JSONArray.parseArray(redisService.getString("systemSetting.all", 1), SystemSetting.class);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class SystemSettingServiceImpl extends ServiceImpl<SystemSettingMapper, S
     public SystemSetting getEntityFromLocalCacheByKey(String key) {
         SystemSetting localEntity = localCache.get(key);
         if (localEntity == null) {
-            SystemSetting redisEntity = redisUtil.getObject(key, 1, SystemSetting.class);
+            SystemSetting redisEntity = redisService.getObject(key, 1, SystemSetting.class);
             if (redisEntity == null) {
                 localCache.put(key, NULL_ENTITY);
                 return null;
@@ -61,7 +61,7 @@ public class SystemSettingServiceImpl extends ServiceImpl<SystemSettingMapper, S
     public void loadCache() {
         List<SystemSetting> systemSettings = systemSettingMapper.selectList(null);
         for (SystemSetting systemSetting : systemSettings) {
-            redisUtil.set(getKey(systemSetting.getName()), systemSetting, 1);
+            redisService.set(getKey(systemSetting.getName()), systemSetting, 1);
         }
         logger.info("缓存SystemSetting{}条", systemSettings.size());
     }

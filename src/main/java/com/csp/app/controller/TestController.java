@@ -7,9 +7,9 @@ import com.csp.app.common.es.EsQueryCondition;
 import com.csp.app.common.es.EsQueryResult;
 import com.csp.app.common.es.JestService;
 import com.csp.app.entity.TestEntity;
+import com.csp.app.service.RedisService;
 import com.csp.app.service.TestService;
 import com.csp.app.util.ExcelUtil;
-import com.csp.app.util.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +43,7 @@ public class TestController {
     @Autowired
     private TestService cdrService;
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisService redisService;
 
     @PostMapping("/importCdr")
     @ResponseBody
@@ -132,7 +135,7 @@ public class TestController {
         for (int i = 0; i < 50000; i++) {
             map.put(i + "", 50000 - i);
         }
-        redisUtil.hmset("num", map, 0);
+        redisService.hmset("num", map, 0);
         return null;
     }
 
@@ -146,7 +149,7 @@ public class TestController {
         }
         long n2 = System.currentTimeMillis();
         logger.info("耗时:" + String.valueOf(n2 - n1));*/
-        String num = redisUtil.hget("num", String.valueOf(key), 0);
+        String num = redisService.hget("num", String.valueOf(key), 0);
         logger.info("读取哈希表值:{}",num);
         return Integer.parseInt(num);
     }

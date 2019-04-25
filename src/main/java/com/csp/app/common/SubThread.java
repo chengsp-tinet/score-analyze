@@ -1,7 +1,7 @@
 package com.csp.app.common;
 
+import com.csp.app.service.RedisService;
 import com.csp.app.util.ContextUtil;
-import com.csp.app.util.RedisUtil;
 
 /**
  * @author chengsp on 2019年4月5日15:01:18
@@ -13,6 +13,6 @@ public class SubThread extends Thread {
 
     @Override
     public void run() {
-        ContextUtil.getBean(RedisUtil.class).subscribe(new Subscriber(), Const.DEFAULT_CHANNEL);
+        ContextUtil.getBean(RedisService.class).subscribe(new Subscriber(), Const.DEFAULT_CHANNEL);
     }
 }

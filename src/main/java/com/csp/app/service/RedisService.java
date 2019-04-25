@@ -1,4 +1,4 @@
-package com.csp.app.util;
+package com.csp.app.service;
 
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -23,8 +23,8 @@ import java.util.Map;
  * @author admin
  */
 @Service
-public class RedisUtil {
-    private static Logger logger = LoggerFactory.getLogger(RedisUtil.class);
+public class RedisService {
+    private Logger logger = LoggerFactory.getLogger(RedisService.class);
     @Autowired
     private JedisPool jedisPool;
     private static final String ENCODING = "UTF-8";
@@ -34,56 +34,56 @@ public class RedisUtil {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     public long incrUntil(String key, int db) {
-        RedisConnection connection = getConnection();
-        Long incr = 0L;
-        try {
-            if (connection != null) {
-                connection.select(db);
-                incr = connection.incr(key.getBytes(ENCODING));
-                if (incr > 10000000) {
-                    set(key, 0, db);
+                    RedisConnection connection = getConnection();
+                    Long incr = 0L;
+                    try {
+                        if (connection != null) {
+                            connection.select(db);
+                            incr = connection.incr(key.getBytes(ENCODING));
+                            if (incr > 10000000) {
+                                set(key, 0, db);
+                            }
+                        }
+                    } catch (Exception e) {
+                        logger.error("redis incr error:{}", e);
+                    } finally {
+                        if (connection != null) {
+                            connection.close();
+                        }
+                        return incr;
+                    }
                 }
-            }
-        } catch (Exception e) {
-            logger.error("redis incr error:{}", e);
-        } finally {
-            if (connection != null) {
-                connection.close();
-            }
-            return incr;
-        }
-    }
 
-    public void set(String key, Object value, int db) {
-        RedisConnection connection = getConnection();
-        try {
-            if (connection != null) {
-                connection.select(db);
-                connection.set(key.getBytes(ENCODING), value.toString().getBytes(ENCODING));
-            }
-        } catch (Exception e) {
-            logger.error("redis set error:{}", e);
-        } finally {
-            if (connection != null) {
-                connection.close();
-            }
-        }
-    }
+                public void set(String key, Object value, int db) {
+                    RedisConnection connection = getConnection();
+                    try {
+                        if (connection != null) {
+                            connection.select(db);
+                            connection.set(key.getBytes(ENCODING), value.toString().getBytes(ENCODING));
+                        }
+                    } catch (Exception e) {
+                        logger.error("redis set error:{}", e);
+                    } finally {
+                        if (connection != null) {
+                            connection.close();
+                        }
+                    }
+                }
 
-    /**
-     * set Object
-     *
-     * @param key
-     * @param value
-     * @param db
-     * @throws Exception
-     */
-    public void setObject(String key, Object value, int db) {
-        RedisConnection connection = getConnection();
-        try {
-            if (connection != null) {
-                connection.select(db);
-                connection.set(key.getBytes(ENCODING), objectMapper.writeValueAsString(value).getBytes(ENCODING));
+                /**
+                 * set Object
+                 *
+                 * @param key
+                 * @param value
+                 * @param db
+                 * @throws Exception
+                 */
+                public void setObject(String key, Object value, int db) {
+                    RedisConnection connection = getConnection();
+                    try {
+                        if (connection != null) {
+                            connection.select(db);
+                            connection.set(key.getBytes(ENCODING), objectMapper.writeValueAsString(value).getBytes(ENCODING));
             }
         } catch (Exception e) {
             logger.error("redis setObject error:{}", e);
@@ -339,11 +339,13 @@ public class RedisUtil {
      * @param channel
      * @param message
      */
-    public void sendMessage(String channel, Object message) {
+    public void convertAndSend(String channel, Object message) {
         if (message instanceof String) {
             redisTemplate.convertAndSend(channel, ((String) message));
         } else {
             redisTemplate.convertAndSend(channel, JSON.toJSON(message));
         }
     }
+
+
 }

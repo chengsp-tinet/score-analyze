@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSON;
 public class ResponseBuilder {
     public static final int SUCCESS_STATUS = 0;
     public static final int FAIL_STATUS = 1;
-    public static final int EROOR_STATUS = -1;
+    public static final int ERROR_STATUS = -1;
 
     private int status;
     private String description;
@@ -29,7 +29,7 @@ public class ResponseBuilder {
     }
 
     public static ResponseBuilder buildError() {
-        return new ResponseBuilder(EROOR_STATUS, "系统异常", null);
+        return new ResponseBuilder(ERROR_STATUS, "系统异常", null);
     }
 
     public int getStatus() {

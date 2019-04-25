@@ -1,7 +1,7 @@
 package com.csp.app.controller;
 
 import com.csp.app.common.Const;
-import com.csp.app.util.RedisUtil;
+import com.csp.app.service.RedisService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("pubsub")
 public class PubSubController {
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisService redisService;
 
     @RequestMapping("test")
     public void testSubAndPub(String str) {
-        redisUtil.sendMessage(Const.DEFAULT_CHANNEL, RandomStringUtils.randomAlphabetic(10));
+        redisService.convertAndSend(Const.DEFAULT_CHANNEL, RandomStringUtils.randomAlphabetic(10));
 
     }
 }
