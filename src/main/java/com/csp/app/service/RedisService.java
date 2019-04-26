@@ -1,8 +1,6 @@
 package com.csp.app.service;
 
 import com.alibaba.fastjson.JSON;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,59 +29,57 @@ public class RedisService {
     @Autowired
     private RedisTemplate redisTemplate;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
-
     public long incrUntil(String key, int db) {
-                    RedisConnection connection = getConnection();
-                    Long incr = 0L;
-                    try {
-                        if (connection != null) {
-                            connection.select(db);
-                            incr = connection.incr(key.getBytes(ENCODING));
-                            if (incr > 10000000) {
-                                set(key, 0, db);
-                            }
-                        }
-                    } catch (Exception e) {
-                        logger.error("redis incr error:{}", e);
-                    } finally {
-                        if (connection != null) {
-                            connection.close();
-                        }
-                        return incr;
-                    }
+        RedisConnection connection = getConnection();
+        Long incr = 0L;
+        try {
+            if (connection != null) {
+                connection.select(db);
+                incr = connection.incr(key.getBytes(ENCODING));
+                if (incr > 10000000) {
+                    set(key, 0, db);
                 }
+            }
+        } catch (Exception e) {
+            logger.error("redis incr error:{}", e);
+        } finally {
+            if (connection != null) {
+                connection.close();
+            }
+        }
+        return incr;
+    }
 
-                public void set(String key, Object value, int db) {
-                    RedisConnection connection = getConnection();
-                    try {
-                        if (connection != null) {
-                            connection.select(db);
-                            connection.set(key.getBytes(ENCODING), value.toString().getBytes(ENCODING));
-                        }
-                    } catch (Exception e) {
-                        logger.error("redis set error:{}", e);
-                    } finally {
-                        if (connection != null) {
-                            connection.close();
-                        }
-                    }
-                }
+    public void set(String key, Object value, int db) {
+        RedisConnection connection = getConnection();
+        try {
+            if (connection != null) {
+                connection.select(db);
+                connection.set(key.getBytes(ENCODING), value.toString().getBytes(ENCODING));
+            }
+        } catch (Exception e) {
+            logger.error("redis set error:{}", e);
+        } finally {
+            if (connection != null) {
+                connection.close();
+            }
+        }
+    }
 
-                /**
-                 * set Object
-                 *
-                 * @param key
-                 * @param value
-                 * @param db
-                 * @throws Exception
-                 */
-                public void setObject(String key, Object value, int db) {
-                    RedisConnection connection = getConnection();
-                    try {
-                        if (connection != null) {
-                            connection.select(db);
-                            connection.set(key.getBytes(ENCODING), objectMapper.writeValueAsString(value).getBytes(ENCODING));
+    /**
+     * set Object
+     *
+     * @param key
+     * @param value
+     * @param db
+     * @throws Exception
+     */
+    public void setObject(String key, Object value, int db) {
+        RedisConnection connection = getConnection();
+        try {
+            if (connection != null) {
+                connection.select(db);
+                connection.set(key.getBytes(ENCODING), JSON.toJSONString(value).getBytes(ENCODING));
             }
         } catch (Exception e) {
             logger.error("redis setObject error:{}", e);
@@ -131,19 +127,15 @@ public class RedisService {
                 connection.select(db);
                 bytes = connection.get(key.getBytes(ENCODING));
             }
+            return bytes == null ? null : new String(bytes, ENCODING);
         } catch (Exception e) {
             logger.error("redis get error:{}", e);
         } finally {
             if (connection != null) {
                 connection.close();
             }
-            try {
-                return bytes == null ? null : new String(bytes, ENCODING);
-            } catch (UnsupportedEncodingException e) {
-                logger.error("redis get error:{}", e);
-            }
-            return null;
         }
+        return null;
     }
 
     /**
@@ -164,7 +156,11 @@ public class RedisService {
                 connection.select(db);
                 bytes = connection.get(key.getBytes(ENCODING));
             }
-            return bytes == null ? null : objectMapper.readValue(bytes, tClass);
+            String jsonStr;
+            if (bytes != null) {
+                jsonStr = new String(bytes, ENCODING);
+                return JSON.parseObject(jsonStr, tClass);
+            }
         } catch (Exception e) {
             logger.error("redis getObject error:{}", e);
         } finally {
@@ -177,7 +173,7 @@ public class RedisService {
 
     public Long incr(String key, int db) {
         RedisConnection connection = getConnection();
-        Long incr = new Long(0);
+        Long incr = 0L;
         try {
             if (connection != null) {
                 connection.select(db);
@@ -189,8 +185,8 @@ public class RedisService {
             if (connection != null) {
                 connection.close();
             }
-            return incr;
         }
+        return incr;
     }
 
 
@@ -212,7 +208,7 @@ public class RedisService {
 
     public Long ttl(String key, int db) {
         RedisConnection connection = getConnection();
-        Long ttl = new Long(-1);
+        Long ttl = (long) -1;
         try {
             if (connection != null) {
                 connection.select(db);
@@ -224,8 +220,8 @@ public class RedisService {
             if (connection != null) {
                 connection.close();
             }
-            return ttl;
         }
+        return ttl;
     }
 
     private RedisConnection getConnection() {
@@ -240,12 +236,10 @@ public class RedisService {
             connection.select(db);
             Map<byte[], byte[]> tempMap = new HashMap<>();
             for (Map.Entry<String, Object> entry : map.entrySet()) {
-                tempMap.put(entry.getKey().getBytes(ENCODING), objectMapper.writeValueAsString(entry.getValue()).getBytes(ENCODING));
+                tempMap.put(entry.getKey().getBytes(ENCODING), JSON.toJSONString(entry.getValue()).getBytes(ENCODING));
             }
             connection.hMSet(key.getBytes(ENCODING), tempMap);
         } catch (UnsupportedEncodingException e) {
-            logger.error("hmset error:{}", e);
-        } catch (JsonProcessingException e) {
             logger.error("hmset error:{}", e);
         } finally {
             if (connection != null) {
@@ -261,10 +255,8 @@ public class RedisService {
         try {
             connection = getConnection();
             connection.select(db);
-            connection.hSet(key.getBytes(ENCODING), field.getBytes(ENCODING), objectMapper.writeValueAsString(value).getBytes(ENCODING));
+            connection.hSet(key.getBytes(ENCODING), field.getBytes(ENCODING), JSON.toJSONString(value).getBytes(ENCODING));
         } catch (UnsupportedEncodingException e) {
-            logger.error("hset error:{}", e);
-        } catch (JsonProcessingException e) {
             logger.error("hset error:{}", e);
         } finally {
             if (connection != null) {
@@ -346,6 +338,4 @@ public class RedisService {
             redisTemplate.convertAndSend(channel, JSON.toJSON(message));
         }
     }
-
-
 }

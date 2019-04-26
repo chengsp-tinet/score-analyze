@@ -32,14 +32,6 @@ public interface CacheService<T> {
         return null;
     }
 
-    /**
-     * 计算key
-     * @param args
-     * @return
-     */
-    default String getKey(Object... args) {
-        return null;
-    }
 
     /**
      * 刷新本地缓存

@@ -3,6 +3,8 @@ package com.csp.app.service.impl;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.csp.app.common.CacheKey;
+import com.csp.app.common.Const;
 import com.csp.app.entity.SystemSetting;
 import com.csp.app.mapper.SystemSettingMapper;
 import com.csp.app.service.RedisService;
@@ -22,7 +24,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class SystemSettingServiceImpl extends ServiceImpl<SystemSettingMapper, SystemSetting> implements SystemSettingService {
     private final static Logger logger = LoggerFactory.getLogger(SystemSettingServiceImpl.class);
-    private static final String KEY = "sa.SystemSetting.name.%s";
     private static final SystemSetting NULL_ENTITY = new SystemSetting();
     private static Map<String, SystemSetting> localCache = new ConcurrentHashMap<>(32);
     @Autowired
@@ -33,11 +34,6 @@ public class SystemSettingServiceImpl extends ServiceImpl<SystemSettingMapper, S
     @Override
     public List<SystemSetting> selectList(Wrapper<SystemSetting> wrapper) {
         return JSONArray.parseArray(redisService.getString("systemSetting.all", 1), SystemSetting.class);
-    }
-
-    @Override
-    public String getKey(Object... args) {
-        return String.format(KEY, args[0]);
     }
 
     @Override
@@ -61,15 +57,16 @@ public class SystemSettingServiceImpl extends ServiceImpl<SystemSettingMapper, S
     public void loadCache() {
         List<SystemSetting> systemSettings = systemSettingMapper.selectList(null);
         for (SystemSetting systemSetting : systemSettings) {
-            redisService.set(getKey(systemSetting.getName()), systemSetting, 1);
+            redisService.set(String.format(CacheKey.SYSTEM_SETTING_NAME_SYSTEM_SETTING, systemSetting.getName())
+                    , systemSetting, Const.DEFAULT_INDEX);
         }
         logger.info("缓存SystemSetting{}条", systemSettings.size());
     }
 
     @Override
     public void flushLocalCache() {
-        logger.info("清空本地缓存{}条",localCache.size());
         localCache.clear();
+        logger.info("清空本地缓存{}条", localCache.size());
 
     }
 }

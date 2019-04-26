@@ -17,7 +17,7 @@ import java.util.List;
 @Component
 public class SqlFilter extends FilterEventAdapter {
 
-    private Logger logger = LoggerFactory.getLogger(SqlFilter.class);
+    private static Logger logger = LoggerFactory.getLogger(SqlFilter.class);
 
     @Autowired
     private List<CacheService> cacheServiceList;
@@ -35,7 +35,7 @@ public class SqlFilter extends FilterEventAdapter {
     @Override
     protected void statementExecuteAfter(StatementProxy statement, String sql, boolean result) {
         //查询返回true，更新或插入返回false
-        if (result == false) {
+        if (!result) {
             sql = sql.toLowerCase();
             if ((sql.contains("insert") || sql.contains("update") || sql.contains("delete")) && !sql.contains("select")) {
                 for (CacheService cacheService : cacheServiceList) {

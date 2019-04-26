@@ -1,0 +1,80 @@
+package com.csp.app.service.impl;
+
+import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.csp.app.common.CacheKey;
+import com.csp.app.common.Const;
+import com.csp.app.entity.Clasz;
+import com.csp.app.mapper.ClassMapper;
+import com.csp.app.service.ClassService;
+import com.csp.app.service.RedisService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import tk.mybatis.mapper.util.StringUtil;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * @author chengsp
+ */
+@Service
+public class ClassServiceImpl extends ServiceImpl<ClassMapper, Clasz> implements ClassService {
+    private final static Logger logger = LoggerFactory.getLogger(ClassServiceImpl.class);
+    private static final Clasz NULL_ENTITY = new Clasz();
+    private static Map<String, Clasz> localCache = new ConcurrentHashMap<>(32);
+    @Autowired
+    private ClassMapper classMapper;
+    @Autowired
+    private RedisService redisService;
+
+    @Override
+    public Clasz getEntityFromLocalCacheByKey(String key) {
+        Clasz localEntity = localCache.get(key);
+        if (localEntity == null) {
+            Clasz redisEntity = redisService.getObject(key, Const.DEFAULT_INDEX, Clasz.class);
+            if (redisEntity == null) {
+                localCache.put(key, NULL_ENTITY);
+                return null;
+            } else {
+                localCache.put(key, redisEntity);
+                return redisEntity;
+            }
+        } else {
+            return localEntity == NULL_ENTITY ? null : localEntity;
+        }
+    }
+
+    @Override
+    public void loadCache() {
+        List<Clasz> classs = classMapper.selectList(null);
+        for (Clasz clasz : classs) {
+            redisService.setObject(String.format(CacheKey.CLASS_ID_CLASS, clasz.getClassId())
+                    , clasz, Const.DEFAULT_INDEX);
+        }
+        redisService.setObject(CacheKey.CLASS_ALL, classs, Const.DEFAULT_INDEX);
+        logger.info("缓存Clasz{}条", classs.size());
+    }
+
+    @Override
+    public void flushLocalCache() {
+        localCache.clear();
+        logger.info("清空本地缓存{}条", localCache.size());
+    }
+
+    @Override
+    public List<Clasz> searchAll() {
+        String claszsStr = redisService.getString(CacheKey.CLASS_ALL, Const.DEFAULT_INDEX);
+        List<Clasz> claszs;
+        if (StringUtil.isNotEmpty(claszsStr)) {
+            claszs = JSON.parseArray(claszsStr,Clasz.class);
+        } else {
+            claszs = classMapper.selectList(null);
+            redisService.setObject(CacheKey.CLASS_ALL, claszs, Const.DEFAULT_INDEX);
+        }
+        return claszs;
+    }
+}

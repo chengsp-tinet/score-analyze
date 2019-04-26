@@ -3,7 +3,11 @@ package com.csp.app.entity;
 import com.csp.app.common.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.util.Date;
 
 /**
@@ -26,16 +30,16 @@ public class OperateLog extends BaseEntity {
     @Column
     private String param;
     @Column
-    private String result;
+    private Integer status;
+    @Column
+    private Integer description;
     @Column
     private Date createTime;
 
-    @Override
     public Integer getId() {
         return id;
     }
 
-    @Override
     public void setId(Integer id) {
         this.id = id;
     }
@@ -72,12 +76,20 @@ public class OperateLog extends BaseEntity {
         this.param = param;
     }
 
-    public String getResult() {
-        return result;
+    public Integer getStatus() {
+        return status;
     }
 
-    public void setResult(String result) {
-        this.result = result;
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Integer getDescription() {
+        return description;
+    }
+
+    public void setDescription(Integer description) {
+        this.description = description;
     }
 
     public Date getCreateTime() {

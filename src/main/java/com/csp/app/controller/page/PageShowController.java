@@ -1,4 +1,4 @@
-package com.csp.app.page;
+package com.csp.app.controller.page;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

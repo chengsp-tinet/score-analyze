@@ -1,6 +1,5 @@
 package com.csp.app.entity;
 
-import com.csp.app.common.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.Column;
@@ -12,25 +11,29 @@ import java.util.Date;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Course extends BaseEntity {
+public class Clasz {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "JDBC")
     private Integer id;
     /**
-     * 课程唯一id
+     * 班级唯一id
      */
-    @Column
-    private Integer courseId;
+    private Integer classId;
     /**
-     * 课程名称
+     * 班号,如1代表某年级1班
      */
     @Column
-    private String courseName;
+    private Integer classNum;
     /**
-     * 满分
+     * 入学年份
      */
     @Column
-    private Integer fullScore;
+    private Integer toSchoolYear;
+    /**
+     * 学校类型:1.小学,2.初中
+     */
+    @Column
+    private Integer type;
     @Column
     private Date createTime;
 
@@ -42,28 +45,36 @@ public class Course extends BaseEntity {
         this.id = id;
     }
 
-    public Integer getCourseId() {
-        return courseId;
+    public Integer getClassNum() {
+        return classNum;
     }
 
-    public void setCourseId(Integer courseId) {
-        this.courseId = courseId;
+    public Integer getClassId() {
+        return classId;
     }
 
-    public String getCourseName() {
-        return courseName;
+    public void setClassId(Integer classId) {
+        this.classId = classId;
     }
 
-    public void setCourseName(String courseName) {
-        this.courseName = courseName;
+    public void setClassNum(Integer classNum) {
+        this.classNum = classNum;
     }
 
-    public Integer getFullScore() {
-        return fullScore;
+    public Integer getToSchoolYear() {
+        return toSchoolYear;
     }
 
-    public void setFullScore(Integer fullScore) {
-        this.fullScore = fullScore;
+    public void setToSchoolYear(Integer toSchoolYear) {
+        this.toSchoolYear = toSchoolYear;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 
     public Date getCreateTime() {

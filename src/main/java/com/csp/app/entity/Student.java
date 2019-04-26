@@ -1,88 +1,94 @@
 package com.csp.app.entity;
 
-import com.csp.app.common.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.util.Date;
-
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Student extends BaseEntity {
+public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "JDBC")
     private Integer id;
+    /**
+     * 学号
+     */
     @Column
-    private String studentNumber;
+    private Long studentId;
+    /**
+     * 学生姓名
+     */
     @Column
-    private String name;
+    private String studentName;
+    /**
+     * 班级id
+     */
     @Column
-    private Integer sex;
+    private Integer classId;
+
+    /**
+     * 入学年份
+     */
     @Column
-    private String gradeNumber;
+    private Integer toSchoolYear;
+    /**
+     * 学校类型:1.小学,2.初中
+     */
     @Column
-    private Date birthday;
-    @Column
-    private String password;
+    private Integer type;
     @Column
     private Date createTime;
 
-    @Override
     public Integer getId() {
         return id;
     }
 
-    @Override
     public void setId(Integer id) {
         this.id = id;
     }
 
-    public String getStudentNumber() {
-        return studentNumber;
+    public Long getStudentId() {
+        return studentId;
     }
 
-    public void setStudentNumber(String studentNumber) {
-        this.studentNumber = studentNumber;
+    public void setStudentId(Long studentId) {
+        this.studentId = studentId;
     }
 
-    public String getName() {
-        return name;
+    public String getStudentName() {
+        return studentName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setStudentName(String studentName) {
+        this.studentName = studentName;
     }
 
-    public Integer getSex() {
-        return sex;
+    public Integer getClassId() {
+        return classId;
     }
 
-    public void setSex(Integer sex) {
-        this.sex = sex;
+    public void setClassId(Integer classId) {
+        this.classId = classId;
     }
 
-    public String getGradeNumber() {
-        return gradeNumber;
+    public Integer getToSchoolYear() {
+        return toSchoolYear;
     }
 
-    public void setGradeNumber(String gradeNumber) {
-        this.gradeNumber = gradeNumber;
+    public void setToSchoolYear(Integer toSchoolYear) {
+        this.toSchoolYear = toSchoolYear;
     }
 
-    public Date getBirthday() {
-        return birthday;
+    public Integer getType() {
+        return type;
     }
 
-    public void setBirthday(Date birthday) {
-        this.birthday = birthday;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+    public void setType(Integer type) {
+        this.type = type;
     }
 
     public Date getCreateTime() {

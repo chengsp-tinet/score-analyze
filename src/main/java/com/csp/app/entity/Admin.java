@@ -3,7 +3,11 @@ package com.csp.app.entity;
 import com.csp.app.common.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.util.Date;
 
 @Entity
@@ -13,38 +17,36 @@ public class Admin extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "JDBC")
     private Integer id;
     @Column
-    private String number;
+    private Integer adminId;
     @Column
-    private String name;
+    private String adminName;
     @Column
     private String password;
     @Column
     private Date createTime;
 
-    @Override
     public Integer getId() {
         return id;
     }
 
-    @Override
     public void setId(Integer id) {
         this.id = id;
     }
 
-    public String getNumber() {
-        return number;
+    public Integer getAdminId() {
+        return adminId;
     }
 
-    public void setNumber(String number) {
-        this.number = number;
+    public void setAdminId(Integer adminId) {
+        this.adminId = adminId;
     }
 
-    public String getName() {
-        return name;
+    public String getAdminName() {
+        return adminName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setAdminName(String adminName) {
+        this.adminName = adminName;
     }
 
     public String getPassword() {

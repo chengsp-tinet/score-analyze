@@ -84,12 +84,10 @@ public class TestEntity extends BaseEntity {
     @Column
     private Date createTime;
 
-    @Override
     public Integer getId() {
         return id;
     }
 
-    @Override
     public void setId(Integer id) {
         this.id = id;
     }

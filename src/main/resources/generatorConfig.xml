@@ -7,7 +7,7 @@
     <properties resource="application.properties"/>
 
     <!-- defaultModelType="flat" 设置复合主键时不单独为主键创建实体 -->
-    <context id="postgres" defaultModelType="flat">
+    <context id="mysql" defaultModelType="flat">
 
         <!-- 生成的POJO实现java.io.Serializable接口 -->
         <plugin type="org.mybatis.generator.plugins.SerializablePlugin" />

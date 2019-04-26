@@ -2,6 +2,7 @@ package com.csp.app.controller;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
+import com.csp.app.common.CacheKey;
 import com.csp.app.common.ResponseBuilder;
 import com.csp.app.entity.SystemSetting;
 import com.csp.app.service.SystemSettingService;
@@ -15,27 +16,28 @@ import java.util.List;
 /**
  * @author chengsp on 2019年1月14日12:00:42
  */
-@RequestMapping("systemSetting")
+@RequestMapping("/systemSetting")
 @Controller
 public class SystemSettingController {
     @Autowired
     private SystemSettingService systemSettingService;
-    @RequestMapping("add")
+
+    @RequestMapping("/add")
     @ResponseBody
     public boolean add(SystemSetting systemSetting) {
         return systemSettingService.insert(systemSetting);
     }
 
-    @RequestMapping("queryByEntity")
+    @RequestMapping("/queryByEntity")
     @ResponseBody
-    public SystemSetting queryByEntity(String name){
-        return systemSettingService.getEntityFromLocalCacheByKey(systemSettingService.getKey(name));
+    public SystemSetting queryByEntity(String name) {
+        return systemSettingService.getEntityFromLocalCacheByKey(String.format(CacheKey.SYSTEM_SETTING_NAME_SYSTEM_SETTING, name));
     }
 
-    @RequestMapping("queryAll")
+    @RequestMapping("/queryAll")
     @ResponseBody
-    public String queryAll(){
+    public String queryAll() {
         List<SystemSetting> systemSettings = systemSettingService.selectList(new EntityWrapper<>(null));
-        return ResponseBuilder.buildSuccess("成功",systemSettings).toString();
+        return ResponseBuilder.buildSuccess("成功", systemSettings).toString();
     }
 }

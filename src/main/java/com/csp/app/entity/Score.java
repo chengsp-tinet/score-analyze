@@ -3,7 +3,11 @@ package com.csp.app.entity;
 import com.csp.app.common.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.util.Date;
 
 @Entity
@@ -12,34 +16,55 @@ public class Score extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "JDBC")
     private Integer id;
+    /**
+     * 学生
+     */
     @Column
-    private String studentId;
+    private Integer studentId;
     @Column
     private String studentName;
+    /**
+     * 班级
+     */
     @Column
-    private String courseId;
+    private Integer classId;
+
+    /**
+     * 年级
+     */
     @Column
-    private String courseName;
+    private Integer gradeNum;
+    /**
+     * 分数
+     */
     @Column
     private Integer score;
+    /**
+     * 考试唯一标识
+     */
     @Column
-    private Date createTiem;
+    private Integer examId;
+    /**
+     * 考试全名
+     */
+    @Column
+    private String examName;
+    @Column
+    private Date createTime;
 
-    @Override
     public Integer getId() {
         return id;
     }
 
-    @Override
     public void setId(Integer id) {
         this.id = id;
     }
 
-    public String getStudentId() {
+    public Integer getStudentId() {
         return studentId;
     }
 
-    public void setStudentId(String studentId) {
+    public void setStudentId(Integer studentId) {
         this.studentId = studentId;
     }
 
@@ -51,27 +76,51 @@ public class Score extends BaseEntity {
         this.studentName = studentName;
     }
 
-    public String getCourseId() {
-        return courseId;
+    public Integer getClassId() {
+        return classId;
     }
 
-    public void setCourseId(String courseId) {
-        this.courseId = courseId;
+    public void setClassId(Integer classId) {
+        this.classId = classId;
     }
 
-    public String getCourseName() {
-        return courseName;
+    public Integer getGradeNum() {
+        return gradeNum;
     }
 
-    public void setCourseName(String courseName) {
-        this.courseName = courseName;
+    public void setGradeNum(Integer gradeNum) {
+        this.gradeNum = gradeNum;
     }
 
     public Integer getScore() {
         return score;
     }
 
+    public Integer getExamId() {
+        return examId;
+    }
+
+    public void setExamId(Integer examId) {
+        this.examId = examId;
+    }
+
+    public String getExamName() {
+        return examName;
+    }
+
+    public void setExamName(String examName) {
+        this.examName = examName;
+    }
+
     public void setScore(Integer score) {
         this.score = score;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 }

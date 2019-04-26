@@ -31,6 +31,9 @@ public class ResponseBuilder {
     public static ResponseBuilder buildError() {
         return new ResponseBuilder(ERROR_STATUS, "系统异常", null);
     }
+    public static ResponseBuilder buildError(String description) {
+        return new ResponseBuilder(ERROR_STATUS, description, null);
+    }
 
     public int getStatus() {
         return status;

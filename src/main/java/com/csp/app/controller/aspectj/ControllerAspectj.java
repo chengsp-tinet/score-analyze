@@ -32,11 +32,11 @@ import java.util.Map;
 @Component
 public class ControllerAspectj {
 
-    private Logger logger = LoggerFactory.getLogger(ControllerAspectj.class);
+    private static Logger logger = LoggerFactory.getLogger(ControllerAspectj.class);
     @Autowired
     private OperateLogService operateLogService;
 
-    @Pointcut("execution(public * com.csp.app.controller.*.*(..))")
+    @Pointcut("execution(public * com.csp.app.controller.SystemSettingController.*(..))")
     private void aspectJMethod() {
     }
 
@@ -57,7 +57,6 @@ public class ControllerAspectj {
             log.setParam(JSON.toJSONString(getParam(args, ((CodeSignature) signature).getParameterNames())));
             log.setInterfaceUrl(requestURI);
             log.setMethod(classTarget.getName() + "." + objMethod.getName());
-            log.setResult(JSON.toJSONString(result));
             log.setUsername("chengsp");
             operateLogService.saveLog(log);
         } catch (NoSuchMethodException e) {

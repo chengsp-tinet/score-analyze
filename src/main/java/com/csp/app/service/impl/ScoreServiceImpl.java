@@ -21,4 +21,9 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     private SystemSettingMapper systemSettingMapper;
     @Autowired
     private RedisService redisService;
+
+    @Override
+    public boolean addOne(Score score) {
+        return false;
+    }
 }

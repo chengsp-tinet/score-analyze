@@ -83,11 +83,11 @@
             type: 'get',
             data: data,
             success: function (data) {
-                var result = JSON.parse(data);
-                if (result.status == 0) {
-                    render(result.data);
+                var status = JSON.parse(data);
+                if (status.status == 0) {
+                    render(status.data);
                 } else {
-                    layer.alert(result.description);
+                    layer.alert(status.description);
                     render([]);
                 }
             },
