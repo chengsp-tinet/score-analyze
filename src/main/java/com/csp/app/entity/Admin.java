@@ -1,6 +1,7 @@
 package com.csp.app.entity;
 
 import com.csp.app.common.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.Column;
@@ -23,6 +24,7 @@ public class Admin extends BaseEntity {
     @Column
     private String password;
     @Column
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date createTime;
 
     public Integer getId() {

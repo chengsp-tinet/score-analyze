@@ -70,11 +70,24 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Clasz> implements
         String claszsStr = redisService.getString(CacheKey.CLASS_ALL, Const.DEFAULT_INDEX);
         List<Clasz> claszs;
         if (StringUtil.isNotEmpty(claszsStr)) {
-            claszs = JSON.parseArray(claszsStr,Clasz.class);
+            claszs = JSON.parseArray(claszsStr, Clasz.class);
         } else {
             claszs = classMapper.selectList(null);
             redisService.setObject(CacheKey.CLASS_ALL, claszs, Const.DEFAULT_INDEX);
         }
         return claszs;
+    }
+
+    @Override
+    public boolean add(Clasz clasz) {
+        Integer toSchoolYear = clasz.getToSchoolYear();
+        Integer classNum = clasz.getClassNum();
+        Integer type = clasz.getType();
+        if (type != Const.CLASS_TYPE_PRIMARY && type != Const.CLASS_TYPE_MIDDLE) {
+            throw new RuntimeException("不合法的班级类型");
+        }
+        Integer classId = toSchoolYear * 1000 + classNum * 10 + type;
+        clasz.setClassId(classId);
+        return classMapper.insert(clasz) == 1;
     }
 }

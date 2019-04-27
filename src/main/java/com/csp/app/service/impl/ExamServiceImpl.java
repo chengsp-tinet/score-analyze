@@ -7,6 +7,7 @@ import com.csp.app.common.Const;
 import com.csp.app.entity.Course;
 import com.csp.app.entity.Exam;
 import com.csp.app.mapper.ExamMapper;
+import com.csp.app.service.CourseService;
 import com.csp.app.service.ExamService;
 import com.csp.app.service.RedisService;
 import org.slf4j.Logger;
@@ -31,6 +32,8 @@ public class ExamServiceImpl extends ServiceImpl<ExamMapper, Exam> implements Ex
     private ExamMapper examMapper;
     @Autowired
     private RedisService redisService;
+    @Autowired
+    private CourseService courseService;
 
     @Override
     public Exam getEntityFromLocalCacheByKey(String key) {
@@ -81,4 +84,36 @@ public class ExamServiceImpl extends ServiceImpl<ExamMapper, Exam> implements Ex
         }
         return exams;
     }
+
+    @Override
+    public boolean add(Exam entity) {
+        Integer maxExamId = examMapper.selectMaxExamId();
+        if (maxExamId == null) {
+            entity.setExamId(Const.INIT_EXAM_ID);
+        } else {
+            entity.setExamId(maxExamId + 1);
+        }
+        Integer courseId = entity.getCourseId();
+        String courseName = entity.getCourseName();
+        if (courseId == null) {
+            Course course = courseService.getEntityFromLocalCacheByKey(String.format(CacheKey.COURSE_NAME_COURSE, courseName));
+            if (course != null) {
+                courseId = course.getCourseId();
+
+            }
+        }
+        if (StringUtil.isEmpty(courseName)) {
+            Course course = courseService.getEntityFromLocalCacheByKey(String.format(CacheKey.COURSE_ID_COURSE, courseId));
+            if (course != null) {
+                courseName = course.getCourseName();
+            }
+        }
+        if (courseId == null || StringUtil.isEmpty(courseName)) {
+            throw new RuntimeException("无法找到考试对应的科目,课程id或课程名称为空");
+        }
+        entity.setCourseId(courseId);
+        entity.setCourseName(courseName);
+        return super.insert(entity);
+    }
+
 }

@@ -8,4 +8,11 @@ import java.util.List;
 
 public interface ExamService extends IService<Exam>, CacheService<Exam> {
     List<Exam> searchAll();
+
+    /**
+     * 添加考试
+     * @param exam
+     * @return
+     */
+    boolean add(Exam exam);
 }

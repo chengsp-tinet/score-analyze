@@ -5,5 +5,10 @@ import com.csp.app.common.CacheService;
 import com.csp.app.entity.Score;
 
 public interface ScoreService extends IService<Score>{
-    boolean addOne(Score score);
+    /**
+     * 添加成绩记录
+     * @param score
+     * @return
+     */
+    boolean add(Score score);
 }

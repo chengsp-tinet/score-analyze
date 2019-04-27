@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * @author chengsp on 2018/12/4.
@@ -37,17 +38,19 @@ public class SqlFilter extends FilterEventAdapter {
         //查询返回true，更新或插入返回false
         if (!result) {
             sql = sql.toLowerCase();
-            if ((sql.contains("insert") || sql.contains("update") || sql.contains("delete")) && !sql.contains("select")) {
-                for (CacheService cacheService : cacheServiceList) {
-
-                    String classFullName = cacheService.getClass().getName();
-                    String className = classFullName.substring(classFullName.lastIndexOf(".") + 1);
-                    String entityName = className.substring(0, className.lastIndexOf("ServiceImpl"));
-                    String tableName = CommUtil.humpToLine(entityName);
-                    if (sql.contains(tableName)) {
-                        cacheService.loadCache();
-                        String beanName = entityName.substring(0, 1).toLowerCase() + entityName.substring(1) + "ServiceImpl";
-                        redisService.publish(Const.DEFAULT_CHANNEL, beanName);
+            if (!sql.contains("select")) {
+                if ((sql.contains("insert") || sql.contains("update") || sql.contains("delete"))) {
+                    for (CacheService cacheService : cacheServiceList) {
+                        String classFullName = cacheService.getClass().getName();
+                        String className = classFullName.substring(classFullName.lastIndexOf(".") + 1);
+                        String entityName = className.substring(0, className.lastIndexOf("ServiceImpl"));
+                        String tableName = CommUtil.humpToLine(entityName);
+                        String regex = "[^\\w]" + tableName + "[^\\w]";
+                        if (Pattern.compile(regex).matcher(sql).find()) {
+                            cacheService.loadCache();
+                            String beanName = entityName.substring(0, 1).toLowerCase() + entityName.substring(1) + "ServiceImpl";
+                            redisService.publish(Const.DEFAULT_CHANNEL, beanName);
+                        }
                     }
                 }
             }

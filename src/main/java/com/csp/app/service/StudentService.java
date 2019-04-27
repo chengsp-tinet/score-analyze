@@ -5,4 +5,5 @@ import com.csp.app.common.CacheService;
 import com.csp.app.entity.Student;
 
 public interface StudentService extends IService<Student>, CacheService<Student> {
+    boolean add(Student student);
 }

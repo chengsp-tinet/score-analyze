@@ -1,6 +1,7 @@
 package com.csp.app.entity;
 
 import com.csp.app.common.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.Column;
@@ -49,7 +50,18 @@ public class Score extends BaseEntity {
      */
     @Column
     private String examName;
+    /**
+     * 科目id
+     */
     @Column
+    private Integer courseId;
+    /**
+     * 科目名称
+     */
+    @Column
+    private String courseName;
+    @Column
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date createTime;
 
     public Integer getId() {
@@ -114,6 +126,22 @@ public class Score extends BaseEntity {
 
     public void setScore(Integer score) {
         this.score = score;
+    }
+
+    public Integer getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(Integer courseId) {
+        this.courseId = courseId;
+    }
+
+    public String getCourseName() {
+        return courseName;
+    }
+
+    public void setCourseName(String courseName) {
+        this.courseName = courseName;
     }
 
     public Date getCreateTime() {

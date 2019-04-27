@@ -1,8 +1,14 @@
 package com.csp.app.common;
 
 import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
-public class ResponseBuilder {
+import java.io.Serializable;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ResponseBuilder implements Serializable {
     public static final int SUCCESS_STATUS = 0;
     public static final int FAIL_STATUS = 1;
     public static final int ERROR_STATUS = -1;

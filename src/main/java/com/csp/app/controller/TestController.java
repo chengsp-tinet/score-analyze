@@ -2,6 +2,7 @@ package com.csp.app.controller;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
+import com.csp.app.common.BaseController;
 import com.csp.app.common.ResponseBuilder;
 import com.csp.app.common.es.EsQueryCondition;
 import com.csp.app.common.es.EsQueryResult;
@@ -36,7 +37,7 @@ import java.util.Map;
  */
 @RequestMapping("/cdr")
 @Controller
-public class TestController {
+public class TestController extends BaseController {
     @Autowired
     private JestService jestService;
     private final static Logger logger = LoggerFactory.getLogger(TestController.class);
@@ -103,7 +104,7 @@ public class TestController {
             while ((pageNum - 1) * size < total) {
                 Page<TestEntity> page = new Page<>(pageNum, size);
 //                page.setAscs(Arrays.asList("start_time"));
-                cdrService.selectPage(page,wrapper);
+                cdrService.selectPage(page, wrapper);
                 pageNum++;
                 exportByPageHelper.exportAsCscByPage(page.getRecords(), br, null, null);
             }
@@ -150,7 +151,7 @@ public class TestController {
         long n2 = System.currentTimeMillis();
         logger.info("耗时:" + String.valueOf(n2 - n1));*/
         String num = redisService.hget("num", String.valueOf(key), 0);
-        logger.info("读取哈希表值:{}",num);
+        logger.info("读取哈希表值:{}", num);
         return Integer.parseInt(num);
     }
 

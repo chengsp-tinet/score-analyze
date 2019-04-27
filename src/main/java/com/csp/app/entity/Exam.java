@@ -1,6 +1,7 @@
 package com.csp.app.entity;
 
 import com.csp.app.common.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.Column;
@@ -27,25 +28,22 @@ public class Exam extends BaseEntity {
     @Column
     private String examName;
     /**
-     * 代表哪个年级的考试
-     */
-    @Column
-    private Integer gradeNum;
-    /**
      * 科目
      */
     @Column
-    private String courseId;
+    private Integer courseId;
     @Column
     private String courseName;
     /**
      * 考试开始时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     @Column
     private Date startTime;
     /**
      * 考试结束时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     @Column
     private Date endTime;
     /**
@@ -53,17 +51,9 @@ public class Exam extends BaseEntity {
      */
     @Column
     private Integer studentCount;
-    /**
-     * 实际到场人数
-     */
+
     @Column
-    private Integer actualStudentCount;
-    /**
-     * 是否完成
-     */
-    @Column
-    private boolean finish;
-    @Column
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date createTime;
 
     public Integer getId() {
@@ -90,19 +80,11 @@ public class Exam extends BaseEntity {
         this.examName = examName;
     }
 
-    public Integer getGradeNum() {
-        return gradeNum;
-    }
-
-    public void setGradeNum(Integer gradeNum) {
-        this.gradeNum = gradeNum;
-    }
-
-    public String getCourseId() {
+    public Integer getCourseId() {
         return courseId;
     }
 
-    public void setCourseId(String courseId) {
+    public void setCourseId(Integer courseId) {
         this.courseId = courseId;
     }
 
@@ -136,22 +118,6 @@ public class Exam extends BaseEntity {
 
     public void setStudentCount(Integer studentCount) {
         this.studentCount = studentCount;
-    }
-
-    public Integer getActualStudentCount() {
-        return actualStudentCount;
-    }
-
-    public void setActualStudentCount(Integer actualStudentCount) {
-        this.actualStudentCount = actualStudentCount;
-    }
-
-    public boolean isFinish() {
-        return finish;
-    }
-
-    public void setFinish(boolean finish) {
-        this.finish = finish;
     }
 
     public Date getCreateTime() {

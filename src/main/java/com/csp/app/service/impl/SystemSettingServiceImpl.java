@@ -57,7 +57,7 @@ public class SystemSettingServiceImpl extends ServiceImpl<SystemSettingMapper, S
     public void loadCache() {
         List<SystemSetting> systemSettings = systemSettingMapper.selectList(null);
         for (SystemSetting systemSetting : systemSettings) {
-            redisService.set(String.format(CacheKey.SYSTEM_SETTING_NAME_SYSTEM_SETTING, systemSetting.getName())
+            redisService.setObject(String.format(CacheKey.SYSTEM_SETTING_NAME_SYSTEM_SETTING, systemSetting.getName())
                     , systemSetting, Const.DEFAULT_INDEX);
         }
         logger.info("缓存SystemSetting{}条", systemSettings.size());

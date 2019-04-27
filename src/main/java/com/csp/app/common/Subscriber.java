@@ -15,7 +15,8 @@ public class Subscriber extends JedisPubSub {
         try {
             if (Const.DEFAULT_CHANNEL.equals(channel)) {
                 logger.info("刷新本地缓存...");
-                ((CacheService) ContextUtil.getBean(message)).flushLocalCache();
+                CacheService cacheService = (CacheService) ContextUtil.getBean(message);
+                cacheService.flushLocalCache();
             }
         } catch (Exception e) {
             logger.error("接受消息异常:{}", e);

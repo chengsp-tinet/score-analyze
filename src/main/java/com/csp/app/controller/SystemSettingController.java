@@ -2,6 +2,7 @@ package com.csp.app.controller;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
+import com.csp.app.common.BaseController;
 import com.csp.app.common.CacheKey;
 import com.csp.app.common.ResponseBuilder;
 import com.csp.app.entity.SystemSetting;
@@ -18,7 +19,7 @@ import java.util.List;
  */
 @RequestMapping("/systemSetting")
 @Controller
-public class SystemSettingController {
+public class SystemSettingController extends BaseController {
     @Autowired
     private SystemSettingService systemSettingService;
 

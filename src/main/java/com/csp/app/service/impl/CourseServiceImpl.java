@@ -80,4 +80,14 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         }
         return courses;
     }
+
+    @Override
+    public boolean insert(Course entity) {
+        Integer maxCourseId = courseMapper.selectMaxCourseId();
+        if (maxCourseId == null) {
+            maxCourseId = Const.INIT_COURSE_ID;
+        }
+        entity.setCourseId(maxCourseId + 1);
+        return super.insert(entity);
+    }
 }
