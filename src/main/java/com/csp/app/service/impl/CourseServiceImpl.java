@@ -82,12 +82,24 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     }
 
     @Override
+    public boolean batchAdd(List<Course> courses) {
+        for (Course course : courses) {
+            completeEntity(course);
+        }
+        return insertBatch(courses);
+    }
+
+    @Override
     public boolean insert(Course entity) {
+        completeEntity(entity);
+        return super.insert(entity);
+    }
+
+    private void completeEntity(Course entity) {
         Integer maxCourseId = courseMapper.selectMaxCourseId();
         if (maxCourseId == null) {
             maxCourseId = Const.INIT_COURSE_ID;
         }
         entity.setCourseId(maxCourseId + 1);
-        return super.insert(entity);
     }
 }

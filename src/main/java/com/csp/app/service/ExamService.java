@@ -15,4 +15,11 @@ public interface ExamService extends IService<Exam>, CacheService<Exam> {
      * @return
      */
     boolean add(Exam exam);
+
+    /**
+     * 批量添加考试
+     * @param exams
+     * @return
+     */
+    boolean batchAdd(List<Exam> exams);
 }

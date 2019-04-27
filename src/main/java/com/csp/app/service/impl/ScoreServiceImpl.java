@@ -24,6 +24,7 @@ import tk.mybatis.mapper.util.StringUtil;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author chengsp
@@ -46,6 +47,10 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
 
     @Override
     public boolean add(Score score) {
+        return insert(completeEntity(score));
+    }
+
+    private Score completeEntity(Score score) {
         String studentName = null;
         Integer studentId = score.getStudentId();
         Student student = studentService.getEntityFromLocalCacheByKey(String.format(CacheKey.STUDENT_ID_STUDENT
@@ -84,11 +89,19 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         Calendar instance = Calendar.getInstance();
         instance.setTime(new Date());
         int nowYear = instance.get(Calendar.YEAR);
-        Integer gradeNum = nowYear - toSchoolYear +1;
+        Integer gradeNum = nowYear - toSchoolYear + 1;
         score.setGradeNum(gradeNum);
         Exam exam = examService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_ID_EXAM, score.getExamId()));
         score.setCourseId(exam.getCourseId());
         score.setCourseName(exam.getCourseName());
-        return insert(score);
+        return score;
+    }
+
+    @Override
+    public boolean batchAdd(List<Score> scores) {
+        for (Score score : scores) {
+            completeEntity(score);
+        }
+        return insertBatch(scores);
     }
 }

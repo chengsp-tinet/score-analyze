@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class PageShowController {
 
     @RequestMapping("/")
-    public String showInde() {
+    public String showIndex() {
         return "index";
     }
 
-    @RequestMapping("/showUploadFile")
+    @RequestMapping("/uploadPage")
     public String showUploadFile() {
         return "upload";
     }

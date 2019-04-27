@@ -19,4 +19,11 @@ public interface ClassService extends IService<Clasz> , CacheService<Clasz> {
      * @return
      */
     boolean add(Clasz clasz);
+
+    /**
+     * 批量添加班级
+     * @param claszs
+     * @return
+     */
+    boolean batchAdd(List<Clasz> claszs);
 }

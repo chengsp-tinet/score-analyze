@@ -87,6 +87,19 @@ public class ExamServiceImpl extends ServiceImpl<ExamMapper, Exam> implements Ex
 
     @Override
     public boolean add(Exam entity) {
+        completeEntity(entity);
+        return super.insert(entity);
+    }
+
+    @Override
+    public boolean batchAdd(List<Exam> exams) {
+        for (Exam exam : exams) {
+            completeEntity(exam);
+        }
+        return insertBatch(exams);
+    }
+
+    private void completeEntity(Exam entity) {
         Integer maxExamId = examMapper.selectMaxExamId();
         if (maxExamId == null) {
             entity.setExamId(Const.INIT_EXAM_ID);
@@ -113,7 +126,5 @@ public class ExamServiceImpl extends ServiceImpl<ExamMapper, Exam> implements Ex
         }
         entity.setCourseId(courseId);
         entity.setCourseName(courseName);
-        return super.insert(entity);
     }
-
 }

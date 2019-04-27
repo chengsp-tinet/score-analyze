@@ -12,4 +12,11 @@ public interface CourseService extends IService<Course> , CacheService<Course> {
      * @return
      */
     List<Course> searchAll();
+
+    /**
+     * 批量添加课程
+     * @param courses
+     * @return
+     */
+    boolean batchAdd(List<Course> courses);
 }

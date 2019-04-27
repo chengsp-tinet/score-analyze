@@ -27,6 +27,7 @@ import java.util.*;
 public class ExcelUtil {
     /**
      * 分批导出数据,适合导出数据量特别大的情况
+     *
      * @param <T>
      */
     public static class ExportByPageHelper<T> {
@@ -82,11 +83,13 @@ public class ExcelUtil {
             return o1.compareTo(o2);
         }
     }
+
     // 字段排序比较器
     private final static Com com = new Com();
 
     /**
      * 统一导出方法
+     *
      * @param data
      * @param fields
      * @param headers
@@ -195,11 +198,11 @@ public class ExcelUtil {
                 }
             } else {
                 if (fileName.endsWith(".xls")) {
-                    wb = new XSSFWorkbook(in);
+                    wb = new HSSFWorkbook(in);
                 } else if (fileName.endsWith(".csv")) {
                     return convertCsvToBean(in, heads, resultType);
                 } else {
-                    wb = new HSSFWorkbook(in);
+                    wb = new XSSFWorkbook(in);
                 }
             }
             Sheet sheet = wb.getSheetAt(sheetNum);
@@ -246,7 +249,9 @@ public class ExcelUtil {
         return heads;
     }
 
-    /**将sheet转化为bean
+    /**
+     * 将sheet转化为bean
+     *
      * @param sheet
      * @param heads
      * @param resultType
@@ -255,7 +260,7 @@ public class ExcelUtil {
      */
     private static <T> List<T> convertSheetToBean(Sheet sheet, String[] heads, Class<T> resultType) {
         List<T> resultList = new LinkedList<>();
-        for (int r = sheet.getFirstRowNum(); r <= sheet.getLastRowNum(); r++) {
+        for (int r = sheet.getFirstRowNum()+1; r <= sheet.getLastRowNum(); r++) {
             Row row = sheet.getRow(r);
             if (row != null) {
                 if (row.getLastCellNum() > 0) {
@@ -351,6 +356,7 @@ public class ExcelUtil {
 
     /**
      * 获取bean的属性
+     *
      * @param target
      * @return
      */
@@ -420,6 +426,7 @@ public class ExcelUtil {
 
     /**
      * 不关闭流导出为csv
+     *
      * @param data
      * @param br
      * @param tempFields

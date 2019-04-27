@@ -80,6 +80,19 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Clasz> implements
 
     @Override
     public boolean add(Clasz clasz) {
+        completeEntity(clasz);
+        return classMapper.insert(clasz) == 1;
+    }
+
+    @Override
+    public boolean batchAdd(List<Clasz> claszs) {
+        for (Clasz clasz : claszs) {
+            completeEntity(clasz);
+        }
+        return insertBatch(claszs);
+    }
+
+    private void completeEntity(Clasz clasz) {
         Integer toSchoolYear = clasz.getToSchoolYear();
         Integer classNum = clasz.getClassNum();
         Integer type = clasz.getType();
@@ -88,6 +101,5 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Clasz> implements
         }
         Integer classId = toSchoolYear * 1000 + classNum * 10 + type;
         clasz.setClassId(classId);
-        return classMapper.insert(clasz) == 1;
     }
 }

@@ -68,6 +68,10 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
 
     @Override
     public boolean add(Student student) {
+        return completeEntity(student);
+    }
+
+    private boolean completeEntity(Student student) {
         Integer classId = student.getClassId();
         Clasz clasz = classService.getEntityFromLocalCacheByKey(String.format(CacheKey.CLASS_ID_CLASS
                 , classId));
@@ -86,5 +90,13 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             student.setType(clasz.getType());
             return insert(student);
         }
+    }
+
+    @Override
+    public boolean batchAdd(List<Student> students) {
+        for (Student student : students) {
+            completeEntity(student);
+        }
+        return insertBatch(students);
     }
 }
