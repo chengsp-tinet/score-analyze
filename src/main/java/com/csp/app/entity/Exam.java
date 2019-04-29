@@ -51,7 +51,16 @@ public class Exam extends BaseEntity {
      */
     @Column
     private Integer studentCount;
-
+    /**
+     * 考试组id
+     */
+    @Column
+    private Integer examGroupId;
+    /**
+     * 考试组名称
+     */
+    @Column
+    private String examGroupName;
     @Column
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date createTime;
@@ -118,6 +127,22 @@ public class Exam extends BaseEntity {
 
     public void setStudentCount(Integer studentCount) {
         this.studentCount = studentCount;
+    }
+
+    public Integer getExamGroupId() {
+        return examGroupId;
+    }
+
+    public void setExamGroupId(Integer examGroupId) {
+        this.examGroupId = examGroupId;
+    }
+
+    public String getExamGroupName() {
+        return examGroupName;
+    }
+
+    public void setExamGroupName(String examGroupName) {
+        this.examGroupName = examGroupName;
     }
 
     public Date getCreateTime() {

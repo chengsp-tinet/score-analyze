@@ -12,4 +12,7 @@ public class CacheKey {
     public static final String EXAM_NAME_EXAM = "sc.exam.examName.%s";
     public static final String EXAM_ALL = "sc.exam.all";
 
+    public static final String EXAM_GROUP_ID_EXAM_GROUP = "sc.examGroup.examGroupId.%s";
+    public static final String EXAM_GROUP_NAME_EXAM_GROUP = "sc.examGroup.examGroupName.%s";
+    public static final String EXAM_GROUP_ALL = "sc.examGroup.all";
 }

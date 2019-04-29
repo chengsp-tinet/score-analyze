@@ -1,10 +1,11 @@
 package com.csp.app.controller;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.plugins.Page;
 import com.csp.app.common.BaseController;
 import com.csp.app.common.ResponseBuilder;
-import com.csp.app.entity.Clasz;
-import com.csp.app.service.ClassService;
+import com.csp.app.entity.ExamGroup;
+import com.csp.app.service.ExamGroupService;
 import com.csp.app.util.ExcelUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,48 +22,54 @@ import java.io.InputStream;
 import java.util.List;
 
 @RestController
-@RequestMapping("/class")
-public class ClassController  extends BaseController {
-    private final static Logger logger = LoggerFactory.getLogger(ClassController.class);
+@RequestMapping("/examGroup")
+public class ExamGroupController extends BaseController {
+    private final static Logger logger = LoggerFactory.getLogger(ExamGroupController.class);
     @Autowired
-    private ClassService classService;
+    private ExamGroupService examGroupService;
 
     @RequestMapping("/inside/searchAll")
     public ResponseBuilder searchAll() {
         try {
-            List<Clasz> claszs = classService.searchAll();
-            return ResponseBuilder.buildSuccess("查询成功", claszs);
+            List<ExamGroup> examGroupList = examGroupService.searchAll();
+            return ResponseBuilder.buildSuccess("查询成功", examGroupList);
         } catch (Exception e) {
             logger.error("searchAll error: {}", e);
             return ResponseBuilder.buildError("系统异常:" + e.getMessage());
         }
     }
-    @RequestMapping("/inside/search")
-    public ResponseBuilder search(Clasz clasz) {
+
+    @RequestMapping("/inside/searchSelectivePage")
+    public ResponseBuilder searchSelectivePage(ExamGroup examGroup, Integer page, Integer limit) {
         try {
-            EntityWrapper<Clasz> wrapper = new EntityWrapper<>(clasz);
-            List<Clasz> claszs = classService.selectList(wrapper);
-            return ResponseBuilder.buildSuccess("查询成功", claszs);
+            EntityWrapper<ExamGroup> wrapper = new EntityWrapper<>(examGroup);
+            int count = examGroupService.selectCount(wrapper);
+            Page<ExamGroup> conditionPage = new Page<>();
+            conditionPage.setCurrent(page);
+            conditionPage.setSize(limit);
+            Page<ExamGroup> examGroupPage = examGroupService.selectPage(conditionPage, wrapper);
+            return ResponseBuilder.buildPage("查询成功", examGroupPage.getRecords(), count);
         } catch (Exception e) {
-            logger.error("searchAll error: {}", e);
+            logger.error("searchSelectivePage error: {}", e);
             return ResponseBuilder.buildError("系统异常:" + e.getMessage());
         }
     }
+
     @RequestMapping(value = "/inside/add", method = RequestMethod.POST)
-    public ResponseBuilder add(Clasz clasz) {
+    public ResponseBuilder add(ExamGroup examGroup) {
         try {
-            if (clasz.getClassNum() == null || clasz.getToSchoolYear() == null || clasz.getType() == null) {
-                return ResponseBuilder.buildSuccess("添加班级失败,classNum/toSchoollYear/type不可为空", null);
+            if (examGroup.getExamGroupName() == null) {
+                return ResponseBuilder.buildFail("添加考试组失败,名称不可为空");
             }
-            boolean result = classService.add(clasz);
+            boolean result = examGroupService.add(examGroup);
             if (result) {
-                return ResponseBuilder.buildSuccess("添加班级成功", clasz);
+                return ResponseBuilder.buildSuccess("添加考试组成功", examGroup);
             } else {
-                return ResponseBuilder.buildSuccess("添加班级失败", null);
+                return ResponseBuilder.buildFail("添加考试组失败");
             }
         } catch (Exception e) {
             logger.error("add error: {}", e);
-            return ResponseBuilder.buildError("系统异常:" + e.getMessage());
+            return ResponseBuilder.buildError("系统异常:" + e.toString());
         }
     }
 
@@ -70,16 +77,16 @@ public class ClassController  extends BaseController {
     @ResponseBody
     public ResponseBuilder addBatch(@RequestParam("file") MultipartFile file) {
         InputStream is = null;
-        List<Clasz> claszs = null;
+        List<ExamGroup> examGroups = null;
         try {
             is = file.getInputStream();
-            claszs = ExcelUtil.read(is, 0, file.getOriginalFilename(), null, Clasz.class);
-            classService.batchAdd(claszs);
+            examGroups = ExcelUtil.read(is, 0, file.getOriginalFilename(), null, ExamGroup.class);
+            examGroupService.batchAdd(examGroups);
             logger.info("导入成功!");
             return ResponseBuilder.buildSuccess("成功", null);
         } catch (Exception e) {
             logger.error("导入发生异常:{}", e);
-            return ResponseBuilder.buildError("批量导入成绩失败,系统异常" + e.getMessage());
+            return ResponseBuilder.buildError("批量导入考试组失败," + e.getMessage());
         } finally {
             if (is != null) {
                 try {
@@ -90,4 +97,5 @@ public class ClassController  extends BaseController {
             }
         }
     }
+
 }

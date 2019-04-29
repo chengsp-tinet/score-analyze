@@ -1,6 +1,7 @@
 package com.csp.app.service.impl;
 
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.toolkit.CollectionUtils;
 import com.csp.app.common.CacheKey;
 import com.csp.app.entity.Clasz;
 import com.csp.app.entity.Course;
@@ -47,10 +48,11 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
 
     @Override
     public boolean add(Score score) {
-        return insert(completeEntity(score));
+        completeEntity(score);
+        return insert(score);
     }
 
-    private Score completeEntity(Score score) {
+    private void completeEntity(Score score) {
         String studentName = null;
         Integer studentId = score.getStudentId();
         Student student = studentService.getEntityFromLocalCacheByKey(String.format(CacheKey.STUDENT_ID_STUDENT
@@ -89,19 +91,27 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         Calendar instance = Calendar.getInstance();
         instance.setTime(new Date());
         int nowYear = instance.get(Calendar.YEAR);
-        Integer gradeNum = nowYear - toSchoolYear + 1;
+        Integer gradeNum = nowYear - toSchoolYear;
+        // 开学时间
+        String toSchoolTime = DateUtil.format(new Date(), "yyyy-09-01 00:00:00");
+        String nowTime = DateUtil.format(instance.getTime(), DateUtil.FMT_DATE_YYYY_MM_DD_HH_mm_ss);
+        if (nowTime.compareTo(toSchoolTime) > 0) {
+            gradeNum++;
+        }
         score.setGradeNum(gradeNum);
         Exam exam = examService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_ID_EXAM, score.getExamId()));
         score.setCourseId(exam.getCourseId());
         score.setCourseName(exam.getCourseName());
-        return score;
     }
 
     @Override
     public boolean batchAdd(List<Score> scores) {
-        for (Score score : scores) {
-            completeEntity(score);
+        if (CollectionUtils.isNotEmpty(scores)) {
+            for (Score score : scores) {
+                completeEntity(score);
+            }
+            return insertBatch(scores);
         }
-        return insertBatch(scores);
+        return true;
     }
 }

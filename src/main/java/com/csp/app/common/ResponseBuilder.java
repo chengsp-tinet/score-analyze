@@ -16,6 +16,7 @@ public class ResponseBuilder implements Serializable {
     private int status;
     private String description;
     private Object data;
+    private Integer count;
 
     public ResponseBuilder() {
     }
@@ -26,8 +27,19 @@ public class ResponseBuilder implements Serializable {
         this.data = data;
     }
 
+    public ResponseBuilder(int status, String description, Object data, Integer count) {
+        this.status = status;
+        this.description = description;
+        this.data = data;
+        this.count = count;
+    }
+
     public static ResponseBuilder buildSuccess(String description, Object data) {
         return new ResponseBuilder(SUCCESS_STATUS, description, data);
+    }
+
+    public static ResponseBuilder buildPage(String description, Object data, int count) {
+        return new ResponseBuilder(SUCCESS_STATUS, description, data, count);
     }
 
     public static ResponseBuilder buildFail(String description) {
@@ -37,6 +49,7 @@ public class ResponseBuilder implements Serializable {
     public static ResponseBuilder buildError() {
         return new ResponseBuilder(ERROR_STATUS, "系统异常", null);
     }
+
     public static ResponseBuilder buildError(String description) {
         return new ResponseBuilder(ERROR_STATUS, description, null);
     }
@@ -63,6 +76,14 @@ public class ResponseBuilder implements Serializable {
 
     public void setData(Object data) {
         this.data = data;
+    }
+
+    public Integer getCount() {
+        return count;
+    }
+
+    public void setCount(Integer count) {
+        this.count = count;
     }
 
     @Override

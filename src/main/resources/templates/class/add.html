@@ -27,23 +27,23 @@
 <body>
 <form class="layui-form form-padding" id="add-form">
     <div class="layui-form-item">
-        <label class="layui-form-label">学号</label>
+        <label class="layui-form-label">班号</label>
         <div class="layui-input-inline">
-            <input type="text" name="studentId" required lay-verify="required" placeholder="请输入学号" autocomplete="on"
+            <input type="text" name="classNum" required lay-verify="required" placeholder="请输入班号" autocomplete="on"
                    class="layui-input">
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">考试id</label>
+        <label class="layui-form-label">入学年份</label>
         <div class="layui-input-inline">
-            <input type="text" name="examId" required lay-verify="required" placeholder="请输入考试id" autocomplete="on"
+            <input type="text" name="toSchoolYear" required lay-verify="required" placeholder="请输入考试id" autocomplete="on"
                    class="layui-input">
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">分数</label>
+        <label class="layui-form-label">学校类型</label>
         <div class="layui-input-inline">
-            <input type="text" name="score" required lay-verify="required" placeholder="请输入分数" autocomplete="on"
+            <input type="text" name="type" required lay-verify="required" placeholder="请输入学校类型" autocomplete="on"
                    class="layui-input">
         </div>
     </div>
@@ -54,7 +54,7 @@
         </div>
     </div>
 </form>
-<div class="layui-btn upload upload-file"  id="# ">点击或拖拽至此上传</div>
+<div class="layui-btn upload upload-file"  id="#upload">点击或拖拽至此上传</div>
 <script type="application/javascript" th:inline="none">
     (function () {
         let layer;
@@ -69,11 +69,12 @@
                 return false;
             });*/
         });
+
         layui.use('upload', function () {
             var upload = layui.upload; //得到 upload 对象
             upload.render({
                 elem: '.upload'
-                ,url:'/score/inside/addBatch'
+                ,url:'/class/inside/addBatch'
                 ,bindAction:'#upload'
                 , done: function (res, index, upload) {
                     var item = this.item;
@@ -92,7 +93,7 @@
         }
         function add(param) {
             $.ajax({
-                url: '/score/inside/add',
+                url: '/class/inside/add',
                 type: 'post',
                 data: param,
                 success: function (data) {

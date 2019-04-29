@@ -2,12 +2,15 @@ package com.csp.app.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.toolkit.CollectionUtils;
 import com.csp.app.common.CacheKey;
 import com.csp.app.common.Const;
 import com.csp.app.entity.Course;
 import com.csp.app.entity.Exam;
+import com.csp.app.entity.ExamGroup;
 import com.csp.app.mapper.ExamMapper;
 import com.csp.app.service.CourseService;
+import com.csp.app.service.ExamGroupService;
 import com.csp.app.service.ExamService;
 import com.csp.app.service.RedisService;
 import org.slf4j.Logger;
@@ -34,6 +37,8 @@ public class ExamServiceImpl extends ServiceImpl<ExamMapper, Exam> implements Ex
     private RedisService redisService;
     @Autowired
     private CourseService courseService;
+    @Autowired
+    private ExamGroupService examGroupService;
 
     @Override
     public Exam getEntityFromLocalCacheByKey(String key) {
@@ -87,25 +92,38 @@ public class ExamServiceImpl extends ServiceImpl<ExamMapper, Exam> implements Ex
 
     @Override
     public boolean add(Exam entity) {
-        completeEntity(entity);
-        return super.insert(entity);
-    }
-
-    @Override
-    public boolean batchAdd(List<Exam> exams) {
-        for (Exam exam : exams) {
-            completeEntity(exam);
-        }
-        return insertBatch(exams);
-    }
-
-    private void completeEntity(Exam entity) {
         Integer maxExamId = examMapper.selectMaxExamId();
         if (maxExamId == null) {
             entity.setExamId(Const.INIT_EXAM_ID);
         } else {
             entity.setExamId(maxExamId + 1);
         }
+        completeEntity(entity);
+        return super.insert(entity);
+    }
+
+    @Override
+    public boolean batchAdd(List<Exam> exams) {
+        if (CollectionUtils.isNotEmpty(exams)) {
+            Integer maxExamId = examMapper.selectMaxExamId();
+            Integer examId;
+            if (maxExamId == null) {
+                examId = Const.INIT_EXAM_ID;
+            } else {
+                examId = maxExamId + 1;
+            }
+            int i = 0;
+            for (Exam exam : exams) {
+                completeEntity(exam);
+                exam.setExamId(examId + i);
+                i++;
+            }
+            return insertBatch(exams);
+        }
+        return true;
+    }
+
+    private void completeEntity(Exam entity) {
         Integer courseId = entity.getCourseId();
         String courseName = entity.getCourseName();
         if (courseId == null) {
@@ -123,6 +141,25 @@ public class ExamServiceImpl extends ServiceImpl<ExamMapper, Exam> implements Ex
         }
         if (courseId == null || StringUtil.isEmpty(courseName)) {
             throw new RuntimeException("无法找到考试对应的科目,课程id或课程名称为空");
+        }
+        Integer examGroupId = entity.getExamGroupId();
+        String examGroupName = entity.getExamGroupName();
+        if (examGroupId == null) {
+            ExamGroup examGroup = examGroupService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_GROUP_NAME_EXAM_GROUP
+                    , examGroupName));
+            if (examGroup != null) {
+                examGroupId = examGroup.getExamGroupId();
+            }
+        }
+        if (StringUtil.isEmpty(examGroupName)) {
+            ExamGroup examGroup = examGroupService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_GROUP_ID_EXAM_GROUP
+                    , examGroupId));
+            if (examGroup != null) {
+                examGroupName = examGroup.getExamGroupName();
+            }
+        }
+        if (examGroupId == null || StringUtil.isEmpty(examGroupName)) {
+            throw new RuntimeException("考试组信息有误");
         }
         entity.setCourseId(courseId);
         entity.setCourseName(courseName);

@@ -1,9 +1,9 @@
 function constructArgs(target) {
     var inputs = target.find('input');
     var args = {};
-    inputs.forEach(function (i,index) {
-        if(i.val()!=''){
-            args[i.attr('name')]=i.val();
+    $.each(inputs, function (i, n) {
+        if (n.value != '') {
+            args[n.name] = n.value;
         }
     })
     return args;

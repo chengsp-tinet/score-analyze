@@ -27,23 +27,46 @@
 <body>
 <form class="layui-form form-padding" id="add-form">
     <div class="layui-form-item">
-        <label class="layui-form-label">学号</label>
+        <label class="layui-form-label">考试名称</label>
         <div class="layui-input-inline">
-            <input type="text" name="studentId" required lay-verify="required" placeholder="请输入学号" autocomplete="on"
+            <input type="text" name="examName" required lay-verify="required" placeholder="请输入考试名称" autocomplete="on"
                    class="layui-input">
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">考试id</label>
+        <label class="layui-form-label">考试科目</label>
         <div class="layui-input-inline">
-            <input type="text" name="examId" required lay-verify="required" placeholder="请输入考试id" autocomplete="on"
+            <input type="text" name="courseName" required lay-verify="required" placeholder="请输入考试科目" autocomplete="on"
                    class="layui-input">
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">分数</label>
+        <label class="layui-form-label">考试组id</label>
         <div class="layui-input-inline">
-            <input type="text" name="score" required lay-verify="required" placeholder="请输入分数" autocomplete="on"
+            <input type="text" name="examGroupId" required lay-verify="required" placeholder="请输入考试组id" autocomplete="on"
+                   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">考试人数</label>
+        <div class="layui-input-inline">
+            <input type="text" name="studentCount" required lay-verify="required" placeholder="请输入考试人数" autocomplete="on"
+                   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">开考时间</label>
+        <div class="layui-input-inline">
+            <input type="text" name="startTime" id="startTime" required lay-verify="required" placeholder="请输入开始时间"
+                   autocomplete="on"
+                   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">结束时间</label>
+        <div class="layui-input-inline">
+            <input type="text" name="endTime" id="endTime" required lay-verify="required" placeholder="请输入结束时间"
+                   autocomplete="on"
                    class="layui-input">
         </div>
     </div>
@@ -54,7 +77,8 @@
         </div>
     </div>
 </form>
-<div class="layui-btn upload upload-file"  id="# ">点击或拖拽至此上传</div>
+
+<div class="layui-btn upload upload-file"  id="#upload">点击或拖拽至此上传</div>
 <script type="application/javascript" th:inline="none">
     (function () {
         let layer;
@@ -69,11 +93,22 @@
                 return false;
             });*/
         });
+        layui.use('laydate',function () {
+            var timeComponent = layui.laydate;
+            timeComponent.render({
+                elem: '#startTime', //指定元素
+                type:'datetime'
+            });
+            timeComponent.render({
+                elem: '#endTime', //指定元素
+                type:'datetime'
+            });
+        })
         layui.use('upload', function () {
             var upload = layui.upload; //得到 upload 对象
             upload.render({
                 elem: '.upload'
-                ,url:'/score/inside/addBatch'
+                ,url:'/exam/inside/addBatch'
                 ,bindAction:'#upload'
                 , done: function (res, index, upload) {
                     var item = this.item;
@@ -92,7 +127,7 @@
         }
         function add(param) {
             $.ajax({
-                url: '/score/inside/add',
+                url: '/exam/inside/add',
                 type: 'post',
                 data: param,
                 success: function (data) {

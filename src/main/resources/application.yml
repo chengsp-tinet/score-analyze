@@ -6,14 +6,18 @@ server:
     mime-types: text/html,text/xml,text/plain,text/css,application/javascript
   tomcat:
     uri-encoding: utf-8
+spring.thymeleaf.mode: HTML
+spring.thymeleaf.encodin: UTF-8
+spring.thymeleaf.prefix: classpath:/templates/
+spring.thymeleaf.suffix: .html
 spring:
   datasource:
     name: druidDataSource
     type: com.alibaba.druid.pool.DruidDataSource
 #    driver-class-name: com.mysql.jdbc.Driver
-#    url:
-#    username:
-#    password:
+#    url: jdbc:mysql://47.103.3.1:3306/sc
+#    username: postgres
+#    password: 45625891
     filters: stat,wall,config,slf4j
     max-active: 50
     initial-size: 1
@@ -33,10 +37,10 @@ spring:
         min-idle: 50
         max-total: 100
 #自动建表配置
-  jpa:
-    hibernate:
-      ddl-auto: update
-      show-sql: true
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#      show-sql: true
 #jest
 jest:
   host: http://localhost:9200

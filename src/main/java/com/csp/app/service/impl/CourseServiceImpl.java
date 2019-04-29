@@ -2,9 +2,9 @@ package com.csp.app.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.toolkit.CollectionUtils;
 import com.csp.app.common.CacheKey;
 import com.csp.app.common.Const;
-import com.csp.app.entity.Clasz;
 import com.csp.app.entity.Course;
 import com.csp.app.mapper.CourseMapper;
 import com.csp.app.service.CourseService;
@@ -83,23 +83,31 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 
     @Override
     public boolean batchAdd(List<Course> courses) {
-        for (Course course : courses) {
-            completeEntity(course);
+        if (CollectionUtils.isNotEmpty(courses)) {
+            Integer maxCourseId = courseMapper.selectMaxCourseId();
+            Integer courseId;
+            if (maxCourseId == null) {
+                courseId = Const.INIT_COURSE_ID;
+            } else {
+                courseId = maxCourseId + 1;
+            }
+            int i = 0;
+            for (Course course : courses) {
+                course.setCourseId(courseId + i);
+                i++;
+            }
+            return insertBatch(courses);
         }
-        return insertBatch(courses);
+        return true;
     }
 
     @Override
     public boolean insert(Course entity) {
-        completeEntity(entity);
-        return super.insert(entity);
-    }
-
-    private void completeEntity(Course entity) {
         Integer maxCourseId = courseMapper.selectMaxCourseId();
         if (maxCourseId == null) {
             maxCourseId = Const.INIT_COURSE_ID;
         }
         entity.setCourseId(maxCourseId + 1);
+        return super.insert(entity);
     }
 }

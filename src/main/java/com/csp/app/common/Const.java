@@ -7,6 +7,7 @@ public class Const {
 
     public static final int INIT_COURSE_ID = 10000;
     public static final int INIT_EXAM_ID = 100000;
+    public static final int INIT_EXAM_GROUP_ID = 100;
     /**
      * 班级类型:小学
      */

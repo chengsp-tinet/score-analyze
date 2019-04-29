@@ -1,5 +1,7 @@
 package com.csp.app.controller;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.plugins.Page;
 import com.csp.app.common.BaseController;
 import com.csp.app.common.ResponseBuilder;
 import com.csp.app.entity.Exam;
@@ -37,6 +39,22 @@ public class ExamController extends BaseController {
         }
     }
 
+    @RequestMapping("/inside/searchSelectivePage")
+    public ResponseBuilder searchSelectivePage(Exam exam, Integer page, Integer limit) {
+        try {
+            EntityWrapper<Exam> wrapper = new EntityWrapper<>(exam);
+            int count = examService.selectCount(wrapper);
+            Page<Exam> conditionPage = new Page<>();
+            conditionPage.setCurrent(page);
+            conditionPage.setSize(limit);
+            Page<Exam> examPage = examService.selectPage(conditionPage, wrapper);
+            return ResponseBuilder.buildPage("查询成功", examPage.getRecords(), count);
+        } catch (Exception e) {
+            logger.error("searchSelectivePage error: {}", e);
+            return ResponseBuilder.buildError("系统异常:" + e.getMessage());
+        }
+    }
+
     @RequestMapping(value = "/inside/add", method = RequestMethod.POST)
     public ResponseBuilder add(Exam exam) {
         try {
@@ -61,6 +79,7 @@ public class ExamController extends BaseController {
             return ResponseBuilder.buildError("系统异常:" + e.toString());
         }
     }
+
     @RequestMapping("/inside/addBatch")
     @ResponseBody
     public ResponseBuilder addBatch(@RequestParam("file") MultipartFile file) {

@@ -10,43 +10,31 @@
 <script src="../../static/lib/jquery/jquery-3.2.1.min.js" th:src="@{/lib/jquery/jquery-3.2.1.min.js}"></script>
 <script src="../../static/js/common/public.js" th:src="@{/js/common/public.js}"></script>
 <style type="text/css">
-.form-padding{
-    padding: 10px;
-}
+    .form-padding{
+        padding: 10px;
+    }
 
-.upload-file {
-    margin-left: 80px;
-    width: 200px;
-    height: 200px;
-    text-align: center;
-    display: inline-block;
-    line-height: 200px;
-}
+    .upload-file {
+        margin-left: 80px;
+        width: 200px;
+        height: 200px;
+        text-align: center;
+        display: inline-block;
+        line-height: 200px;
+    }
 </style>
 </head>
 <body>
 <form class="layui-form form-padding" id="add-form">
     <div class="layui-form-item">
-        <label class="layui-form-label">学号</label>
+        <label class="layui-form-label">考试组名</label>
         <div class="layui-input-inline">
-            <input type="text" name="studentId" required lay-verify="required" placeholder="请输入学号" autocomplete="on"
+            <input type="text" name="examGroupName" required lay-verify="required" placeholder="请输入考试组名"
+                   autocomplete="on"
                    class="layui-input">
         </div>
     </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">考试id</label>
-        <div class="layui-input-inline">
-            <input type="text" name="examId" required lay-verify="required" placeholder="请输入考试id" autocomplete="on"
-                   class="layui-input">
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">分数</label>
-        <div class="layui-input-inline">
-            <input type="text" name="score" required lay-verify="required" placeholder="请输入分数" autocomplete="on"
-                   class="layui-input">
-        </div>
-    </div>
+
     <div class="layui-form-item">
         <div class="layui-input-block">
             <div class="layui-btn"  id="submit">立即提交</div>
@@ -54,7 +42,7 @@
         </div>
     </div>
 </form>
-<div class="layui-btn upload upload-file"  id="# ">点击或拖拽至此上传</div>
+<div class="layui-btn upload upload-file"  id="#upload">点击或拖拽至此上传</div>
 <script type="application/javascript" th:inline="none">
     (function () {
         let layer;
@@ -69,11 +57,12 @@
                 return false;
             });*/
         });
+
         layui.use('upload', function () {
             var upload = layui.upload; //得到 upload 对象
             upload.render({
                 elem: '.upload'
-                ,url:'/score/inside/addBatch'
+                ,url:'/examGroup/inside/addBatch'
                 ,bindAction:'#upload'
                 , done: function (res, index, upload) {
                     var item = this.item;
@@ -92,7 +81,7 @@
         }
         function add(param) {
             $.ajax({
-                url: '/score/inside/add',
+                url: '/examGroup/inside/add',
                 type: 'post',
                 data: param,
                 success: function (data) {
