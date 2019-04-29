@@ -1,5 +1,6 @@
 package com.csp.app.service.impl;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.toolkit.CollectionUtils;
 import com.csp.app.common.CacheKey;
@@ -23,9 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.util.StringUtil;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author chengsp
@@ -114,4 +114,48 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         }
         return true;
     }
+
+    /**
+     * 各科目成绩，班级科目名次，年级科目名次，总分，班级总分名次，年级总分名次
+     * @param studentId 学号
+     * @return
+     */
+    @Override
+    public List<HashMap<String, Object>> getPersonScores(Integer studentId,Integer examGroupId) {
+        List<HashMap<String, Object>> personScores = new ArrayList<>();
+        List<Exam> exams = examService.getExamsByGroupId(examGroupId);
+        for (Exam exam : exams) {
+            HashMap<String,Object> personScore = new HashMap<>();
+            Score score = getScoreByStudentAndExamId(studentId, exam.getExamId());
+            personScore.put("courseName",score.getCourseName());
+            personScore.put("score",score.getScore());
+            personScores.add(personScore);
+        }
+        return personScores;
+    }
+
+    @Override
+    public List<HashMap<String, Object>> getClazzScore(Integer classId) {
+        return null;
+    }
+
+    @Override
+    public List<HashMap<String, Object>> getGradeScore(Integer gradeNum) {
+        return null;
+    }
+
+    /**
+     * 通过学号和考试组查询考试
+     * @param studentId
+     * @param examId
+     * @return
+     */
+    private Score getScoreByStudentAndExamId(Integer studentId,Integer examId){
+        EntityWrapper entityWrapper = new EntityWrapper(new Score());
+        entityWrapper.eq("student_id",studentId);
+        entityWrapper.eq("exam_id",examId);
+        return selectOne(entityWrapper);
+    }
+
+
 }

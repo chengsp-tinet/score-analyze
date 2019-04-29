@@ -1,6 +1,7 @@
 package com.csp.app.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.toolkit.CollectionUtils;
 import com.csp.app.common.CacheKey;
@@ -121,6 +122,13 @@ public class ExamServiceImpl extends ServiceImpl<ExamMapper, Exam> implements Ex
             return insertBatch(exams);
         }
         return true;
+    }
+
+    @Override
+    public List<Exam> getExamsByGroupId(Integer groupId) {
+        EntityWrapper entityWrapper = new EntityWrapper<>(new Exam());
+        entityWrapper.eq("group_id",groupId);
+        return examMapper.selectList(entityWrapper);
     }
 
     private void completeEntity(Exam entity) {
