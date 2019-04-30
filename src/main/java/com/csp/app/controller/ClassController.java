@@ -66,7 +66,7 @@ public class ClassController  extends BaseController {
         }
     }
 
-    @RequestMapping("/inside/addBatch")
+    @RequestMapping(value = "/inside/addBatch",method = RequestMethod.POST)
     @ResponseBody
     public ResponseBuilder addBatch(@RequestParam("file") MultipartFile file) {
         InputStream is = null;

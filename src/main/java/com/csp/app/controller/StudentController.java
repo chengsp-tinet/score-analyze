@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import tk.mybatis.mapper.util.StringUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,7 +47,7 @@ public class StudentController extends BaseController {
         }
     }
 
-    @RequestMapping("/inside/addBatch")
+    @RequestMapping(value = "/inside/addBatch",method = RequestMethod.POST)
     @ResponseBody
     public ResponseBuilder addBatch(@RequestParam("file") MultipartFile file) {
         InputStream is = null;
@@ -72,7 +73,8 @@ public class StudentController extends BaseController {
     }
 
     @RequestMapping("/inside/searchSelectivePage")
-    public ResponseBuilder searchSelectivePage(Student student, Integer page, Integer limit) {
+    public ResponseBuilder searchSelectivePage(Student student, Integer page, Integer limit, String studentName
+            , String orderFiled, String orderType) {
         try {
             if (page == null) {
                 page = 0;
@@ -80,9 +82,20 @@ public class StudentController extends BaseController {
             if (limit == null) {
                 limit = 10;
             }
+            student.setStudentName(null);
             EntityWrapper<Student> wrapper = new EntityWrapper<>(student);
+            if (StringUtil.isNotEmpty(studentName)) {
+                wrapper.like("student_name", "%" + studentName + "%");
+            }
+            boolean orderTypeBoo = true;
+            if (StringUtil.isNotEmpty(orderType) && orderType.equals("asc")) {
+                orderTypeBoo = false;
+            }
+            if (StringUtil.isEmpty(orderFiled)) {
+                orderFiled = "id";
+            }
             int count = studentService.selectCount(wrapper);
-            Page<Student> examPage = new Page<>(page,limit,"student_id",true);
+            Page<Student> examPage = new Page<>(page,limit,orderFiled,orderTypeBoo);
             examPage.setTotal(count);
             studentService.selectPage(examPage, wrapper);
             return ResponseBuilder.buildPage("查询成功", examPage.getRecords(), count);

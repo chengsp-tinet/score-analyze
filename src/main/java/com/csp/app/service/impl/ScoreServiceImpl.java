@@ -24,6 +24,8 @@ import com.csp.app.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.util.StringUtil;
 
@@ -60,12 +62,20 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     @Autowired
     private ExamGroupService examGroupService;
 
+    @CacheEvict(value = {"getPersonScores","searchTotalScoreGradeOrderMap","searchTotalScoreClassOrderMap"
+            ,"getClassScoreOrderMap","getGradeScoreOrderMap"},allEntries = true)
     @Override
     public boolean add(Score score) {
         completeEntity(score);
         return insert(score);
     }
 
+    @CacheEvict(value = {"getPersonScores","searchTotalScoreGradeOrderMap","searchTotalScoreClassOrderMap"
+            ,"getClassScoreOrderMap","getGradeScoreOrderMap"},allEntries = true)
+    @Override
+    public boolean updateById(Score entity) {
+        return super.updateById(entity);
+    }
     private void completeEntity(Score score) {
         String studentName = null;
         Integer studentId = score.getStudentId();
@@ -80,8 +90,6 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         score.setStudentName(studentName);
         Integer examId = score.getExamId();
         String examName = score.getExamName();
-        Integer examGroupId;
-        String examGroupName;
         if (examId == null) {
             Exam exam = examService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_NAME_EXAM, score.getExamName()));
             if (exam != null) {
@@ -127,6 +135,8 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     }
 
     @Override
+    @CacheEvict(value = {"getPersonScores","searchTotalScoreGradeOrderMap","searchTotalScoreClassOrderMap"
+            ,"getClassScoreOrderMap","getGradeScoreOrderMap"},allEntries = true)
     public boolean batchAdd(List<Score> scores) {
         if (CollectionUtils.isNotEmpty(scores)) {
             for (Score score : scores) {
@@ -144,6 +154,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
      * @return
      */
     @Override
+    @Cacheable("getPersonScores")
     public JSONObject getPersonScores(Integer studentId, Integer examGroupId) {
         JSONObject scoreMsg = new JSONObject();
         List<Map> personScores = new ArrayList<>();
@@ -210,7 +221,9 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         return scoreMsg;
     }
 
-    private Map<Object, Integer> searchTotalScoreGradeOrderMap(Integer examGroupId) {
+    @Override
+    @Cacheable("searchTotalScoreGradeOrderMap")
+    public Map<Object, Integer> searchTotalScoreGradeOrderMap(Integer examGroupId) {
         List<Map> gradeOrderInfoMaps = scoreMapper.searchTotalScoreGradeOrder(examGroupId);
         Map<Object, Integer> gradeOrderMap = new LinkedHashMap<>();
         int i = 1;
@@ -220,7 +233,9 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         return gradeOrderMap;
     }
 
-    private Map<Object, Integer> searchTotalScoreClassOrderMap(Integer examGroupId, Integer classId) {
+    @Override
+    @Cacheable("searchTotalScoreClassOrderMap")
+    public Map<Object, Integer> searchTotalScoreClassOrderMap(Integer examGroupId, Integer classId) {
         List<Map> gradeOrderInfoMaps = scoreMapper.searchTotalScoreClassOrder(examGroupId, classId);
         Map<Object, Integer> classOrderMap = new LinkedHashMap<>();
         int i = 1;
@@ -254,9 +269,11 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         return selectOne(entityWrapper);
     }
 
-    private Map<Object, Integer> getClassScoreOrderMap(Integer examId, Integer classId) {
+    @Override
+    @Cacheable("getClassScoreOrderMap")
+    public Map<Object, Integer> getClassScoreOrderMap(Integer examId, Integer classId) {
         LinkedHashMap<Object, Integer> orderMap = new LinkedHashMap<>();
-        EntityWrapper<Score> entityWrapper = new EntityWrapper<>(new Score());
+        EntityWrapper<Score> entityWrapper = new EntityWrapper<>();
         entityWrapper.eq("exam_id", examId);
         entityWrapper.eq("class_id", classId);
         entityWrapper.orderBy("score", false);
@@ -268,9 +285,12 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         return orderMap;
     }
 
-    private Map<Object, Integer> getGradeScoreOrderMap(Integer examId) {
+
+    @Override
+    @Cacheable("getGradeScoreOrderMap")
+    public Map<Object, Integer> getGradeScoreOrderMap(Integer examId) {
         LinkedHashMap<Object, Integer> orderMap = new LinkedHashMap<>();
-        EntityWrapper<Score> entityWrapper = new EntityWrapper<>(new Score());
+        EntityWrapper<Score> entityWrapper = new EntityWrapper<>();
         entityWrapper.eq("exam_id", examId);
         entityWrapper.orderBy("score", false);
         List<Score> scores = selectList(entityWrapper);

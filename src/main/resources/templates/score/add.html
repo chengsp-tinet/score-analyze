@@ -10,18 +10,19 @@
 <script src="../../static/lib/jquery/jquery-3.2.1.min.js" th:src="@{/lib/jquery/jquery-3.2.1.min.js}"></script>
 <script src="../../static/js/common/public.js" th:src="@{/js/common/public.js}"></script>
 <style type="text/css">
-.form-padding{
-    padding: 10px;
-}
+    .form-padding {
+        padding: 10px;
+        width: 310px;
+    }
 
-.upload-file {
-    margin-left: 80px;
-    width: 200px;
-    height: 200px;
-    text-align: center;
-    display: inline-block;
-    line-height: 200px;
-}
+    .upload-file {
+        margin-left: 80px;
+        width: 200px;
+        height: 200px;
+        text-align: center;
+        display: inline-block;
+        line-height: 200px;
+    }
 </style>
 </head>
 <body>
@@ -33,11 +34,19 @@
                    class="layui-input">
         </div>
     </div>
-    <div class="layui-form-item">
+    <!--<div class="layui-form-item">
         <label class="layui-form-label">考试id</label>
         <div class="layui-input-inline">
             <input type="text" name="examId" required lay-verify="required" placeholder="请输入考试id" autocomplete="on"
                    class="layui-input">
+        </div>
+    </div>-->
+    <div class="layui-form-item">
+        <label class="layui-form-label">考试</label>
+        <div class="layui-input-block">
+            <select name="examId" lay-filter="aihao">
+                <option th:each="exam:${exams}" th:value="${exam.examId}" th:text="${exam.examName}"></option>
+            </select>
         </div>
     </div>
     <div class="layui-form-item">
@@ -49,12 +58,12 @@
     </div>
     <div class="layui-form-item">
         <div class="layui-input-block">
-            <div class="layui-btn"  id="submit">立即提交</div>
+            <div class="layui-btn" id="submit">立即提交</div>
             <button type="reset" class="layui-btn layui-btn-primary">重置</button>
         </div>
     </div>
 </form>
-<div class="layui-btn upload upload-file"  id="# ">点击或拖拽至此上传</div>
+<div class="layui-btn upload upload-file" id="#upload">点击或拖拽至此上传</div>
 <script type="application/javascript" th:inline="none">
     (function () {
         let layer;
@@ -73,30 +82,32 @@
             var upload = layui.upload; //得到 upload 对象
             upload.render({
                 elem: '.upload'
-                ,url:'/score/inside/addBatch'
-                ,bindAction:'#upload'
+                , url: '/score/inside/addBatch'
+                , bindAction: '#upload'
                 , done: function (res, index, upload) {
                     var item = this.item;
                 }
                 , drog: true
-                ,accept: 'file'
+                , accept: 'file'
             })
         })
         layui.use('layer', function () {
             layer = layui.layer;
         });
-        function bindAction(){
+
+        function bindAction() {
             $('#submit').click(function () {
-                add(constructArgs($('#add-form')))
+                let param = constructArgs($('#add-form'));
+                add(param)
             })
         }
+
         function add(param) {
             $.ajax({
                 url: '/score/inside/add',
                 type: 'post',
                 data: param,
                 success: function (data) {
-                    console.log(JSON.stringify(data))
                     try {
                         layer.msg(data.description)
                     } catch (e) {

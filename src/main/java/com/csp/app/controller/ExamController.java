@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import tk.mybatis.mapper.util.StringUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,9 +41,17 @@ public class ExamController extends BaseController {
     }
 
     @RequestMapping("/inside/searchSelectivePage")
-    public ResponseBuilder searchSelectivePage(Exam exam, Integer page, Integer limit) {
+    public ResponseBuilder searchSelectivePage(Exam exam, Integer page, Integer limit,String examName,String courseName) {
         try {
+            exam.setExamName(null);
+            exam.setCourseName(null);
             EntityWrapper<Exam> wrapper = new EntityWrapper<>(exam);
+            if (StringUtil.isNotEmpty(examName)) {
+                wrapper.like("exam_name","%" + examName + "%");
+            }
+            if (StringUtil.isNotEmpty(courseName)) {
+                wrapper.like("course_name","%" + courseName + "%");
+            }
             int count = examService.selectCount(wrapper);
             Page<Exam> examPage = new Page<>(page,limit,"id",false);
             examService.selectPage(examPage, wrapper);
@@ -78,7 +87,7 @@ public class ExamController extends BaseController {
         }
     }
 
-    @RequestMapping("/inside/addBatch")
+    @RequestMapping(value = "/inside/addBatch" ,method = RequestMethod.POST)
     @ResponseBody
     public ResponseBuilder addBatch(@RequestParam("file") MultipartFile file) {
         InputStream is = null;

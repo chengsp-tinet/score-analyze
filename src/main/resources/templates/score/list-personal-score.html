@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+<meta charset="UTF-8">
+<title>考试添加</title>
+<meta name="renderer" content="webkit">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<link rel="stylesheet" href="../../static/lib/layui/css/layui.css" th:href="@{/lib/layui/css/layui.css}" media="all">
+<script src="../../static/lib/layui/layui.js" th:src="@{/lib/layui/layui.js}" charset="utf-8"></script>
+<script src="../../static/lib/jquery/jquery-3.2.1.min.js" th:src="@{/lib/jquery/jquery-3.2.1.min.js}"></script>
+<script src="../../static/js/common/public.js" th:src="@{/js/common/public.js}"></script>
+<style type="text/css">
+    .form-padding {
+        padding: 10px;
+    }
+
+</style>
+</head>
+<body>
+<form class="layui-form form-padding" id="search-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">学号</label>
+        <div class="layui-input-inline">
+            <input type="text" name="studentId" autocomplete="on"
+                   class="layui-input">
+        </div>
+        <label class="layui-form-label">考试组号</label>
+        <div class="layui-input-inline">
+            <input type="text" name="examGroupId" required autocomplete="on"
+                   class="layui-input">
+        </div>
+        <div class="layui-input-inline">
+            <div class="layui-btn" id="submit">搜索</div>
+        </div>
+    </div>
+</form>
+<span><span id="class-order"></span><span id="grade-order"></span><span id="total-score"></span><span
+        id="average-score"></span></span>
+<script type="application/javascript" th:inline="none">
+    (function () {
+        let layer;
+        layui.use('element', function () {
+            var element = layui.element;
+        });
+        layui.use('form', function () {
+            /*var form = layui.form;
+            //监听提交
+            form.on('submit(formDemo)', function (data) {
+                layer.msg(JSON.stringify(data.field));
+                return false;
+            });*/
+        });
+
+        layui.use('layer', function () {
+            layer = layui.layer;
+        });
+
+        function bindAction() {
+            $('#submit').click(function () {
+                search(constructArgs($('#search-form')))
+            })
+        }
+
+        function search(param) {
+            $.ajax({
+                url: '/score/inside/searchPersonalScore'
+                , data: param
+                , success: function (data) {
+                    if (data.status == 0) {
+                        $('#class-order').html('  班级排名:'+data.data.classOrder);
+                        $('#grade-order').html('  年级排名:'+data.data.gradeOrder);
+                        $('#total-score').html('  总分:'+data.data.totalScore);
+                        $('#average-score').html('  平均分:'+data.data.averageScore);
+                        let scoreData = data.data.personScores;
+                        scoreData.forEach(function (i, index) {
+                            if (i.isPass) {
+                                i.isPass = '是'
+                            } else {
+                                i.isPass = '否'
+                            }
+                        })
+                        render(scoreData);
+                    } else {
+                        layer.msg(data.description)
+                    }
+                }
+            })
+        }
+
+        function render(data) {
+            let table = null;
+            layui.use('table', function () {
+                table = layui.table;
+                table.render({
+                    elem: '#list'
+                    //,width: 900
+                    //,height: 274
+                    , cellMinWidth: 100
+                    , cols: [[
+                        {field: 'courseName', title: '课程名称', align: 'center'}
+                        , {field: 'score', title: '成绩', align: 'center'}
+                        , {field: 'classOrder', title: '班级排名', align: 'center'}
+                        , {field: 'gradeOrder', title: '年级排名', align: 'center'}
+                        , {field: 'isPass', title: '是否合格', align: 'center'}
+                        , {field: 'fullScore', title: '满分', align: 'center'}
+                        , {field: 'examName', title: '考试名称', align: 'center'}
+                    ]]
+                    , data: data
+
+                    , skin: 'row' //表格风格
+                    , even: true
+                    //,size: 'lg' //尺寸
+
+                    , page: true //是否显示分页
+                    //, limits: [3, 5, 10]
+                    , limit: 10 //每页默认显示的数量
+                    , loading: false //请求数据时，是否显示loading
+                });
+            });
+        };
+        bindAction();
+    })()
+
+</script>
+<table id="list" lay-filter="data-table"></table>
+</body>
+</html>

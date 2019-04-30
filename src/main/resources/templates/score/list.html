@@ -19,19 +19,40 @@
 <body>
 <form class="layui-form form-padding" id="search-form">
     <div class="layui-form-item">
+        <label class="layui-form-label">学号</label>
+        <div class="layui-input-inline">
+            <input type="text" name="studentId" required autocomplete="on"
+                   class="layui-input">
+        </div>
+        <label class="layui-form-label">姓名</label>
+        <div class="layui-input-inline">
+            <input type="text" name="studentName" required autocomplete="on"
+                   class="layui-input">
+        </div>
         <label class="layui-form-label">班级id</label>
         <div class="layui-input-inline">
             <input type="text" name="classId" autocomplete="on"
                    class="layui-input">
         </div>
-        <label class="layui-form-label">班号</label>
+
+        <label class="layui-form-label">考试id</label>
         <div class="layui-input-inline">
-            <input type="text" name="classNum" required autocomplete="on"
+            <input type="text" name="examId" autocomplete="on"
                    class="layui-input">
         </div>
-        <label class="layui-form-label">入学年份</label>
+        <label class="layui-form-label">课程id</label>
         <div class="layui-input-inline">
-            <input type="text" name="toSchoolYear" autocomplete="on"
+            <input type="text" name="courseId" autocomplete="on"
+                   class="layui-input">
+        </div>
+        <label class="layui-form-label">考试id</label>
+        <div class="layui-input-inline">
+            <input type="text" name="examId" autocomplete="on"
+                   class="layui-input">
+        </div>
+        <label class="layui-form-label">考试组id</label>
+        <div class="layui-input-inline">
+            <input type="text" name="examGroupId" autocomplete="on"
                    class="layui-input">
         </div>
         <div class="layui-input-inline">
@@ -40,9 +61,6 @@
     </div>
 </form>
 <table id="list" lay-filter="data-table"></table>
-<script type="text/html" id="toolBar">
-    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">更新</a>
-</script>
 <script type="application/javascript" th:inline="none">
     (function () {
         let layer;
@@ -68,9 +86,9 @@
             })
         }
 
-        /*function update(param) {
+        function update(param) {
             $.ajax({
-                url: '/student/inside/updateSelective'
+                url: '/score/inside/updateSelective'
                 , type: 'PUT'
                 , data: param
                 , success: function (data) {
@@ -79,7 +97,7 @@
                     }
                 }
             })
-        }*/
+        }
 
         function render(param) {
             var table = null;
@@ -89,7 +107,7 @@
                     elem: '#list'
                     , autoSort: false
                     , initSort: {
-                        field: 'id' //排序字段，对应 cols 设定的各字段名
+                        field: 'score' //排序字段，对应 cols 设定的各字段名
                         , type: 'desc' //排序方式  asc: 升序、desc: 降序、null: 默认排序
                     }
                     //,width: 900
@@ -100,11 +118,14 @@
                         , {field: 'classId', title: '班级id', align: 'center', sort: true}
                         , {field: 'studentId', title: '学号', align: 'center', sort: true}
                         , {field: 'studentName', title: '姓名', align: 'center', sort: true}
-                        , {field: 'toSchoolYear', title: '入学年份', align: 'center', sort: true}
-                        , {field: 'type', title: '学校类型', align: 'center', sort: true}
+                        , {field: 'score', title: '成绩', align: 'center', edit: true, sort: true}
+                        , {field: 'gradeNum', title: '年级', align: 'center', sort: true}
+                        , {field: 'courseName', title: '科目', align: 'center', sort: true}
+                        , {field: 'examName', title: '考试名', align: 'center', sort: true}
+                        , {field: 'examGroupName', title: '考试组名', align: 'center', sort: true}
                         , {field: 'createTime', title: '创建时间', align: 'center', sort: true}
                     ]]
-                    , url: '/student/inside/searchSelectivePage'
+                    , url: '/score/inside/searchSelectivePage'
                     , response: {
                         statusName: 'status' //规定数据状态的字段名称，默认：code
                         , statusCode: 0 //规定成功的状态码，默认：0
@@ -121,6 +142,19 @@
                     //, limits: [3, 5, 10]
                     , loading: true //请求数据时，是否显示loading
                 });
+                table.on('edit(data-table)', function (obj) {
+                    var value = obj.value //得到修改后的值
+                        , data = obj.data //得到所在行所有键值
+                        , field = obj.field; //得到字段
+                    layer.confirm('确定更改?', function () {
+                        var param = {
+                            id: data.id
+                        };
+                        param[field] = value;
+                        update(param);
+                    })
+
+                })
                 table.on('sort(data-table)', function (obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
                     console.log(obj.field); //当前排序的字段名
                     console.log(obj.type); //当前排序类型：desc（降序）、asc（升序）、null（空对象，默认排序）
@@ -136,15 +170,6 @@
                         }
                     });
                 });
-                /*table.on('edit(data-table)', function (obj) {
-                    var value = obj.value //得到修改后的值
-                        , data = obj.data //得到所在行所有键值
-                        , field = obj.field; //得到字段
-                    layer.confirm('确定更改?', function () {
-                        update(obj.data);
-                    })
-
-                })*/
             });
         };
         bindAction();

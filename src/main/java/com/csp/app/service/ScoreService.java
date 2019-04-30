@@ -4,10 +4,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.service.IService;
 import com.csp.app.common.CacheService;
 import com.csp.app.entity.Score;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 1.	个人成绩单：要求展示各科目成绩，班级科目名次，年级科目名次，总分，班级总分名次，年级总分名次
@@ -40,6 +42,22 @@ public interface ScoreService extends IService<Score>{
      */
     JSONObject getPersonScores(Integer studentId, Integer examGroupId);
 
+
+    /**
+     * 查询年级总分排名
+     * @param examGroupId
+     * @return
+     */
+    Map<Object, Integer> searchTotalScoreGradeOrderMap(Integer examGroupId);
+
+    /**
+     * 查询班级总分排名
+     * @param examGroupId
+     * @param classId
+     * @return
+     */
+    Map<Object, Integer> searchTotalScoreClassOrderMap(Integer examGroupId, Integer classId);
+
     /**
      * 班级成绩单
      * @param classId 班级编号
@@ -54,4 +72,17 @@ public interface ScoreService extends IService<Score>{
      */
     List<HashMap<String,Object>> getGradeScore(Integer gradeNum);
 
+    /**
+     * 查询单科班级排名
+     * @param examId
+     * @param classId
+     * @return
+     */
+    Map<Object, Integer> getClassScoreOrderMap(Integer examId, Integer classId);
+    /**
+     * 查询单个年级排名
+     * @param examId
+     * @return
+     */
+    Map<Object, Integer> getGradeScoreOrderMap(Integer examId);
 }
