@@ -1,5 +1,6 @@
 package com.csp.app.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.toolkit.CollectionUtils;
@@ -7,12 +8,14 @@ import com.csp.app.common.CacheKey;
 import com.csp.app.entity.Clasz;
 import com.csp.app.entity.Course;
 import com.csp.app.entity.Exam;
+import com.csp.app.entity.ExamGroup;
 import com.csp.app.entity.Score;
 import com.csp.app.entity.Student;
 import com.csp.app.mapper.ScoreMapper;
 import com.csp.app.mapper.SystemSettingMapper;
 import com.csp.app.service.ClassService;
 import com.csp.app.service.CourseService;
+import com.csp.app.service.ExamGroupService;
 import com.csp.app.service.ExamService;
 import com.csp.app.service.RedisService;
 import com.csp.app.service.ScoreService;
@@ -24,8 +27,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.util.StringUtil;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author chengsp
@@ -33,6 +42,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements ScoreService {
     private final static Logger logger = LoggerFactory.getLogger(ScoreServiceImpl.class);
+    private static DecimalFormat decimalFormat = new DecimalFormat("0.00");
     @Autowired
     private SystemSettingMapper systemSettingMapper;
     @Autowired
@@ -45,6 +55,10 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     private ExamService examService;
     @Autowired
     private CourseService courseService;
+    @Autowired
+    private ScoreMapper scoreMapper;
+    @Autowired
+    private ExamGroupService examGroupService;
 
     @Override
     public boolean add(Score score) {
@@ -66,15 +80,17 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         score.setStudentName(studentName);
         Integer examId = score.getExamId();
         String examName = score.getExamName();
+        Integer examGroupId;
+        String examGroupName;
         if (examId == null) {
-            Exam exam = examService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_NAME_EXAM
-                    , score.getExamName()));
+            Exam exam = examService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_NAME_EXAM, score.getExamName()));
             if (exam != null) {
                 examId = exam.getExamId();
             }
         }
+        String key = String.format(CacheKey.EXAM_ID_EXAM, score.getExamId());
         if (examName == null) {
-            Exam exam = examService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_ID_EXAM, score.getExamId()));
+            Exam exam = examService.getEntityFromLocalCacheByKey(key);
             if (exam != null) {
                 examName = exam.getExamName();
             }
@@ -82,6 +98,13 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         if (examId == null || examName == null) {
             throw new RuntimeException("找不到对应的考试信息");
         }
+
+        Exam exam = examService.getEntityFromLocalCacheByKey(key);
+        if (exam == null) {
+            throw new RuntimeException("找不到对应的考试信息");
+        }
+        score.setExamGroupId(exam.getExamGroupId());
+        score.setExamGroupName(exam.getExamGroupName());
         score.setExamId(examId);
         score.setExamName(examName);
         score.setClassId(student.getClassId());
@@ -99,7 +122,6 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
             gradeNum++;
         }
         score.setGradeNum(gradeNum);
-        Exam exam = examService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_ID_EXAM, score.getExamId()));
         score.setCourseId(exam.getCourseId());
         score.setCourseName(exam.getCourseName());
     }
@@ -117,21 +139,95 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
 
     /**
      * 各科目成绩，班级科目名次，年级科目名次，总分，班级总分名次，年级总分名次
+     *
      * @param studentId 学号
      * @return
      */
     @Override
-    public List<HashMap<String, Object>> getPersonScores(Integer studentId,Integer examGroupId) {
-        List<HashMap<String, Object>> personScores = new ArrayList<>();
+    public JSONObject getPersonScores(Integer studentId, Integer examGroupId) {
+        JSONObject scoreMsg = new JSONObject();
+        List<Map> personScores = new ArrayList<>();
+        ExamGroup examGroup = examGroupService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_GROUP_ID_EXAM_GROUP, examGroupId));
+        if (examGroup == null) {
+            throw new RuntimeException("考试组不存在,考试组id:" + examGroupId);
+        }
+        Student student = studentService.getEntityFromLocalCacheByKey(String.format(CacheKey.STUDENT_ID_STUDENT, studentId));
+        if (student == null) {
+            throw new RuntimeException("没有这样的学生,学号:" + studentId);
+        }
         List<Exam> exams = examService.getExamsByGroupId(examGroupId);
+        if (exams.isEmpty()) {
+            throw new RuntimeException("考试组未添加考试,考试组id:" + examGroupId);
+        }
+        Score score = null;
+        int totalScore = 0;
         for (Exam exam : exams) {
-            HashMap<String,Object> personScore = new HashMap<>();
-            Score score = getScoreByStudentAndExamId(studentId, exam.getExamId());
-            personScore.put("courseName",score.getCourseName());
-            personScore.put("score",score.getScore());
+            JSONObject personScore = new JSONObject();
+            Map<Object, Integer> classOrderMap = getClassScoreOrderMap(exam.getExamId(), student.getClassId());
+            Map<Object, Integer> gradeOrderMap = getGradeScoreOrderMap(exam.getExamId());
+            score = getScoreByStudentAndExamId(studentId, exam.getExamId());
+            Integer scoreValue = 0;
+            if (score == null) {
+                personScore.put("score", scoreValue);
+            } else {
+                scoreValue = score.getScore();
+                personScore.put("score", scoreValue);
+                totalScore += scoreValue;
+            }
+            Integer courseId = exam.getCourseId();
+            Course course = courseService.getEntityFromLocalCacheByKey(String.format(CacheKey.COURSE_ID_COURSE
+                    , courseId));
+            boolean isPass = true;
+            if (course == null) {
+                throw new RuntimeException("没有这样的科目,科目id" + courseId);
+            }
+            if (scoreValue < course.getFullScore() * 0.6) {
+                isPass = false;
+            }
+            personScore.put("courseName", exam.getCourseName());
+            personScore.put("isPass", isPass);
+            personScore.put("courseId", courseId);
+            personScore.put("fullScore", course.getFullScore());
+            personScore.put("examName", exam.getExamName());
+            personScore.put("examId", exam.getExamId());
+            personScore.put("classOrder", classOrderMap.get(studentId));
+            personScore.put("gradeOrder", gradeOrderMap.get(studentId));
             personScores.add(personScore);
         }
-        return personScores;
+        scoreMsg.put("personScores", personScores);
+        Map<Object, Integer> gradeOrderMap = searchTotalScoreGradeOrderMap(examGroupId);
+        Map<Object, Integer> classOrderMap = searchTotalScoreClassOrderMap(examGroupId, student.getClassId());
+        scoreMsg.put("gradeOrder", gradeOrderMap.get(studentId.toString()));
+        scoreMsg.put("studentId", studentId);
+        scoreMsg.put("classId", student.getClassId());
+        scoreMsg.put("studentName", student.getStudentName());
+        scoreMsg.put("classOrder", classOrderMap.get(studentId.toString()));
+        scoreMsg.put("examGroupId", examGroup.getExamGroupId());
+        scoreMsg.put("examGroupName", examGroup.getExamGroupName());
+        scoreMsg.put("gradeNum", score.getGradeNum());
+        scoreMsg.put("totalScore", totalScore);
+        scoreMsg.put("averageScore", decimalFormat.format(totalScore * 1.0 / exams.size()));
+        return scoreMsg;
+    }
+
+    private Map<Object, Integer> searchTotalScoreGradeOrderMap(Integer examGroupId) {
+        List<Map> gradeOrderInfoMaps = scoreMapper.searchTotalScoreGradeOrder(examGroupId);
+        Map<Object, Integer> gradeOrderMap = new LinkedHashMap<>();
+        int i = 1;
+        for (Map map : gradeOrderInfoMaps) {
+            gradeOrderMap.put(map.get("studentId").toString(), i++);
+        }
+        return gradeOrderMap;
+    }
+
+    private Map<Object, Integer> searchTotalScoreClassOrderMap(Integer examGroupId, Integer classId) {
+        List<Map> gradeOrderInfoMaps = scoreMapper.searchTotalScoreClassOrder(examGroupId, classId);
+        Map<Object, Integer> classOrderMap = new LinkedHashMap<>();
+        int i = 1;
+        for (Map map : gradeOrderInfoMaps) {
+            classOrderMap.put(map.get("studentId").toString(), i++);
+        }
+        return classOrderMap;
     }
 
     @Override
@@ -146,16 +242,43 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
 
     /**
      * 通过学号和考试组查询考试
+     *
      * @param studentId
      * @param examId
      * @return
      */
-    private Score getScoreByStudentAndExamId(Integer studentId,Integer examId){
-        EntityWrapper entityWrapper = new EntityWrapper(new Score());
-        entityWrapper.eq("student_id",studentId);
-        entityWrapper.eq("exam_id",examId);
+    private Score getScoreByStudentAndExamId(Integer studentId, Integer examId) {
+        EntityWrapper<Score> entityWrapper = new EntityWrapper<>(new Score());
+        entityWrapper.eq("student_id", studentId);
+        entityWrapper.eq("exam_id", examId);
         return selectOne(entityWrapper);
     }
 
+    private Map<Object, Integer> getClassScoreOrderMap(Integer examId, Integer classId) {
+        LinkedHashMap<Object, Integer> orderMap = new LinkedHashMap<>();
+        EntityWrapper<Score> entityWrapper = new EntityWrapper<>(new Score());
+        entityWrapper.eq("exam_id", examId);
+        entityWrapper.eq("class_id", classId);
+        entityWrapper.orderBy("score", false);
+        List<Score> scores = selectList(entityWrapper);
+        int i = 1;
+        for (Score score : scores) {
+            orderMap.put(score.getStudentId(), i++);
+        }
+        return orderMap;
+    }
+
+    private Map<Object, Integer> getGradeScoreOrderMap(Integer examId) {
+        LinkedHashMap<Object, Integer> orderMap = new LinkedHashMap<>();
+        EntityWrapper<Score> entityWrapper = new EntityWrapper<>(new Score());
+        entityWrapper.eq("exam_id", examId);
+        entityWrapper.orderBy("score", false);
+        List<Score> scores = selectList(entityWrapper);
+        int i = 1;
+        for (Score score : scores) {
+            orderMap.put(score.getStudentId(), i++);
+        }
+        return orderMap;
+    }
 
 }

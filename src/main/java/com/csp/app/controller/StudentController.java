@@ -70,15 +70,21 @@ public class StudentController extends BaseController {
             }
         }
     }
+
     @RequestMapping("/inside/searchSelectivePage")
-    public ResponseBuilder searchSelectivePage(Student exam, Integer page, Integer limit) {
+    public ResponseBuilder searchSelectivePage(Student student, Integer page, Integer limit) {
         try {
-            EntityWrapper<Student> wrapper = new EntityWrapper<>(exam);
+            if (page == null) {
+                page = 0;
+            }
+            if (limit == null) {
+                limit = 10;
+            }
+            EntityWrapper<Student> wrapper = new EntityWrapper<>(student);
             int count = studentService.selectCount(wrapper);
-            Page<Student> conditionPage = new Page<>();
-            conditionPage.setCurrent(page);
-            conditionPage.setSize(limit);
-            Page<Student> examPage = studentService.selectPage(conditionPage, wrapper);
+            Page<Student> examPage = new Page<>(page,limit,"student_id",true);
+            examPage.setTotal(count);
+            studentService.selectPage(examPage, wrapper);
             return ResponseBuilder.buildPage("查询成功", examPage.getRecords(), count);
         } catch (Exception e) {
             logger.error("searchSelectivePage error: {}", e);

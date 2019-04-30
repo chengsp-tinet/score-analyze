@@ -51,6 +51,16 @@ public class Score extends BaseEntity {
     @Column
     private String examName;
     /**
+     * 考试组id
+     */
+    @Column
+    private Integer examGroupId;
+    /**
+     * 考试组名
+     */
+    @Column
+    private String examGroupName;
+    /**
      * 科目id
      */
     @Column
@@ -110,6 +120,22 @@ public class Score extends BaseEntity {
 
     public Integer getExamId() {
         return examId;
+    }
+
+    public Integer getExamGroupId() {
+        return examGroupId;
+    }
+
+    public void setExamGroupId(Integer examGroupId) {
+        this.examGroupId = examGroupId;
+    }
+
+    public String getExamGroupName() {
+        return examGroupName;
+    }
+
+    public void setExamGroupName(String examGroupName) {
+        this.examGroupName = examGroupName;
     }
 
     public void setExamId(Integer examId) {

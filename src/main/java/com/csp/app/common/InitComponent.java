@@ -18,7 +18,7 @@ public class InitComponent implements CommandLineRunner {
     @Override
     public void run(String... arg0) {
         new SubThread("订阅线程").start();
-        logger.info("启动成功......");
+        logger.info("score-analyze启动成功......");
     }
 
 }

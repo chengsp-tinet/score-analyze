@@ -44,10 +44,8 @@ public class ExamController extends BaseController {
         try {
             EntityWrapper<Exam> wrapper = new EntityWrapper<>(exam);
             int count = examService.selectCount(wrapper);
-            Page<Exam> conditionPage = new Page<>();
-            conditionPage.setCurrent(page);
-            conditionPage.setSize(limit);
-            Page<Exam> examPage = examService.selectPage(conditionPage, wrapper);
+            Page<Exam> examPage = new Page<>(page,limit,"id",false);
+            examService.selectPage(examPage, wrapper);
             return ResponseBuilder.buildPage("查询成功", examPage.getRecords(), count);
         } catch (Exception e) {
             logger.error("searchSelectivePage error: {}", e);
@@ -76,7 +74,7 @@ public class ExamController extends BaseController {
             }
         } catch (Exception e) {
             logger.error("add error: {}", e);
-            return ResponseBuilder.buildError("系统异常:" + e.toString());
+            return ResponseBuilder.buildError("系统异常:" + e.getMessage());
         }
     }
 

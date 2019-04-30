@@ -1,5 +1,6 @@
 package com.csp.app.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.csp.app.common.BaseController;
@@ -81,7 +82,7 @@ public class ScoreController extends BaseController {
             logger.info("导入成功!");
             return ResponseBuilder.buildSuccess("成功", null);
         } catch (Exception e) {
-            logger.error("导入发生异常:{}", e);
+            logger.error("导入发生异常 :{}", e);
             return ResponseBuilder.buildError("批量导入成绩失败,系统异常" + e.getMessage());
         } finally {
             if (is != null) {
@@ -93,4 +94,16 @@ public class ScoreController extends BaseController {
             }
         }
     }
+    @RequestMapping("/inside/searchPersonalScore")
+    @ResponseBody
+    public ResponseBuilder searchPersonalScore(Integer studentId, Integer examGroupId) {
+        try {
+            JSONObject personScores = scoreService.getPersonScores(studentId, examGroupId);
+            return ResponseBuilder.buildSuccess("成功", personScores);
+        } catch (Exception e) {
+            logger.error("searchPersonalScore error :{}", e);
+            return ResponseBuilder.buildFail("失败,系统异常:" + e.getMessage());
+        }
+    }
+
 }

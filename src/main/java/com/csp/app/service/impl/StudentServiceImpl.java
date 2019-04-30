@@ -9,11 +9,14 @@ import com.csp.app.mapper.StudentMapper;
 import com.csp.app.service.ClassService;
 import com.csp.app.service.RedisService;
 import com.csp.app.service.StudentService;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -68,10 +71,11 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
 
     @Override
     public boolean add(Student student) {
-        return completeEntity(student);
+        completeEntity(student);
+        return insert(student);
     }
 
-    private boolean completeEntity(Student student) {
+    private void completeEntity(Student student) {
         Integer classId = student.getClassId();
         Clasz clasz = classService.getEntityFromLocalCacheByKey(String.format(CacheKey.CLASS_ID_CLASS
                 , classId));
@@ -88,15 +92,34 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             student.setStudentId(insertStudentId);
             student.setToSchoolYear(clasz.getToSchoolYear());
             student.setType(clasz.getType());
-            return insert(student);
         }
     }
 
     @Override
     public boolean batchAdd(List<Student> students) {
+        ArrayListMultimap<Integer, Student> multiMap = ArrayListMultimap.create();
         for (Student student : students) {
-            completeEntity(student);
+            multiMap.put(student.getClassId(), student);
         }
+        Map<Integer, Collection<Student>> classfyMap = multiMap.asMap();
+        classfyMap.forEach((classId, studentList) -> {
+            Clasz clasz = classService.getEntityFromLocalCacheByKey(String.format(CacheKey.CLASS_ID_CLASS
+                , classId));
+            Long maxStudentId = studentMapper.selectMaxStudentIdByClassId(classId);
+            Long insertStudentId;
+            if (maxStudentId == null) {
+                insertStudentId = classId * 1000L;
+            } else {
+                insertStudentId = maxStudentId + 1;
+            }
+            int i = 1;
+            for (Student student : studentList) {
+                student.setStudentId(insertStudentId + i);
+                student.setToSchoolYear(clasz.getToSchoolYear());
+                student.setType(clasz.getType());
+                i++;
+            }
+        });
         return insertBatch(students);
     }
 }

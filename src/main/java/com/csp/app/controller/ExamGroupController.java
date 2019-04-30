@@ -44,10 +44,8 @@ public class ExamGroupController extends BaseController {
         try {
             EntityWrapper<ExamGroup> wrapper = new EntityWrapper<>(examGroup);
             int count = examGroupService.selectCount(wrapper);
-            Page<ExamGroup> conditionPage = new Page<>();
-            conditionPage.setCurrent(page);
-            conditionPage.setSize(limit);
-            Page<ExamGroup> examGroupPage = examGroupService.selectPage(conditionPage, wrapper);
+            Page<ExamGroup> examGroupPage = new Page<>(page,limit,"id",false);
+            examGroupService.selectPage(examGroupPage, wrapper);
             return ResponseBuilder.buildPage("查询成功", examGroupPage.getRecords(), count);
         } catch (Exception e) {
             logger.error("searchSelectivePage error: {}", e);

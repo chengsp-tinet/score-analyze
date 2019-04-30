@@ -127,7 +127,7 @@ public class ExamServiceImpl extends ServiceImpl<ExamMapper, Exam> implements Ex
     @Override
     public List<Exam> getExamsByGroupId(Integer groupId) {
         EntityWrapper entityWrapper = new EntityWrapper<>(new Exam());
-        entityWrapper.eq("group_id",groupId);
+        entityWrapper.eq("exam_group_id",groupId);
         return examMapper.selectList(entityWrapper);
     }
 

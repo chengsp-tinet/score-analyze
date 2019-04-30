@@ -1,10 +1,12 @@
 package com.csp.app.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.service.IService;
 import com.csp.app.common.CacheService;
 import com.csp.app.entity.Score;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -36,7 +38,7 @@ public interface ScoreService extends IService<Score>{
      * @param studentId 学号
      * @return
      */
-    List<HashMap<String, Object>> getPersonScores(Integer studentId,Integer examGroupId);
+    JSONObject getPersonScores(Integer studentId, Integer examGroupId);
 
     /**
      * 班级成绩单
@@ -51,4 +53,5 @@ public interface ScoreService extends IService<Score>{
      * @return
      */
     List<HashMap<String,Object>> getGradeScore(Integer gradeNum);
+
 }

@@ -1,6 +1,7 @@
 package com.csp.app.common;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.csp.app.service.RedisService;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +20,8 @@ public class AplicationEvent {
     private List<CacheService> cacheServices;
     @Autowired
     private SqlFilter sqlFilter;
-
+    @Autowired
+    private RedisService redisService;
     @PreDestroy
     private void doBeforeDestroy(){
         logger.info("项目关闭时执行的操作");
@@ -27,6 +29,7 @@ public class AplicationEvent {
 
     @PostConstruct
     private void doAfterStart(){
+        redisService.flushDB(Const.DEFAULT_INDEX);
         logger.info("项目启动时执行的操作");
         logger.info("CacheService个数:{}",cacheServices.size());
         druidDataSource.setProxyFilters(Lists.newArrayList(sqlFilter));

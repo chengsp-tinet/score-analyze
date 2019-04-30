@@ -338,4 +338,14 @@ public class RedisService {
             redisTemplate.convertAndSend(channel, JSON.toJSON(message));
         }
     }
+
+    /**
+     * 清空某库
+     * @param index
+     */
+    public void flushDB(int index){
+        RedisConnection connection = getConnection();
+        connection.select(index);
+        connection.flushDb();
+    }
 }
