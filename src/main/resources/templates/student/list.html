@@ -19,19 +19,34 @@
 <body>
 <form class="layui-form form-padding" id="search-form">
     <div class="layui-form-item">
-        <label class="layui-form-label">班级id</label>
+        <label class="layui-form-label">学号</label>
+        <div class="layui-input-inline">
+            <input type="text" name="studentId" autocomplete="on"
+                   class="layui-input">
+        </div>
+        <label class="layui-form-label">姓名</label>
+        <div class="layui-input-inline">
+            <input type="text" name="studentName" autocomplete="on"
+                   class="layui-input">
+        </div>
+        <label class="layui-form-label">班级编号</label>
         <div class="layui-input-inline">
             <input type="text" name="classId" autocomplete="on"
                    class="layui-input">
         </div>
-        <label class="layui-form-label">班号</label>
+        <!--<label class="layui-form-label">班级编号</label>
         <div class="layui-input-inline">
             <input type="text" name="classNum" required autocomplete="on"
                    class="layui-input">
-        </div>
+        </div>-->
         <label class="layui-form-label">入学年份</label>
         <div class="layui-input-inline">
             <input type="text" name="toSchoolYear" autocomplete="on"
+                   class="layui-input">
+        </div>
+        <label class="layui-form-label">学校类型</label>
+        <div class="layui-input-inline">
+            <input type="text" name="type" autocomplete="on"
                    class="layui-input">
         </div>
         <div class="layui-input-inline">
@@ -96,8 +111,7 @@
                     //,height: 274
                     , cellMinWidth: 80
                     , cols: [[
-                        {field: 'id', title: '流水号', align: 'center', sort: true}
-                        , {field: 'classId', title: '班级id', align: 'center', sort: true}
+                        {field: 'classId', title: '班级编号', align: 'center', sort: true}
                         , {field: 'studentId', title: '学号', align: 'center', sort: true}
                         , {field: 'studentName', title: '姓名', align: 'center', sort: true}
                         , {field: 'toSchoolYear', title: '入学年份', align: 'center', sort: true}

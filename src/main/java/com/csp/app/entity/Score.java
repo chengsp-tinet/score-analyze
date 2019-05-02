@@ -21,7 +21,7 @@ public class Score extends BaseEntity {
      * 学生
      */
     @Column
-    private Integer studentId;
+    private Long studentId;
     @Column
     private String studentName;
     /**
@@ -82,11 +82,11 @@ public class Score extends BaseEntity {
         this.id = id;
     }
 
-    public Integer getStudentId() {
+    public Long getStudentId() {
         return studentId;
     }
 
-    public void setStudentId(Integer studentId) {
+    public void setStudentId(Long studentId) {
         this.studentId = studentId;
     }
 

@@ -12,7 +12,7 @@
 <style type="text/css">
     .form-padding {
         padding: 10px;
-        width: 310px;
+        width: 400px;
     }
 
     .upload-file {
@@ -22,6 +22,9 @@
         text-align: center;
         display: inline-block;
         line-height: 200px;
+    }
+    .form-padding div.layui-input-inline{
+        width: 220px;
     }
 </style>
 </head>
@@ -34,17 +37,10 @@
                    class="layui-input">
         </div>
     </div>
-    <!--<div class="layui-form-item">
-        <label class="layui-form-label">考试id</label>
-        <div class="layui-input-inline">
-            <input type="text" name="examId" required lay-verify="required" placeholder="请输入考试id" autocomplete="on"
-                   class="layui-input">
-        </div>
-    </div>-->
     <div class="layui-form-item">
         <label class="layui-form-label">考试</label>
         <div class="layui-input-block">
-            <select name="examId" lay-filter="aihao">
+            <select name="examId" lay-filter="exam" lay-search>
                 <option th:each="exam:${exams}" th:value="${exam.examId}" th:text="${exam.examName}"></option>
             </select>
         </div>

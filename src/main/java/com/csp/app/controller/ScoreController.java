@@ -1,5 +1,6 @@
 package com.csp.app.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
@@ -78,7 +79,7 @@ public class ScoreController extends BaseController {
     @RequestMapping("/inside/searchSelectivePage")
     @ResponseBody
     public ResponseBuilder searchSelectivePage(Score score, Integer page, Integer limit, String studentName
-            , String orderFiled, String orderType) {
+            , String orderFiled, String orderType, Integer ltScore, Integer geScore) {
         try {
             if (page == null) {
                 page = 0;
@@ -91,6 +92,12 @@ public class ScoreController extends BaseController {
             if (StringUtil.isNotEmpty(studentName)) {
                 wrapper.like("student_name", "%" + studentName + "%");
             }
+            if (ltScore != null) {
+                wrapper.lt("score", ltScore);
+            }
+            if (geScore != null) {
+                wrapper.lt("score", geScore);
+            }
             int count = scoreService.selectCount(wrapper);
             boolean orderTypeBoo = true;
             if (StringUtil.isNotEmpty(orderType) && orderType.equals("asc")) {
@@ -99,6 +106,7 @@ public class ScoreController extends BaseController {
             if (StringUtil.isEmpty(orderFiled)) {
                 orderFiled = "id";
             }
+
             Page<Score> scorePage = new Page<>(page, limit, orderFiled, orderTypeBoo);
             scorePage.setTotal(count);
             scoreService.selectPage(scorePage, wrapper);
@@ -116,7 +124,7 @@ public class ScoreController extends BaseController {
         return ResponseBuilder.buildSuccess("成功", scores);
     }
 
-    @RequestMapping(value = "/inside/addBatch",method = RequestMethod.POST)
+    @RequestMapping(value = "/inside/addBatch", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBuilder addBatch(@RequestParam("file") MultipartFile file) {
         InputStream is = null;
@@ -143,7 +151,7 @@ public class ScoreController extends BaseController {
 
     @RequestMapping("/inside/searchPersonalScore")
     @ResponseBody
-    public ResponseBuilder searchPersonalScore(Integer studentId, Integer examGroupId) {
+    public ResponseBuilder searchPersonalScore(Long studentId, Integer examGroupId) {
         try {
             if (studentId == null) {
                 return ResponseBuilder.buildFail("失败,学号不可为空");
@@ -151,10 +159,28 @@ public class ScoreController extends BaseController {
             if (examGroupId == null) {
                 return ResponseBuilder.buildFail("失败,考试组号不可为空");
             }
-            JSONObject personScores = scoreService.getPersonScores(studentId, examGroupId);
+            JSONArray personScores = scoreService.getPersonScores(studentId, examGroupId);
             return ResponseBuilder.buildSuccess("成功", personScores);
         } catch (Exception e) {
             logger.error("searchPersonalScore error :{}", e);
+            return ResponseBuilder.buildFail("失败,系统异常:" + e.getMessage());
+        }
+    }
+
+    @RequestMapping("/inside/searchClassScore")
+    @ResponseBody
+    public ResponseBuilder searchClassScore(Integer classId, Integer examGroupId) {
+        try {
+            if (classId == null) {
+                return ResponseBuilder.buildFail("失败,班级编号不可为空");
+            }
+            if (examGroupId == null) {
+                return ResponseBuilder.buildFail("失败,考试组号不可为空");
+            }
+            JSONObject classScore = scoreService.getClassScore(classId, examGroupId);
+            return ResponseBuilder.buildSuccess("成功", classScore);
+        } catch (Exception e) {
+            logger.error("searchClassScore error :{}", e);
             return ResponseBuilder.buildFail("失败,系统异常:" + e.getMessage());
         }
     }
@@ -166,9 +192,26 @@ public class ScoreController extends BaseController {
             scoreService.updateById(score);
             return ResponseBuilder.buildSuccess("成功", null);
         } catch (Exception e) {
-            logger.error("searchPersonalScore error :{}", e);
+            logger.error("updateSelective error :{}", e);
             return ResponseBuilder.buildFail("失败,系统异常:" + e.getMessage());
         }
     }
 
+    @RequestMapping(value = "/inside/getScoreShowTemplate")
+    @ResponseBody
+    public ResponseBuilder getScoreShowTemplate(Long studentId, Integer examGroupId) {
+        try {
+            if (studentId == null) {
+                return ResponseBuilder.buildFail("失败,学号不可为空");
+            }
+            if (examGroupId == null) {
+                return ResponseBuilder.buildFail("失败,考试组号不可为空");
+            }
+            JSONArray scoreShowTemplate = scoreService.getScoreShowTemplate(studentId, examGroupId);
+            return ResponseBuilder.buildSuccess("成功", scoreShowTemplate);
+        } catch (Exception e) {
+            logger.error("getScoreShowTemplate erro :{}", e);
+            return ResponseBuilder.buildError("失败,系统异常:" + e.getMessage());
+        }
+    }
 }

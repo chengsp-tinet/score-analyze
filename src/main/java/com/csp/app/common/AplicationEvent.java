@@ -29,7 +29,6 @@ public class AplicationEvent {
 
     @PostConstruct
     private void doAfterStart(){
-        redisService.flushDB(Const.DEFAULT_INDEX);
         logger.info("项目启动时执行的操作");
         logger.info("CacheService个数:{}",cacheServices.size());
         druidDataSource.setProxyFilters(Lists.newArrayList(sqlFilter));

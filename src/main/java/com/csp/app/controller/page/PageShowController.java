@@ -89,6 +89,10 @@ public class PageShowController {
     public String showScorePersonalList() {
         return "score/list-personal-score";
     }
+    @RequestMapping("/score/listClassScore")
+    public String showScoreClassList() {
+        return "score/list-class-score";
+    }
 
     @RequestMapping("/examGroup/add")
     public String showExamGroupAdd() {

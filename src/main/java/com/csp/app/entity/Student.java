@@ -45,6 +45,13 @@ public class Student {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date createTime;
 
+    public Student() {
+    }
+
+    public Student(Integer classId) {
+        this.classId = classId;
+    }
+
     public Integer getId() {
         return id;
     }

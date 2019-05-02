@@ -30,4 +30,20 @@ public interface ScoreMapper extends BaseMapper<Score> {
      */
     @Select("SELECT sum(score) total,student_id studentId FROM score WHERE exam_group_id =#{examGroupId} and class_id=#{classId} GROUP BY student_id ORDER BY total DESC")
     List<Map> searchTotalScoreClassOrder(@Param("examGroupId") Integer examGroupId, @Param("classId") Integer classId);
+
+    /**
+     * 查询班级某课程平均分
+     * @param examId
+     * @return
+     */
+    @Select("SELECT avg(score) avg_score,class_id FROM `score` WHERE exam_id=100000 GROUP BY class_id ORDER BY avg_score desc")
+    List<Map> selectCourseScoreAvgByExamId(@Param("examId") Integer examId);
+
+    /**
+     * 查询班级某课程总分
+     * @param examId
+     * @return
+     */
+    @Select("SELECT sum(score) total_score,class_id FROM `score` WHERE exam_id=100000 GROUP BY class_id")
+    List<Map> selectCourseScoreTotalByExamId(@Param("examId") Integer examId);
 }

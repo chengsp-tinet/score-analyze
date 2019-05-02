@@ -29,30 +29,40 @@
             <input type="text" name="studentName" required autocomplete="on"
                    class="layui-input">
         </div>
-        <label class="layui-form-label">班级id</label>
+        <label class="layui-form-label">班级编号</label>
         <div class="layui-input-inline">
             <input type="text" name="classId" autocomplete="on"
                    class="layui-input">
         </div>
 
-        <label class="layui-form-label">考试id</label>
+        <label class="layui-form-label">考试编号</label>
         <div class="layui-input-inline">
             <input type="text" name="examId" autocomplete="on"
                    class="layui-input">
         </div>
-        <label class="layui-form-label">课程id</label>
+        <label class="layui-form-label">科目编号</label>
         <div class="layui-input-inline">
             <input type="text" name="courseId" autocomplete="on"
                    class="layui-input">
         </div>
-        <label class="layui-form-label">考试id</label>
+        <label class="layui-form-label">考试编号</label>
         <div class="layui-input-inline">
             <input type="text" name="examId" autocomplete="on"
                    class="layui-input">
         </div>
-        <label class="layui-form-label">考试组id</label>
+        <label class="layui-form-label">考试组编号</label>
         <div class="layui-input-inline">
             <input type="text" name="examGroupId" autocomplete="on"
+                   class="layui-input">
+        </div>
+        <label class="layui-form-label">成绩下限</label>
+        <div class="layui-input-inline">
+            <input type="text" name="geScore" autocomplete="on"
+                   class="layui-input">
+        </div>
+        <label class="layui-form-label">成绩上限</label>
+        <div class="layui-input-inline">
+            <input type="text" name="ltScore" autocomplete="on"
                    class="layui-input">
         </div>
         <div class="layui-input-inline">
@@ -115,7 +125,7 @@
                     , cellMinWidth: 80
                     , cols: [[
                         {field: 'id', title: '流水号', align: 'center', sort: true}
-                        , {field: 'classId', title: '班级id', align: 'center', sort: true}
+                        , {field: 'classId', title: '班级编号', align: 'center', sort: true}
                         , {field: 'studentId', title: '学号', align: 'center', sort: true}
                         , {field: 'studentName', title: '姓名', align: 'center', sort: true}
                         , {field: 'score', title: '成绩', align: 'center', edit: true, sort: true}

@@ -1,13 +1,11 @@
 package com.csp.app.service;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.service.IService;
-import com.csp.app.common.CacheService;
 import com.csp.app.entity.Score;
-import org.springframework.cache.annotation.Cacheable;
+import org.apache.ibatis.annotations.Param;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,11 +35,38 @@ public interface ScoreService extends IService<Score>{
 
     /**
      * 个人成绩单
-     * @param studentId 学号
+     * @param studentId
+     * @param examGroupId
      * @return
      */
-    JSONObject getPersonScores(Integer studentId, Integer examGroupId);
+    JSONArray getPersonScores(Long studentId, Integer examGroupId);
 
+    /**
+     * 查询班级某课程平均分
+     * @param examId
+     * @return
+     */
+    List<Map> selectCourseScoreAvgByExamId(Integer examId);
+    /**
+     * 查询班级某课程总分
+     * @param examId
+     * @return
+     */
+    List<Map> selectCourseScoreTotalByExamId(@Param("examId") Integer examId);
+
+    /**
+     * 查询班级课程平均分排名
+     * @param examId
+     * @return
+     */
+    Map<String, Map> searchCourseScoreAvgOrderMap(Integer examId);
+
+    /**
+     * 查询班级课程总分
+     * @param examId
+     * @return
+     */
+    Map searchCourseScoreTotalMap(Integer examId);
 
     /**
      * 查询年级总分排名
@@ -58,19 +83,6 @@ public interface ScoreService extends IService<Score>{
      */
     Map<Object, Integer> searchTotalScoreClassOrderMap(Integer examGroupId, Integer classId);
 
-    /**
-     * 班级成绩单
-     * @param classId 班级编号
-     * @return
-     */
-    List<HashMap<String,Object>> getClazzScore(Integer classId);
-
-    /**
-     * 年纪成绩单
-     * @param gradeNum 年级编号
-     * @return
-     */
-    List<HashMap<String,Object>> getGradeScore(Integer gradeNum);
 
     /**
      * 查询单科班级排名
@@ -85,4 +97,20 @@ public interface ScoreService extends IService<Score>{
      * @return
      */
     Map<Object, Integer> getGradeScoreOrderMap(Integer examId);
+
+    /**
+     * 查询班级成绩单
+     * @param classId
+     * @param examGroupId
+     * @return
+     */
+    JSONObject getClassScore(Integer classId, Integer examGroupId);
+
+    /**
+     * 构建前端展示分数信息的模板
+     * @param studentId
+     * @param examGroupId
+     * @return
+     */
+    JSONArray getScoreShowTemplate(Long studentId, Integer examGroupId);
 }

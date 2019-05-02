@@ -7,7 +7,7 @@ server:
   tomcat:
     uri-encoding: utf-8
 spring.thymeleaf.mode: HTML
-spring.thymeleaf.encodin: UTF-8
+spring.thymeleaf.encoding: UTF-8
 spring.thymeleaf.prefix: classpath:/templates/
 spring.thymeleaf.suffix: .html
 spring:
