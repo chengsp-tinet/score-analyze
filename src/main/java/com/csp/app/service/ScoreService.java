@@ -42,6 +42,13 @@ public interface ScoreService extends IService<Score>{
     JSONArray getPersonScores(Long studentId, Integer examGroupId);
 
     /**
+     * 查询年级成绩总览
+     * @param examGroupId
+     * @return
+     */
+    JSONArray getClassScore(Integer examGroupId);
+
+    /**
      * 查询班级某课程平均分
      * @param examId
      * @return
@@ -83,6 +90,13 @@ public interface ScoreService extends IService<Score>{
      */
     Map<Object, Integer> searchTotalScoreClassOrderMap(Integer examGroupId, Integer classId);
 
+    /**
+     * 查询某学生某场考试对应的分数
+     * @param studentId
+     * @param examId
+     * @return
+     */
+    Score getScoreByStudentAndExamId(Long studentId, Integer examId);
 
     /**
      * 查询单科班级排名
@@ -108,9 +122,8 @@ public interface ScoreService extends IService<Score>{
 
     /**
      * 构建前端展示分数信息的模板
-     * @param studentId
      * @param examGroupId
      * @return
      */
-    JSONArray getScoreShowTemplate(Long studentId, Integer examGroupId);
+    JSONArray getScoreShowTemplate(Integer examGroupId);
 }

@@ -36,7 +36,7 @@ public interface ScoreMapper extends BaseMapper<Score> {
      * @param examId
      * @return
      */
-    @Select("SELECT avg(score) avg_score,class_id FROM `score` WHERE exam_id=100000 GROUP BY class_id ORDER BY avg_score desc")
+    @Select("SELECT avg(score) avg_score,class_id FROM `score` WHERE exam_id={examId} GROUP BY class_id ORDER BY avg_score desc")
     List<Map> selectCourseScoreAvgByExamId(@Param("examId") Integer examId);
 
     /**
@@ -44,6 +44,6 @@ public interface ScoreMapper extends BaseMapper<Score> {
      * @param examId
      * @return
      */
-    @Select("SELECT sum(score) total_score,class_id FROM `score` WHERE exam_id=100000 GROUP BY class_id")
+    @Select("SELECT sum(score) total_score,class_id FROM `score` WHERE exam_id={examId} GROUP BY class_id")
     List<Map> selectCourseScoreTotalByExamId(@Param("examId") Integer examId);
 }

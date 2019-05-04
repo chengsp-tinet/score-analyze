@@ -82,7 +82,7 @@ public class ScoreController extends BaseController {
             , String orderFiled, String orderType, Integer ltScore, Integer geScore) {
         try {
             if (page == null) {
-                page = 0;
+                page = 1;
             }
             if (limit == null) {
                 limit = 10;
@@ -96,7 +96,7 @@ public class ScoreController extends BaseController {
                 wrapper.lt("score", ltScore);
             }
             if (geScore != null) {
-                wrapper.lt("score", geScore);
+                wrapper.ge("score", geScore);
             }
             int count = scoreService.selectCount(wrapper);
             boolean orderTypeBoo = true;
@@ -106,8 +106,8 @@ public class ScoreController extends BaseController {
             if (StringUtil.isEmpty(orderFiled)) {
                 orderFiled = "id";
             }
-
-            Page<Score> scorePage = new Page<>(page, limit, orderFiled, orderTypeBoo);
+            wrapper.orderBy(orderFiled,orderTypeBoo);
+            Page<Score> scorePage = new Page<>(page, limit);
             scorePage.setTotal(count);
             scoreService.selectPage(scorePage, wrapper);
             return ResponseBuilder.buildPage("查询成功", scorePage.getRecords(), count);
@@ -153,13 +153,11 @@ public class ScoreController extends BaseController {
     @ResponseBody
     public ResponseBuilder searchPersonalScore(Long studentId, Integer examGroupId) {
         try {
-            if (studentId == null) {
-                return ResponseBuilder.buildFail("失败,学号不可为空");
-            }
             if (examGroupId == null) {
                 return ResponseBuilder.buildFail("失败,考试组号不可为空");
             }
             JSONArray personScores = scoreService.getPersonScores(studentId, examGroupId);
+
             return ResponseBuilder.buildSuccess("成功", personScores);
         } catch (Exception e) {
             logger.error("searchPersonalScore error :{}", e);
@@ -199,15 +197,12 @@ public class ScoreController extends BaseController {
 
     @RequestMapping(value = "/inside/getScoreShowTemplate")
     @ResponseBody
-    public ResponseBuilder getScoreShowTemplate(Long studentId, Integer examGroupId) {
+    public ResponseBuilder getScoreShowTemplate(Integer examGroupId) {
         try {
-            if (studentId == null) {
-                return ResponseBuilder.buildFail("失败,学号不可为空");
-            }
             if (examGroupId == null) {
                 return ResponseBuilder.buildFail("失败,考试组号不可为空");
             }
-            JSONArray scoreShowTemplate = scoreService.getScoreShowTemplate(studentId, examGroupId);
+            JSONArray scoreShowTemplate = scoreService.getScoreShowTemplate(examGroupId);
             return ResponseBuilder.buildSuccess("成功", scoreShowTemplate);
         } catch (Exception e) {
             logger.error("getScoreShowTemplate erro :{}", e);

@@ -17,6 +17,8 @@ import com.csp.app.service.RedisService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.util.StringUtil;
 
@@ -92,6 +94,7 @@ public class ExamServiceImpl extends ServiceImpl<ExamMapper, Exam> implements Ex
     }
 
     @Override
+    @CacheEvict(value = "getExamsByGroupId")
     public boolean add(Exam entity) {
         Integer maxExamId = examMapper.selectMaxExamId();
         if (maxExamId == null) {
@@ -104,6 +107,7 @@ public class ExamServiceImpl extends ServiceImpl<ExamMapper, Exam> implements Ex
     }
 
     @Override
+    @CacheEvict(value = "getExamsByGroupId")
     public boolean batchAdd(List<Exam> exams) {
         if (CollectionUtils.isNotEmpty(exams)) {
             Integer maxExamId = examMapper.selectMaxExamId();
@@ -123,10 +127,10 @@ public class ExamServiceImpl extends ServiceImpl<ExamMapper, Exam> implements Ex
         }
         return true;
     }
-
+    @Cacheable("getExamsByGroupId")
     @Override
     public List<Exam> getExamsByGroupId(Integer groupId) {
-        EntityWrapper entityWrapper = new EntityWrapper<>(new Exam());
+        EntityWrapper entityWrapper = new EntityWrapper<>();
         entityWrapper.eq("exam_group_id",groupId);
         return examMapper.selectList(entityWrapper);
     }

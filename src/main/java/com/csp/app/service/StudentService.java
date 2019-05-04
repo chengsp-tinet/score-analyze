@@ -20,4 +20,10 @@ public interface StudentService extends IService<Student>, CacheService<Student>
      * @return
      */
     boolean batchAdd(List<Student> students);
+    /**
+     * 查询那些学生参加了对应的考试
+     * @param examGroupId
+     * @return
+     */
+    List<Object> selectStudentsByExamGroupId(Integer examGroupId);
 }

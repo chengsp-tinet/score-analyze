@@ -1,5 +1,6 @@
 package com.csp.app.service.impl;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.csp.app.common.CacheKey;
 import com.csp.app.common.Const;
@@ -10,7 +11,6 @@ import com.csp.app.service.ClassService;
 import com.csp.app.service.RedisService;
 import com.csp.app.service.StudentService;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,5 +121,12 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             }
         });
         return insertBatch(students);
+    }
+
+    @Override
+    public List<Object> selectStudentsByExamGroupId(Integer examGroupId){
+        EntityWrapper<Student> wrapper = new EntityWrapper<>();
+        wrapper.setSqlSelect("student_id");
+        return selectObjs(wrapper);
     }
 }

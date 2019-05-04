@@ -103,4 +103,14 @@ public class PageShowController {
     public String showExamGroupList() {
         return "examGroup/list";
     }
+
+    @RequestMapping("/course/add")
+    public String showCourseAdd() {
+        return "course/add";
+    }
+
+    @RequestMapping("/course/list")
+    public String showCourseList() {
+        return "course/list";
+    }
 }

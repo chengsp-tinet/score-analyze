@@ -45,11 +45,6 @@
             <input type="text" name="courseId" autocomplete="on"
                    class="layui-input">
         </div>
-        <label class="layui-form-label">考试编号</label>
-        <div class="layui-input-inline">
-            <input type="text" name="examId" autocomplete="on"
-                   class="layui-input">
-        </div>
         <label class="layui-form-label">考试组编号</label>
         <div class="layui-input-inline">
             <input type="text" name="examGroupId" autocomplete="on"
@@ -133,6 +128,8 @@
                         , {field: 'courseName', title: '科目', align: 'center', sort: true}
                         , {field: 'examName', title: '考试名', align: 'center', sort: true}
                         , {field: 'examGroupName', title: '考试组名', align: 'center', sort: true}
+                        , {field: 'examId', title: '考试编号', align: 'center', sort: true}
+                        , {field: 'examGroupId', title: '考试组编号', align: 'center', sort: true}
                         , {field: 'createTime', title: '创建时间', align: 'center', sort: true}
                     ]]
                     , url: '/score/inside/searchSelectivePage'

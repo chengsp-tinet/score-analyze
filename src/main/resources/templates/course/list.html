@@ -19,14 +19,14 @@
 <body>
 <form class="layui-form form-padding" id="search-form">
     <div class="layui-form-item">
-        <label class="layui-form-label">学号</label>
+        <label class="layui-form-label">科目id</label>
         <div class="layui-input-inline">
-            <input type="text" name="studentId" autocomplete="on"
+            <input type="text" name="courseId" autocomplete="on"
                    class="layui-input">
         </div>
-        <label class="layui-form-label">考试组号</label>
+        <label class="layui-form-label">科目名称</label>
         <div class="layui-input-inline">
-            <input type="text" name="examGroupId" required autocomplete="on"
+            <input type="text" name="courseName" required autocomplete="on"
                    class="layui-input">
         </div>
         <div class="layui-input-inline">
@@ -34,12 +34,10 @@
         </div>
     </div>
 </form>
-<table id="list" lay-filter="data-table"></table>
-</body>
+<table id="list"></table>
 <script type="application/javascript" th:inline="none">
     (function () {
         let layer;
-        let template = null;
         layui.use('element', function () {
             var element = layui.element;
         });
@@ -58,70 +56,52 @@
 
         function bindAction() {
             $('#submit').click(function () {
-                let param = constructArgs($('#search-form'));
-                if (template == null) {
-                    getTemplate(param);
-                } else {
-                    search(param)
-                }
-            })
-        }
-        function getTemplate(param) {
-            $.ajax({
-                url: '/score/inside/getScoreShowTemplate'
-                , data: param
-                , success: function (data) {
-                    if (data.status == 0) {
-                        template = data.data
-                        search(param)
-                    } else {
-                        layer.msg(data.description)
-                    }
-                }
+                search(constructArgs($('#search-form')))
             })
         }
         function search(param) {
             $.ajax({
-                url: '/score/inside/searchPersonalScore'
-                , data: param
-                , success: function (data) {
-                    if (data.status == 0) {
-                        let scoreData = data.data;
-                        scoreData.forEach(function (i, index) {
-                            if (i.isPass) {
-                                i.isPass = '是'
-                            } else {
-                                i.isPass = '否'
-                            }
-                        })
-                        render(scoreData,template);
-                    } else {
-                        layer.msg(data.description)
+                url: '/course/inside/search',
+                data: param,
+                success: function (data) {
+                    try {
+                        if (data.status == 0) {
+                            render(data.data);
+                        } else {
+                            layer.msg(data.description)
+                        }
+                    } catch (e) {
+                        //location.href='/showLogin'
                     }
                 }
             })
         }
-
-        function render(data,template) {
-            let table = null;
+        function render(data) {
+            var table = null;
             layui.use('table', function () {
                 table = layui.table;
                 table.render({
                     elem: '#list'
                     //,width: 900
                     //,height: 274
-                    , cellMinWidth: 100
-                    , cols: [template]
+                    , cellMinWidth: 80
+                    , cols: [[
+                        {field: 'id', title: '流水号', align: 'center',width:100}
+                        , {field: 'courseId', title: '考试编号', align: 'center'}
+                        , {field: 'courseName', title: '考试名称', align: 'center',width:320}
+                        , {field: 'fullScore', title: '考试组名', align: 'center'}
+                        , {field: 'courseId', title: '科目编号', align: 'center'}
+                        , {field: 'courseName', title: '科目名称', align: 'center'}
+                        , {field: 'createTime', title: '创建时间', align: 'center'}
+                    ]]
                     , data: data
-
                     , skin: 'row' //表格风格
                     , even: true
                     //,size: 'lg' //尺寸
 
                     , page: true //是否显示分页
                     //, limits: [3, 5, 10]
-                    , limit: 10 //每页默认显示的数量
-                    , loading: false //请求数据时，是否显示loading
+                    , loading: true //请求数据时，是否显示loading
                 });
             });
         };

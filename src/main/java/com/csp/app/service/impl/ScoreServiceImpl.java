@@ -33,7 +33,6 @@ import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.util.StringUtil;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -65,16 +64,21 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     @Autowired
     private ExamGroupService examGroupService;
     private ScoreService scoreService;
-    @CacheEvict(value = {"getPersonScores", "searchTotalScoreGradeOrderMap", "searchTotalScoreClassOrderMap"
-            , "getClassScoreOrderMap", "getGradeScoreOrderMap", "getClassScore"}, allEntries = true)
+
+    @CacheEvict(value = {"getClassScore", "selectCourseScoreAvgByExamId", "selectCourseScoreTotalByExamId"
+            , "searchCourseScoreAvgOrderMap", "searchCourseScoreTotalMap", "searchTotalScoreGradeOrderMap"
+            , "searchTotalScoreClassOrderMap", "getScoreByStudentAndExamId", "getClassScoreOrderMap"
+            , "getGradeScoreOrderMap"}, allEntries = true)
     @Override
     public boolean add(Score score) {
         completeEntity(score);
         return insert(score);
     }
 
-    @CacheEvict(value = {"getPersonScores", "searchTotalScoreGradeOrderMap", "searchTotalScoreClassOrderMap"
-            , "getClassScoreOrderMap", "getGradeScoreOrderMap", "getClassScore"}, allEntries = true)
+    @CacheEvict(value = {"getClassScore", "selectCourseScoreAvgByExamId", "selectCourseScoreTotalByExamId"
+            , "searchCourseScoreAvgOrderMap", "searchCourseScoreTotalMap", "searchTotalScoreGradeOrderMap"
+            , "searchTotalScoreClassOrderMap", "getScoreByStudentAndExamId", "getClassScoreOrderMap"
+            , "getGradeScoreOrderMap"}, allEntries = true)
     @Override
     public boolean updateById(Score entity) {
         return super.updateById(entity);
@@ -139,8 +143,10 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     }
 
     @Override
-    @CacheEvict(value = {"getPersonScores", "searchTotalScoreGradeOrderMap", "searchTotalScoreClassOrderMap"
-            , "getClassScoreOrderMap", "getGradeScoreOrderMap", "getClassScore"}, allEntries = true)
+    @CacheEvict(value = {"getClassScore", "selectCourseScoreAvgByExamId", "selectCourseScoreTotalByExamId"
+            , "searchCourseScoreAvgOrderMap", "searchCourseScoreTotalMap", "searchTotalScoreGradeOrderMap"
+            , "searchTotalScoreClassOrderMap", "getScoreByStudentAndExamId", "getClassScoreOrderMap"
+            , "getGradeScoreOrderMap"}, allEntries = true)
     public boolean batchAdd(List<Score> scores) {
         if (CollectionUtils.isNotEmpty(scores)) {
             for (Score score : scores) {
@@ -165,6 +171,23 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         if (examGroup == null) {
             throw new RuntimeException("考试组不存在,考试组id:" + examGroupId);
         }
+        if (studentId == null) {
+            List<Object> studentIds = studentService.selectStudentsByExamGroupId(examGroupId);
+            for (Object id : studentIds) {
+                calculateStudentsScore(Long.valueOf(id.toString()), examGroupId, personScores, examGroup);
+            }
+        } else {
+            calculateStudentsScore(studentId, examGroupId, personScores, examGroup);
+        }
+        personScores.sort((o1, o2) -> {
+            JSONObject obj1 = (JSONObject) o1;
+            JSONObject obj2 = (JSONObject) o2;
+            return obj2.getIntValue("score") - obj1.getIntValue("score");
+        });
+        return personScores;
+    }
+
+    private void calculateStudentsScore(Long studentId, Integer examGroupId, JSONArray personScores, ExamGroup examGroup) {
         Student student = studentService.getEntityFromLocalCacheByKey(String.format(CacheKey.STUDENT_ID_STUDENT, studentId));
         if (student == null) {
             throw new RuntimeException("没有这样的学生,学号:" + studentId);
@@ -185,10 +208,10 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
             score = getScoreByStudentAndExamId(studentId, examId);
             Integer scoreValue = 0;
             if (score == null) {
-                jsonObject.put("score"+ examId, scoreValue);
+                jsonObject.put("score" + examId, scoreValue);
             } else {
                 scoreValue = score.getScore();
-                jsonObject.put("score"+ examId, scoreValue);
+                jsonObject.put("score" + examId, scoreValue);
                 totalScore += scoreValue;
             }
             Integer courseId = exam.getCourseId();
@@ -201,14 +224,14 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
             if (scoreValue < course.getFullScore() * 0.6) {
                 isPass = false;
             }
-            jsonObject.put("courseName"+ examId, exam.getCourseName());
-            jsonObject.put("isPass"+ examId, isPass);
-            jsonObject.put("courseId"+ examId, courseId);
-            jsonObject.put("fullScore"+ examId, course.getFullScore());
-            jsonObject.put("examName"+ examId, exam.getExamName());
-            jsonObject.put("examId"+ examId, examId);
-            jsonObject.put("classOrder"+ examId, classOrderMap.get(studentId.toString()));
-            jsonObject.put("gradeOrder"+ examId, gradeOrderMap.get(studentId.toString()));
+            jsonObject.put("courseName" + examId, exam.getCourseName());
+            jsonObject.put("isPass" + examId, isPass);
+            jsonObject.put("courseId" + examId, courseId);
+            jsonObject.put("fullScore" + examId, course.getFullScore());
+            jsonObject.put("examName" + examId, exam.getExamName());
+            jsonObject.put("examId" + examId, examId);
+            jsonObject.put("classOrder" + examId, classOrderMap.get(studentId.toString()));
+            jsonObject.put("gradeOrder" + examId, gradeOrderMap.get(studentId.toString()));
         }
         Map<Object, Integer> gradeOrderMap = scoreService.searchTotalScoreGradeOrderMap(examGroupId);
         Map<Object, Integer> classOrderMap = scoreService.searchTotalScoreClassOrderMap(examGroupId, student.getClassId());
@@ -224,7 +247,6 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         jsonObject.put("score", totalScore);
         jsonObject.put("averageScore", decimalFormat.format(totalScore * 1.0 / exams.size()));
         personScores.add(jsonObject);
-        return personScores;
     }
 
     @Override
@@ -273,6 +295,12 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     }
 
     @Override
+    public JSONArray getClassScore(Integer examGroupId){
+        return null;
+    }
+
+    @Override
+    @Cacheable("selectCourseScoreAvgByExamId")
     public List<Map> selectCourseScoreAvgByExamId(Integer examId) {
         return scoreMapper.selectCourseScoreAvgByExamId(examId);
     }
@@ -284,11 +312,13 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
      * @return
      */
     @Override
+    @Cacheable("selectCourseScoreTotalByExamId")
     public List<Map> selectCourseScoreTotalByExamId(@Param("examId") Integer examId) {
         return scoreMapper.selectCourseScoreTotalByExamId(examId);
     }
 
     @Override
+    @Cacheable("searchCourseScoreAvgOrderMap")
     public Map<String, Map> searchCourseScoreAvgOrderMap(Integer examId) {
         ScoreService scoreService = getScoreService();
         List<Map> courseScoreAvgs = scoreService.selectCourseScoreAvgByExamId(examId);
@@ -304,6 +334,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     }
 
     @Override
+    @Cacheable("searchCourseScoreTotalMap")
     public Map searchCourseScoreTotalMap(Integer examId) {
         ScoreService scoreService = getScoreService();
         List<Map> courseScoreTotals = scoreService.selectCourseScoreTotalByExamId(examId);
@@ -345,7 +376,9 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
      * @param examId
      * @return
      */
-    private Score getScoreByStudentAndExamId(Long studentId, Integer examId) {
+    @Override
+    @Cacheable("getScoreByStudentAndExamId")
+    public Score getScoreByStudentAndExamId(Long studentId, Integer examId) {
         EntityWrapper<Score> entityWrapper = new EntityWrapper<>(null);
         entityWrapper.eq("student_id", studentId);
         entityWrapper.eq("exam_id", examId);
@@ -414,7 +447,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     }
 
     @Override
-    public JSONArray getScoreShowTemplate(Long studentId, Integer examGroupId) {
+    public JSONArray getScoreShowTemplate(Integer examGroupId) {
         ExamGroup examGroup = examGroupService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_GROUP_ID_EXAM_GROUP
                 , examGroupId));
         if (examGroup == null) {
@@ -451,9 +484,10 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
 
     /**
      * 通过bean调用内部方法,使得cache注解生效
+     *
      * @return
      */
-    private ScoreService getScoreService(){
+    private ScoreService getScoreService() {
         if (scoreService == null) {
             scoreService = ContextUtil.getBean(ScoreService.class);
         }

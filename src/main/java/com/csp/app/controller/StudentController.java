@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import tk.mybatis.mapper.util.StringUtil;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -95,7 +96,8 @@ public class StudentController extends BaseController {
                 orderFiled = "id";
             }
             int count = studentService.selectCount(wrapper);
-            Page<Student> examPage = new Page<>(page,limit,orderFiled,orderTypeBoo);
+            wrapper.orderBy(orderFiled,orderTypeBoo);
+            Page<Student> examPage = new Page<>(page,limit);
             examPage.setTotal(count);
             studentService.selectPage(examPage, wrapper);
             return ResponseBuilder.buildPage("查询成功", examPage.getRecords(), count);
