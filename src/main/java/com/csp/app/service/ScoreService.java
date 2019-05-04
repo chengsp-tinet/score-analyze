@@ -2,8 +2,10 @@ package com.csp.app.service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.service.IService;
 import com.csp.app.entity.Score;
+import com.csp.app.entity.Student;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -35,18 +37,22 @@ public interface ScoreService extends IService<Score>{
 
     /**
      * 个人成绩单
-     * @param studentId
+     * @param student
      * @param examGroupId
+     * @param page
+     * @param limit
+     * @param orderField
+     * @param orderType
      * @return
      */
-    JSONArray getPersonScores(Long studentId, Integer examGroupId);
+    Page getPersonScores(Student student, Integer examGroupId, Integer page, Integer limit, String orderField, String orderType);
 
     /**
      * 查询年级成绩总览
      * @param examGroupId
      * @return
      */
-    JSONArray getClassScore(Integer examGroupId);
+    JSONArray getGradeScore(Integer examGroupId);
 
     /**
      * 查询班级某课程平均分

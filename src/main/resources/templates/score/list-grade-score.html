@@ -19,11 +19,6 @@
 <body>
 <form class="layui-form form-padding" id="search-form">
     <div class="layui-form-item">
-        <label class="layui-form-label">班级编号</label>
-        <div class="layui-input-inline">
-            <input type="text" name="classId" autocomplete="on"
-                   class="layui-input">
-        </div>
         <label class="layui-form-label">考试组号</label>
         <div class="layui-input-inline">
             <input type="text" name="examGroupId" required autocomplete="on"
@@ -34,6 +29,7 @@
         </div>
     </div>
 </form>
+<table id="list" lay-filter="data-table"></table>
 <script type="application/javascript" th:inline="none">
     (function () {
         let layer;
@@ -61,11 +57,11 @@
 
         function search(param) {
             $.ajax({
-                url: '/inside/score/inside/searchClassScore'
+                url: '/inside/score/inside/searchGradeScore'
                 , data: param
                 , success: function (data) {
-                    if (data.status == 0) {
-                        let scoreData = data.data.courseAvgOrders;
+                    if (data.status === 0) {
+                        let scoreData = data.data;
 
                         render(scoreData);
                     } else {
@@ -85,14 +81,10 @@
                     //,height: 274
                     , cellMinWidth: 100
                     , cols: [[
-                        {field: 'courseName', title: '科目名称', align: 'center'}
-                        , {field: 'courseTotalScore', title: '班级科目总分', align: 'center'}
-                        , {field: 'courseAvg', title: '科目人均分', align: 'center'}
-                        , {field: 'courseAvgOrder', title: '科目人均分名次', align: 'center'}
-                        , {field: 'passCount', title: '合格人数', align: 'center'}
-                        , {field: 'passRate', title: '合格率', align: 'center'}
-                        , {field: 'notPassCount', title: '不合格人数', align: 'center'}
-                        , {field: 'notPassRate', title: '不合格率', align: 'center'}
+                        {field: 'avgOrder', title: '班级总分均分名次', align: 'center'}
+                        , {field: 'avg', title: '班级总分均分', align: 'center'}
+                        , {field: 'studentCount', title: '考试人数', align: 'center'}
+                        , {field: 'classId', title: '班级id', align: 'center'}
                     ]]
                     , data: data
 
@@ -111,6 +103,5 @@
     })()
 
 </script>
-<table id="list" lay-filter="data-table"></table>
 </body>
 </html>

@@ -21,7 +21,7 @@ import java.io.InputStream;
 import java.util.List;
 
 @RestController
-@RequestMapping("/class")
+@RequestMapping("/inside/class")
 public class ClassController  extends BaseController {
     private final static Logger logger = LoggerFactory.getLogger(ClassController.class);
     @Autowired

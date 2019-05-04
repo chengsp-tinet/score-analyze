@@ -37,7 +37,7 @@ import java.util.Map;
 /**
  * @author chengsp on 2019年1月14日12:00:42
  */
-@RequestMapping("/cdr")
+@RequestMapping("/inside/cdr")
 @Controller
 public class TestController extends BaseController {
     @Autowired

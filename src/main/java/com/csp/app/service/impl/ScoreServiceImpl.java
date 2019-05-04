@@ -3,6 +3,7 @@ package com.csp.app.service.impl;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.toolkit.CollectionUtils;
 import com.csp.app.common.CacheKey;
@@ -160,39 +161,42 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     /**
      * 各科目成绩，班级科目名次，年级科目名次，总分，班级总分名次，年级总分名次
      *
-     * @param studentId 学号
+     * @param student 学号
+     * @param page
+     * @param limit
+     * @param orderField
+     * @param orderType
      * @return
      */
     @Override
     @Cacheable("getPersonScores")
-    public JSONArray getPersonScores(Long studentId, Integer examGroupId) {
+    public Page getPersonScores(Student student, Integer examGroupId, Integer page, Integer limit
+            , String orderField, String orderType) {
         JSONArray personScores = new JSONArray();
-        ExamGroup examGroup = examGroupService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_GROUP_ID_EXAM_GROUP, examGroupId));
+        ExamGroup examGroup = examGroupService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_GROUP_ID_EXAM_GROUP
+                , examGroupId));
         if (examGroup == null) {
             throw new RuntimeException("考试组不存在,考试组id:" + examGroupId);
         }
-        if (studentId == null) {
-            List<Object> studentIds = studentService.selectStudentsByExamGroupId(examGroupId);
-            for (Object id : studentIds) {
-                calculateStudentsScore(Long.valueOf(id.toString()), examGroupId, personScores, examGroup);
-            }
-        } else {
-            calculateStudentsScore(studentId, examGroupId, personScores, examGroup);
+        Page<Student> studentPage = studentService.searchSelectivePage(student, page, limit, student.getStudentName()
+                , orderField, orderType);
+        for (Student recorder : studentPage.getRecords()) {
+            calculateStudentsScore(recorder, examGroupId, personScores, examGroup);
         }
         personScores.sort((o1, o2) -> {
             JSONObject obj1 = (JSONObject) o1;
             JSONObject obj2 = (JSONObject) o2;
             return obj2.getIntValue("score") - obj1.getIntValue("score");
         });
-        return personScores;
+        Page scorePage = new Page();
+        scorePage.setRecords(personScores);
+        scorePage.setTotal(studentPage.getTotal());
+        return scorePage;
     }
 
-    private void calculateStudentsScore(Long studentId, Integer examGroupId, JSONArray personScores, ExamGroup examGroup) {
-        Student student = studentService.getEntityFromLocalCacheByKey(String.format(CacheKey.STUDENT_ID_STUDENT, studentId));
-        if (student == null) {
-            throw new RuntimeException("没有这样的学生,学号:" + studentId);
-        }
+    private void calculateStudentsScore(Student student, Integer examGroupId, JSONArray personScores, ExamGroup examGroup) {
         List<Exam> exams = examService.getExamsByGroupId(examGroupId);
+        Long studentId = student.getStudentId();
         if (CollectionUtils.isEmpty(exams)) {
             throw new RuntimeException("考试组未添加考试,考试组id:" + examGroupId);
         }
@@ -295,8 +299,24 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     }
 
     @Override
-    public JSONArray getClassScore(Integer examGroupId){
-        return null;
+    public JSONArray getGradeScore(Integer examGroupId) {
+        JSONArray objects = new JSONArray();
+        List<Map> totalAvgs = scoreMapper.selectClassTotalAvg(examGroupId);
+        int order = 1;
+        Map<String, Integer> orderMap = new HashMap<>();
+        for (Map totalAvg : totalAvgs) {
+            orderMap.put(totalAvg.get("class_id").toString(), order++);
+        }
+        for (Map totalAvg : totalAvgs) {
+            JSONObject jsonObject = new JSONObject();
+            Object classId = totalAvg.get("class_id");
+            jsonObject.put("avgOrder",orderMap.get(classId.toString()));
+            jsonObject.put("avg",totalAvg.get("avg"));
+            jsonObject.put("studentCount",totalAvg.get("st_count"));
+            jsonObject.put("classId", classId);
+            objects.add(jsonObject);
+        }
+        return objects;
     }
 
     @Override

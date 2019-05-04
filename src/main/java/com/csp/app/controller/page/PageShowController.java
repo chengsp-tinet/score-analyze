@@ -1,13 +1,14 @@
 package com.csp.app.controller.page;
 
-import com.csp.app.entity.Exam;
+import com.csp.app.entity.Admin;
 import com.csp.app.service.ExamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.List;
+import javax.servlet.http.HttpSession;
+
 
 /**
  * @author chengsp on 2019年1月14日17:04:18
@@ -22,6 +23,10 @@ public class PageShowController {
     public String showIndex() {
         return "index";
     }
+    @RequestMapping("/loginPage")
+    public String showLogin() {
+        return "login";
+    }
 
     @RequestMapping("/uploadPage")
     public String showUploadFile() {
@@ -33,25 +38,20 @@ public class PageShowController {
         return "listCdr";
     }
 
-    @RequestMapping("/loginPage")
-    public String showLogin() {
-        return "login";
-    }
-
     @RequestMapping("/request")
     public String request() {
         return "request";
     }
 
     @RequestMapping("/score/add")
-    public String showSoreAdd(Model model) {
-        List<Exam> exams = examService.searchAll();
-        model.addAttribute("exams", exams);
+    public String showSoreAdd(Model model,Integer examId) {
+        model.addAttribute("examId", examId);
         return "score/add";
     }
 
     @RequestMapping("/exam/add")
-    public String showExamAdd() {
+    public String showExamAdd(Model model,Integer examGroupId) {
+        model.addAttribute("examGroupId", examGroupId);
         return "exam/add";
     }
 
@@ -71,7 +71,8 @@ public class PageShowController {
     }
 
     @RequestMapping("/student/add")
-    public String showStudentAdd() {
+    public String showStudentAdd(Model model,Integer classId) {
+        model.addAttribute("classId", classId);
         return "student/add";
     }
 
@@ -92,6 +93,11 @@ public class PageShowController {
     @RequestMapping("/score/listClassScore")
     public String showScoreClassList() {
         return "score/list-class-score";
+    }
+
+    @RequestMapping("/score/listGradeScore")
+    public String showScoreGradeList() {
+        return "score/list-grade-score";
     }
 
     @RequestMapping("/examGroup/add")

@@ -30,7 +30,7 @@
         <label class="layui-form-label">班级编号</label>
         <div class="layui-input-inline">
             <input type="text" name="classId" required lay-verify="required" placeholder="请输入班级编号" autocomplete="on"
-                   class="layui-input">
+                   class="layui-input" th:value="${classId}">
         </div>
     </div>
     <div class="layui-form-item">
@@ -67,7 +67,7 @@
             var upload = layui.upload; //得到 upload 对象
             upload.render({
                 elem: '.upload'
-                ,url:'/student/inside/addBatch'
+                ,url:'/inside/student/inside/addBatch'
                 ,bindAction:'#upload'
                 , done: function (res, index, upload) {
                     var item = this.item;
@@ -86,7 +86,7 @@
         }
         function add(param) {
             $.ajax({
-                url: '/student/inside/add',
+                url: '/inside/student/inside/add',
                 type: 'post',
                 data: param,
                 success: function (data) {

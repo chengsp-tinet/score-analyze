@@ -173,6 +173,8 @@ public class ExamServiceImpl extends ServiceImpl<ExamMapper, Exam> implements Ex
         if (examGroupId == null || StringUtil.isEmpty(examGroupName)) {
             throw new RuntimeException("考试组信息有误");
         }
+        entity.setExamGroupName(examGroupName);
+        entity.setExamGroupId(examGroupId);
         entity.setCourseId(courseId);
         entity.setCourseName(courseName);
     }

@@ -1,5 +1,6 @@
 package com.csp.app.entity;
 
+import com.csp.app.common.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -12,7 +13,7 @@ import java.util.Date;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Clasz {
+public class Clasz extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "JDBC")
     private Integer id;

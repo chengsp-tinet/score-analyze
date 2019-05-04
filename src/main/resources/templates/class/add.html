@@ -27,7 +27,7 @@
 <body>
 <form class="layui-form form-padding" id="add-form">
     <div class="layui-form-item">
-        <label class="layui-form-label">班级编号</label>
+        <label class="layui-form-label">班号</label>
         <div class="layui-input-inline">
             <input type="text" name="classNum" required lay-verify="required" placeholder="请输入班级编号" autocomplete="on"
                    class="layui-input">
@@ -93,7 +93,7 @@
         }
         function add(param) {
             $.ajax({
-                url: '/class/inside/add',
+                url: '/inside/class/inside/add',
                 type: 'post',
                 data: param,
                 success: function (data) {

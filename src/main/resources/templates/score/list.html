@@ -40,14 +40,29 @@
             <input type="text" name="examId" autocomplete="on"
                    class="layui-input">
         </div>
+        <label class="layui-form-label">考试名</label>
+        <div class="layui-input-inline">
+            <input type="text" name="examName" autocomplete="on"
+                   class="layui-input">
+        </div>
         <label class="layui-form-label">科目编号</label>
         <div class="layui-input-inline">
             <input type="text" name="courseId" autocomplete="on"
                    class="layui-input">
         </div>
+        <label class="layui-form-label">科目名</label>
+        <div class="layui-input-inline">
+            <input type="text" name="courseName" autocomplete="on"
+                   class="layui-input">
+        </div>
         <label class="layui-form-label">考试组编号</label>
         <div class="layui-input-inline">
             <input type="text" name="examGroupId" autocomplete="on"
+                   class="layui-input">
+        </div>
+        <label class="layui-form-label">考试组名</label>
+        <div class="layui-input-inline">
+            <input type="text" name="examGroupName" autocomplete="on"
                    class="layui-input">
         </div>
         <label class="layui-form-label">成绩下限</label>
@@ -93,7 +108,7 @@
 
         function update(param) {
             $.ajax({
-                url: '/score/inside/updateSelective'
+                url: '/inside/score/inside/updateSelective'
                 , type: 'PUT'
                 , data: param
                 , success: function (data) {
@@ -132,7 +147,7 @@
                         , {field: 'examGroupId', title: '考试组编号', align: 'center', sort: true}
                         , {field: 'createTime', title: '创建时间', align: 'center', sort: true}
                     ]]
-                    , url: '/score/inside/searchSelectivePage'
+                    , url: '/inside/score/inside/searchSelectivePage'
                     , response: {
                         statusName: 'status' //规定数据状态的字段名称，默认：code
                         , statusCode: 0 //规定成功的状态码，默认：0

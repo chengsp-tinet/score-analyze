@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.util.List;
 
 @RestController
-@RequestMapping("/course")
+@RequestMapping("/inside/course")
 public class CourseController extends BaseController {
     private final static Logger logger = LoggerFactory.getLogger(CourseController.class);
     @Autowired

@@ -67,7 +67,7 @@
             var upload = layui.upload; //得到 upload 对象
             upload.render({
                 elem: '.upload'
-                ,url:'/course/inside/addBatch'
+                ,url:'/inside/course/inside/addBatch'
                 ,bindAction:'#upload'
                 , done: function (res, index, upload) {
                     var item = this.item;
@@ -86,7 +86,7 @@
         }
         function add(param) {
             $.ajax({
-                url: '/course/inside/add',
+                url: '/inside/course/inside/add',
                 type: 'post',
                 data: param,
                 success: function (data) {

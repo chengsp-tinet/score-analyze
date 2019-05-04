@@ -38,11 +38,10 @@
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">考试</label>
-        <div class="layui-input-block">
-            <select name="examId" lay-filter="exam" lay-search>
-                <option th:each="exam:${exams}" th:value="${exam.examId}" th:text="${exam.examName}"></option>
-            </select>
+        <label class="layui-form-label">考试编号</label>
+        <div class="layui-input-inline">
+            <input type="text" name="examId" required lay-verify="required" placeholder="请输入学号" autocomplete="on"
+                   class="layui-input" th:value="${examId}">
         </div>
     </div>
     <div class="layui-form-item">
@@ -78,7 +77,7 @@
             var upload = layui.upload; //得到 upload 对象
             upload.render({
                 elem: '.upload'
-                , url: '/score/inside/addBatch'
+                , url: '/inside/score/inside/addBatch'
                 , bindAction: '#upload'
                 , done: function (res, index, upload) {
                     var item = this.item;
@@ -100,7 +99,7 @@
 
         function add(param) {
             $.ajax({
-                url: '/score/inside/add',
+                url: '/inside/score/inside/add',
                 type: 'post',
                 data: param,
                 success: function (data) {

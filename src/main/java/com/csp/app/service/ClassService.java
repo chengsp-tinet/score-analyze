@@ -3,9 +3,10 @@ package com.csp.app.service;
 import com.baomidou.mybatisplus.service.IService;
 import com.csp.app.common.CacheService;
 import com.csp.app.entity.Clasz;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
-
+@Mapper
 public interface ClassService extends IService<Clasz> , CacheService<Clasz> {
     /**
      * 查询所有

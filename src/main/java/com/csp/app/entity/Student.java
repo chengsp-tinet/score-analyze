@@ -1,5 +1,6 @@
 package com.csp.app.entity;
 
+import com.csp.app.common.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -11,7 +12,7 @@ import javax.persistence.Id;
 import java.util.Date;
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Student {
+public class Student extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "JDBC")
     private Integer id;

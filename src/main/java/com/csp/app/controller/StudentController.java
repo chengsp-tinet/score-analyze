@@ -1,6 +1,5 @@
 package com.csp.app.controller;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.csp.app.common.BaseController;
 import com.csp.app.common.ResponseBuilder;
@@ -16,15 +15,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import tk.mybatis.mapper.util.StringUtil;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
 @RestController
-@RequestMapping("/student")
+@RequestMapping("/inside/student")
 public class StudentController extends BaseController {
     @Autowired
     private StudentService studentService;
@@ -77,30 +74,8 @@ public class StudentController extends BaseController {
     public ResponseBuilder searchSelectivePage(Student student, Integer page, Integer limit, String studentName
             , String orderFiled, String orderType) {
         try {
-            if (page == null) {
-                page = 0;
-            }
-            if (limit == null) {
-                limit = 10;
-            }
-            student.setStudentName(null);
-            EntityWrapper<Student> wrapper = new EntityWrapper<>(student);
-            if (StringUtil.isNotEmpty(studentName)) {
-                wrapper.like("student_name", "%" + studentName + "%");
-            }
-            boolean orderTypeBoo = true;
-            if (StringUtil.isNotEmpty(orderType) && orderType.equals("asc")) {
-                orderTypeBoo = false;
-            }
-            if (StringUtil.isEmpty(orderFiled)) {
-                orderFiled = "id";
-            }
-            int count = studentService.selectCount(wrapper);
-            wrapper.orderBy(orderFiled,orderTypeBoo);
-            Page<Student> examPage = new Page<>(page,limit);
-            examPage.setTotal(count);
-            studentService.selectPage(examPage, wrapper);
-            return ResponseBuilder.buildPage("查询成功", examPage.getRecords(), count);
+            Page studentPage = studentService.searchSelectivePage(student, page, limit, studentName, orderFiled, orderType);
+            return ResponseBuilder.buildPage("查询成功",studentPage.getRecords() , (int) studentPage.getTotal());
         } catch (Exception e) {
             logger.error("searchSelectivePage error: {}", e);
             return ResponseBuilder.buildError("系统异常:" + e.getMessage());

@@ -10,6 +10,7 @@ import com.csp.app.common.ResponseBuilder;
 import com.csp.app.entity.Course;
 import com.csp.app.entity.Exam;
 import com.csp.app.entity.Score;
+import com.csp.app.entity.Student;
 import com.csp.app.service.CourseService;
 import com.csp.app.service.ExamService;
 import com.csp.app.service.ScoreService;
@@ -32,7 +33,7 @@ import java.util.List;
 /**
  * @author chengsp on 2019年1月14日12:00:42
  */
-@RequestMapping("/score")
+@RequestMapping("/inside/score")
 @Controller
 public class ScoreController extends BaseController {
     private final static Logger logger = LoggerFactory.getLogger(ScoreController.class);
@@ -78,7 +79,7 @@ public class ScoreController extends BaseController {
 
     @RequestMapping("/inside/searchSelectivePage")
     @ResponseBody
-    public ResponseBuilder searchSelectivePage(Score score, Integer page, Integer limit, String studentName
+    public ResponseBuilder searchSelectivePage(Score score, Integer page, Integer limit
             , String orderFiled, String orderType, Integer ltScore, Integer geScore) {
         try {
             if (page == null) {
@@ -89,8 +90,20 @@ public class ScoreController extends BaseController {
             }
             score.setStudentName(null);
             EntityWrapper<Score> wrapper = new EntityWrapper<>(score);
+            String studentName = score.getStudentName();
+            String examName = score.getExamName();
+            String examGroupName = score.getExamGroupName();
+            score.setStudentName(null);
+            score.setExamName(null);
+            score.setExamGroupName(null);
             if (StringUtil.isNotEmpty(studentName)) {
                 wrapper.like("student_name", "%" + studentName + "%");
+            }
+            if (StringUtil.isNotEmpty(examName)) {
+                wrapper.like("exam_name", "%" + studentName + "%");
+            }
+            if (StringUtil.isNotEmpty(examGroupName)) {
+                wrapper.like("exam_group_name", "%" + studentName + "%");
             }
             if (ltScore != null) {
                 wrapper.lt("score", ltScore);
@@ -99,9 +112,9 @@ public class ScoreController extends BaseController {
                 wrapper.ge("score", geScore);
             }
             int count = scoreService.selectCount(wrapper);
-            boolean orderTypeBoo = true;
+            boolean orderTypeBoo = false;
             if (StringUtil.isNotEmpty(orderType) && orderType.equals("asc")) {
-                orderTypeBoo = false;
+                orderTypeBoo = true;
             }
             if (StringUtil.isEmpty(orderFiled)) {
                 orderFiled = "id";
@@ -151,14 +164,15 @@ public class ScoreController extends BaseController {
 
     @RequestMapping("/inside/searchPersonalScore")
     @ResponseBody
-    public ResponseBuilder searchPersonalScore(Long studentId, Integer examGroupId) {
+    public ResponseBuilder searchPersonalScore(Student student, Integer examGroupId, Integer page, Integer limit
+            , String orderField, String orderType) {
         try {
             if (examGroupId == null) {
                 return ResponseBuilder.buildFail("失败,考试组号不可为空");
             }
-            JSONArray personScores = scoreService.getPersonScores(studentId, examGroupId);
+            Page personScores = scoreService.getPersonScores(student, examGroupId, page, limit, orderField, orderType);
 
-            return ResponseBuilder.buildSuccess("成功", personScores);
+            return ResponseBuilder.buildPage("成功", personScores.getRecords(), (int) personScores.getTotal());
         } catch (Exception e) {
             logger.error("searchPersonalScore error :{}", e);
             return ResponseBuilder.buildFail("失败,系统异常:" + e.getMessage());
@@ -179,6 +193,21 @@ public class ScoreController extends BaseController {
             return ResponseBuilder.buildSuccess("成功", classScore);
         } catch (Exception e) {
             logger.error("searchClassScore error :{}", e);
+            return ResponseBuilder.buildFail("失败,系统异常:" + e.getMessage());
+        }
+    }
+
+    @RequestMapping("/inside/searchGradeScore")
+    @ResponseBody
+    public ResponseBuilder searchGradeScore(Integer examGroupId) {
+        try {
+            if (examGroupId == null) {
+                return ResponseBuilder.buildFail("失败,考试组号不可为空");
+            }
+            JSONArray gradeScore = scoreService.getGradeScore(examGroupId);
+            return ResponseBuilder.buildSuccess("成功", gradeScore);
+        } catch (Exception e) {
+            logger.error("searchGradeScore error :{}", e);
             return ResponseBuilder.buildFail("失败,系统异常:" + e.getMessage());
         }
     }

@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
 <meta charset="UTF-8">
-<title>成绩添加</title>
+<title>考试添加</title>
 <meta name="renderer" content="webkit">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <link rel="stylesheet" href="../../static/lib/layui/css/layui.css" th:href="@{/lib/layui/css/layui.css}" media="all">
@@ -44,7 +44,7 @@
         <label class="layui-form-label">考试组编号</label>
         <div class="layui-input-inline">
             <input type="text" name="examGroupId" required lay-verify="required" placeholder="请输入考试组编号" autocomplete="on"
-                   class="layui-input">
+                   class="layui-input"  th:value="${examGroupId}">
         </div>
     </div>
     <div class="layui-form-item">
@@ -108,7 +108,7 @@
             var upload = layui.upload; //得到 upload 对象
             upload.render({
                 elem: '.upload'
-                ,url:'/exam/inside/addBatch'
+                ,url:'/inside/exam/inside/addBatch'
                 ,bindAction:'#upload'
                 , done: function (res, index, upload) {
                     var item = this.item;
@@ -127,7 +127,7 @@
         }
         function add(param) {
             $.ajax({
-                url: '/exam/inside/add',
+                url: '/inside/exam/inside/add',
                 type: 'post',
                 data: param,
                 success: function (data) {
