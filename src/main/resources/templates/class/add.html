@@ -12,6 +12,7 @@
 <style type="text/css">
 .form-padding{
     padding: 10px;
+    width: 320px;
 }
 
 .upload-file {
@@ -42,9 +43,11 @@
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">学校类型</label>
-        <div class="layui-input-inline">
-            <input type="text" name="type" required lay-verify="required" placeholder="请输入学校类型" autocomplete="on"
-                   class="layui-input">
+        <div class="layui-input-block" >
+            <select id="appId-select" name="type" lay-verify="required" lay-search  lay-filter="type">
+                <option value="1">小学</option>
+                <option value="2">中学</option>
+            </select>
         </div>
     </div>
     <div class="layui-form-item">

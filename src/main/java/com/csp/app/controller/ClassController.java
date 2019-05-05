@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.csp.app.common.BaseController;
 import com.csp.app.common.ResponseBuilder;
 import com.csp.app.entity.Clasz;
-import com.csp.app.service.ClassService;
+import com.csp.app.service.ClaszService;
 import com.csp.app.util.ExcelUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,12 +25,12 @@ import java.util.List;
 public class ClassController  extends BaseController {
     private final static Logger logger = LoggerFactory.getLogger(ClassController.class);
     @Autowired
-    private ClassService classService;
+    private ClaszService claszService;
 
     @RequestMapping("/inside/searchAll")
     public ResponseBuilder searchAll() {
         try {
-            List<Clasz> claszs = classService.searchAll();
+            List<Clasz> claszs = claszService.searchAll();
             return ResponseBuilder.buildSuccess("查询成功", claszs);
         } catch (Exception e) {
             logger.error("searchAll error: {}", e);
@@ -41,10 +41,10 @@ public class ClassController  extends BaseController {
     public ResponseBuilder search(Clasz clasz) {
         try {
             EntityWrapper<Clasz> wrapper = new EntityWrapper<>(clasz);
-            List<Clasz> claszs = classService.selectList(wrapper);
+            List<Clasz> claszs = claszService.selectList(wrapper);
             return ResponseBuilder.buildSuccess("查询成功", claszs);
         } catch (Exception e) {
-            logger.error("searchAll error: {}", e);
+            logger.error("search error: {}", e);
             return ResponseBuilder.buildError("系统异常:" + e.getMessage());
         }
     }
@@ -52,9 +52,9 @@ public class ClassController  extends BaseController {
     public ResponseBuilder add(Clasz clasz) {
         try {
             if (clasz.getClassNum() == null || clasz.getToSchoolYear() == null || clasz.getType() == null) {
-                return ResponseBuilder.buildSuccess("添加班级失败,classNum/toSchoollYear/type不可为空", null);
+                return ResponseBuilder.buildSuccess("添加班级失败,classNum/toSchoolYear/type不可为空", null);
             }
-            boolean result = classService.add(clasz);
+            boolean result = claszService.add(clasz);
             if (result) {
                 return ResponseBuilder.buildSuccess("添加班级成功", clasz);
             } else {
@@ -74,7 +74,7 @@ public class ClassController  extends BaseController {
         try {
             is = file.getInputStream();
             claszs = ExcelUtil.read(is, 0, file.getOriginalFilename(), null, Clasz.class);
-            classService.batchAdd(claszs);
+            claszService.batchAdd(claszs);
             logger.info("导入成功!");
             return ResponseBuilder.buildSuccess("成功", null);
         } catch (Exception e) {

@@ -59,7 +59,7 @@
 <script type="application/javascript" th:inline="none">
     (function () {
         let layer;
-        let template = null;
+        let template = {};
         layui.use('element', function () {
             var element = layui.element;
         });
@@ -79,10 +79,11 @@
         function bindAction() {
             $('#submit').click(function () {
                 let param = constructArgs($('#search-form'));
-                if (template == null) {
+                let templateElement = template['egi'+param.examGroupId];
+                if (templateElement == null || !templateElement) {
                     getTemplate(param);
                 } else {
-                    render(param,template)
+                    render(param,templateElement)
                 }
 
             })
@@ -93,8 +94,8 @@
                 , data: param
                 , success: function (data) {
                     if (data.status == 0) {
-                        template = data.data
-                        render(param,template);
+                        template['egi'+param.examGroupId] = data.data
+                        render(param,data.data);
                     } else {
                         layer.msg(data.description)
                     }

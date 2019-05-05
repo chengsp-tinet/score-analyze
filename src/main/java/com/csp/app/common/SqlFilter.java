@@ -65,6 +65,6 @@ public class SqlFilter extends FilterEventAdapter {
     @Override
     protected void statementExecuteBatchAfter(StatementProxy statement, int[] result) {
         String batchSql = statement.getBatchSql();
-        super.statementExecuteAfter(statement,batchSql, false);
+        statementExecuteAfter(statement,batchSql, false);
     }
 }

@@ -5,8 +5,8 @@ import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.csp.app.common.CacheKey;
 import com.csp.app.common.Const;
 import com.csp.app.entity.Clasz;
-import com.csp.app.mapper.ClassMapper;
-import com.csp.app.service.ClassService;
+import com.csp.app.mapper.ClaszMapper;
+import com.csp.app.service.ClaszService;
 import com.csp.app.service.RedisService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,12 +22,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author chengsp
  */
 @Service
-public class ClassServiceImpl extends ServiceImpl<ClassMapper, Clasz> implements ClassService {
-    private final static Logger logger = LoggerFactory.getLogger(ClassServiceImpl.class);
+public class ClaszServiceImpl extends ServiceImpl<ClaszMapper, Clasz> implements ClaszService {
+    private final static Logger logger = LoggerFactory.getLogger(ClaszServiceImpl.class);
     private static final Clasz NULL_ENTITY = new Clasz();
     private static Map<String, Clasz> localCache = new ConcurrentHashMap<>(32);
     @Autowired
-    private ClassMapper classMapper;
+    private ClaszMapper claszMapper;
     @Autowired
     private RedisService redisService;
 
@@ -50,7 +50,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Clasz> implements
 
     @Override
     public void loadCache() {
-        List<Clasz> classs = classMapper.selectList(null);
+        List<Clasz> classs = claszMapper.selectList(null);
         for (Clasz clasz : classs) {
             redisService.setObject(String.format(CacheKey.CLASS_ID_CLASS, clasz.getClassId())
                     , clasz, Const.DEFAULT_INDEX);
@@ -72,7 +72,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Clasz> implements
         if (StringUtil.isNotEmpty(claszsStr)) {
             claszs = JSON.parseArray(claszsStr, Clasz.class);
         } else {
-            claszs = classMapper.selectList(null);
+            claszs = selectList(null);
             redisService.setObject(CacheKey.CLASS_ALL, claszs, Const.DEFAULT_INDEX);
         }
         return claszs;
@@ -81,7 +81,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, Clasz> implements
     @Override
     public boolean add(Clasz clasz) {
         completeEntity(clasz);
-        return classMapper.insert(clasz) == 1;
+        return claszMapper.insert(clasz) == 1;
     }
 
     @Override

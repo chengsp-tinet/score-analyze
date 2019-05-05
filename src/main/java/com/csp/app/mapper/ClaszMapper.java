@@ -5,6 +5,6 @@ import com.csp.app.entity.Clasz;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface ClassMapper extends BaseMapper<Clasz> {
+public interface ClaszMapper extends BaseMapper<Clasz> {
 
 }

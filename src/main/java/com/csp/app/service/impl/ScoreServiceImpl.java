@@ -15,7 +15,7 @@ import com.csp.app.entity.Score;
 import com.csp.app.entity.Student;
 import com.csp.app.mapper.ScoreMapper;
 import com.csp.app.mapper.SystemSettingMapper;
-import com.csp.app.service.ClassService;
+import com.csp.app.service.ClaszService;
 import com.csp.app.service.CourseService;
 import com.csp.app.service.ExamGroupService;
 import com.csp.app.service.ExamService;
@@ -55,7 +55,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     @Autowired
     private StudentService studentService;
     @Autowired
-    private ClassService classService;
+    private ClaszService claszService;
     @Autowired
     private ExamService examService;
     @Autowired
@@ -69,7 +69,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     @CacheEvict(value = {"getClassScore", "selectCourseScoreAvgByExamId", "selectCourseScoreTotalByExamId"
             , "searchCourseScoreAvgOrderMap", "searchCourseScoreTotalMap", "searchTotalScoreGradeOrderMap"
             , "searchTotalScoreClassOrderMap", "getScoreByStudentAndExamId", "getClassScoreOrderMap"
-            , "getGradeScoreOrderMap"}, allEntries = true)
+            , "getGradeScoreOrderMap","getGradeScore"}, allEntries = true)
     @Override
     public boolean add(Score score) {
         completeEntity(score);
@@ -79,7 +79,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     @CacheEvict(value = {"getClassScore", "selectCourseScoreAvgByExamId", "selectCourseScoreTotalByExamId"
             , "searchCourseScoreAvgOrderMap", "searchCourseScoreTotalMap", "searchTotalScoreGradeOrderMap"
             , "searchTotalScoreClassOrderMap", "getScoreByStudentAndExamId", "getClassScoreOrderMap"
-            , "getGradeScoreOrderMap"}, allEntries = true)
+            , "getGradeScoreOrderMap","getGradeScore"}, allEntries = true)
     @Override
     public boolean updateById(Score entity) {
         return super.updateById(entity);
@@ -125,7 +125,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         score.setExamId(examId);
         score.setExamName(examName);
         score.setClassId(student.getClassId());
-        Clasz clasz = classService.getEntityFromLocalCacheByKey(String.format(CacheKey.CLASS_ID_CLASS
+        Clasz clasz = claszService.getEntityFromLocalCacheByKey(String.format(CacheKey.CLASS_ID_CLASS
                 , score.getClassId()));
         Integer toSchoolYear = clasz.getToSchoolYear();
         Calendar instance = Calendar.getInstance();
@@ -147,7 +147,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     @CacheEvict(value = {"getClassScore", "selectCourseScoreAvgByExamId", "selectCourseScoreTotalByExamId"
             , "searchCourseScoreAvgOrderMap", "searchCourseScoreTotalMap", "searchTotalScoreGradeOrderMap"
             , "searchTotalScoreClassOrderMap", "getScoreByStudentAndExamId", "getClassScoreOrderMap"
-            , "getGradeScoreOrderMap"}, allEntries = true)
+            , "getGradeScoreOrderMap","getGradeScore"}, allEntries = true)
     public boolean batchAdd(List<Score> scores) {
         if (CollectionUtils.isNotEmpty(scores)) {
             for (Score score : scores) {
@@ -178,8 +178,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         if (examGroup == null) {
             throw new RuntimeException("考试组不存在,考试组id:" + examGroupId);
         }
-        Page<Student> studentPage = studentService.searchSelectivePage(student, page, limit, student.getStudentName()
-                , orderField, orderType);
+        Page<Student> studentPage = searchScoreJoinStudentPage(student,page,limit,examGroupId);
         for (Student recorder : studentPage.getRecords()) {
             calculateStudentsScore(recorder, examGroupId, personScores, examGroup);
         }
@@ -256,13 +255,14 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     @Override
     @Cacheable("getClassScore")
     public JSONObject getClassScore(Integer classId, Integer examGroupId) {
-        Clasz clasz = classService.getEntityFromLocalCacheByKey(String.format(CacheKey.CLASS_ID_CLASS, classId));
+        Clasz clasz = claszService.getEntityFromLocalCacheByKey(String.format(CacheKey.CLASS_ID_CLASS, classId));
         if (clasz == null) {
             throw new RuntimeException("不存在这样的班级,id:" + classId);
         }
         ExamGroup examGroup = examGroupService.getEntityFromLocalCacheByKey(String.format(
                 CacheKey.EXAM_GROUP_ID_EXAM_GROUP, examGroupId));
         if (examGroup == null) {
+
             throw new RuntimeException("不存在这样的考试组,id:" + examGroupId);
         }
         JSONObject classScoreMsg = new JSONObject();
@@ -299,6 +299,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     }
 
     @Override
+    @Cacheable("getGradeScore")
     public JSONArray getGradeScore(Integer examGroupId) {
         JSONArray objects = new JSONArray();
         List<Map> totalAvgs = scoreMapper.selectClassTotalAvg(examGroupId);
@@ -512,5 +513,21 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
             scoreService = ContextUtil.getBean(ScoreService.class);
         }
         return scoreService;
+    }
+
+    private Page searchScoreJoinStudentPage(Student student, Integer page, Integer limit,Integer examGroupId){
+        if (page == null) {
+            page = 1;
+        }
+        if (limit == null) {
+            limit = 10;
+        }
+        int start = (page - 1)*limit;
+        Page studentPage = new Page(page,limit);
+        int count = scoreMapper.searchScoreJoinStudentPageCount(student, examGroupId);
+        List<Student> students = scoreMapper.searchScoreJoinStudentPage(student, start, limit, examGroupId);
+        studentPage.setRecords(students);
+        studentPage.setTotal(count);
+        return studentPage;
     }
 }

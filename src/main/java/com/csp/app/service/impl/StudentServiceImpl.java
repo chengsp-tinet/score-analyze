@@ -8,7 +8,7 @@ import com.csp.app.common.Const;
 import com.csp.app.entity.Clasz;
 import com.csp.app.entity.Student;
 import com.csp.app.mapper.StudentMapper;
-import com.csp.app.service.ClassService;
+import com.csp.app.service.ClaszService;
 import com.csp.app.service.RedisService;
 import com.csp.app.service.StudentService;
 import com.google.common.collect.ArrayListMultimap;
@@ -36,7 +36,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     @Autowired
     private RedisService redisService;
     @Autowired
-    private ClassService classService;
+    private ClaszService claszService;
 
     @Override
     public Student getEntityFromLocalCacheByKey(String key) {
@@ -79,7 +79,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
 
     private void completeEntity(Student student) {
         Integer classId = student.getClassId();
-        Clasz clasz = classService.getEntityFromLocalCacheByKey(String.format(CacheKey.CLASS_ID_CLASS
+        Clasz clasz = claszService.getEntityFromLocalCacheByKey(String.format(CacheKey.CLASS_ID_CLASS
                 , classId));
         if (clasz == null) {
             throw new RuntimeException("不存在这样的班级,班级id" + classId);
@@ -105,7 +105,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         }
         Map<Integer, Collection<Student>> classfyMap = multiMap.asMap();
         classfyMap.forEach((classId, studentList) -> {
-            Clasz clasz = classService.getEntityFromLocalCacheByKey(String.format(CacheKey.CLASS_ID_CLASS
+            Clasz clasz = claszService.getEntityFromLocalCacheByKey(String.format(CacheKey.CLASS_ID_CLASS
                 , classId));
             Long maxStudentId = studentMapper.selectMaxStudentIdByClassId(classId);
             Long insertStudentId;
@@ -136,7 +136,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     public Page<Student> searchSelectivePage(Student student, Integer page, Integer limit, String studentName
             , String orderFiled, String orderType){
         if (page == null) {
-            page = 0;
+            page = 1;
         }
         if (limit == null) {
             limit = 10;
