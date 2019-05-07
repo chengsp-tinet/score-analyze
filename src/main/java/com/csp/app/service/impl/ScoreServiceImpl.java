@@ -515,15 +515,15 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         return scoreService;
     }
 
-    private Page searchScoreJoinStudentPage(Student student, Integer page, Integer limit,Integer examGroupId){
+    private Page<Student> searchScoreJoinStudentPage(Student student, Integer page, Integer limit,Integer examGroupId) {
         if (page == null) {
             page = 1;
         }
         if (limit == null) {
             limit = 10;
         }
-        int start = (page - 1)*limit;
-        Page studentPage = new Page(page,limit);
+        int start = (page - 1) * limit;
+        Page studentPage = new Page(page, limit);
         int count = scoreMapper.searchScoreJoinStudentPageCount(student, examGroupId);
         List<Student> students = scoreMapper.searchScoreJoinStudentPage(student, start, limit, examGroupId);
         studentPage.setRecords(students);

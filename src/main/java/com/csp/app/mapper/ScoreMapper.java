@@ -89,13 +89,13 @@ public interface ScoreMapper extends BaseMapper<Score> {
             "        and st.student_name like '%'||#{student.studentName}||'%'" +
             "      </if>" +
             "      <if test='student.toSchoolYear != null'>" +
-            "        and st.class_id = #{student.toSchoolYear}" +
+            "        and st.to_school_year = #{student.toSchoolYear}" +
             "      </if>" +
             "      <if test='student.type != null'>" +
             "        and st.type = #{student.type}" +
             "      </if>" +
             "    </where>" +
-            "    order by sc.id limit #{start},#{limit}"+
+            "    order by st.id limit #{start},#{limit}"+
             "</script>")
     List<Student> searchScoreJoinStudentPage(Student student, @Param("start") Integer start
             , @Param("limit") Integer limit, @Param("examGroupId") Integer examGroupId);
@@ -125,7 +125,7 @@ public interface ScoreMapper extends BaseMapper<Score> {
             "        and st.student_name like '%'||#{student.studentName}||'%'" +
             "      </if>" +
             "      <if test='student.toSchoolYear != null'>" +
-            "        and st.class_id = #{student.toSchoolYear}" +
+            "        and st.to_school_year = #{student.toSchoolYear}" +
             "      </if>" +
             "      <if test='student.type != null'>" +
             "        and st.type = #{student.type}" +
