@@ -73,6 +73,9 @@
                 return false;
             });*/
         });
+        layui.use('layer', function () {
+            layer = layui.layer;
+        });
         layui.use('upload', function () {
             var upload = layui.upload; //得到 upload 对象
             upload.render({
@@ -81,14 +84,12 @@
                 , bindAction: '#upload'
                 , done: function (res, index, upload) {
                     var item = this.item;
+                    layer.msg(res.description)
                 }
-                , drog: true
+                , drag: true
                 , accept: 'file'
             })
         })
-        layui.use('layer', function () {
-            layer = layui.layer;
-        });
 
         function bindAction() {
             $('#submit').click(function () {

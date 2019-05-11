@@ -93,6 +93,11 @@
                 return false;
             });*/
         });
+
+        layui.use('layer', function () {
+            layer = layui.layer;
+        });
+
         layui.use('laydate',function () {
             var timeComponent = layui.laydate;
             timeComponent.render({
@@ -112,14 +117,12 @@
                 ,bindAction:'#upload'
                 , done: function (res, index, upload) {
                     var item = this.item;
+                    layer.msg(res.description)
                 }
-                , drog: true
+                , drag: true
                 ,accept: 'file'
             })
         })
-        layui.use('layer', function () {
-            layer = layui.layer;
-        });
         function bindAction(){
             $('#submit').click(function () {
                 add(constructArgs($('#add-form')))
