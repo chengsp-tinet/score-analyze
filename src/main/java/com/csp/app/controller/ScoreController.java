@@ -88,11 +88,11 @@ public class ScoreController extends BaseController {
             if (limit == null) {
                 limit = 10;
             }
-            score.setStudentName(null);
             EntityWrapper<Score> wrapper = new EntityWrapper<>(score);
             String studentName = score.getStudentName();
             String examName = score.getExamName();
             String examGroupName = score.getExamGroupName();
+            score.setStudentName(null);
             score.setStudentName(null);
             score.setExamName(null);
             score.setExamGroupName(null);

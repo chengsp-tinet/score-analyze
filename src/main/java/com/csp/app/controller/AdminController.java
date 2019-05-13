@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import tk.mybatis.mapper.util.StringUtil;
 
 import javax.servlet.http.HttpSession;
 
@@ -22,6 +23,9 @@ public class AdminController extends BaseController {
     public ResponseBuilder login(Admin admin, HttpSession session) {
         try {
             Admin checkUser = adminService.login(admin);
+            if (StringUtil.isEmpty(admin.getAdminName())||StringUtil.isEmpty(admin.getPassword())) {
+                return ResponseBuilder.buildFail("失败,账号或密码不可为空");
+            }
             if (checkUser == null) {
                 return ResponseBuilder.buildFail("失败,密码或账号错误");
             } else {

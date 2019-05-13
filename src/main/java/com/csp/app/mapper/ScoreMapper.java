@@ -69,9 +69,8 @@ public interface ScoreMapper extends BaseMapper<Score> {
      * @return
      */
     @Select("<script>" +
-            "select st.id, st.class_id classId, st.create_time creatTime, sc.exam_id examId, sc.exam_name examName, sc.grade_num gradeNm" +
-            "    , sc.score, st.student_id studentId, st.student_name studentName, sc.course_id courseId, sc.course_name courseName" +
-            "    ,st.to_school_year,st.type from score sc left join student st on st.student_id=sc.student_id" +
+            " select DISTINCT st.id, st.class_id classId, st.create_time creatTime,st.student_name studentName,st.student_id studentId "+
+            ",st.to_school_year toSchoolYear,st.type from  student st left join score sc on st.student_id=sc.student_id "+
             "    <where>" +
             "      <if test='examGroupId != null'>" +
             "        and sc.exam_group_id = #{examGroupId}" +
@@ -86,7 +85,7 @@ public interface ScoreMapper extends BaseMapper<Score> {
             "        and st.student_id = #{student.studentId}" +
             "      </if>" +
             "      <if test='student.studentName != null'>" +
-            "        and st.student_name like '%'||#{student.studentName}||'%'" +
+            "        and st.student_name like concat('%',#{student.studentName},'%')" +
             "      </if>" +
             "      <if test='student.toSchoolYear != null'>" +
             "        and st.to_school_year = #{student.toSchoolYear}" +
@@ -107,7 +106,8 @@ public interface ScoreMapper extends BaseMapper<Score> {
      * @return
      */
     @Select("<script>" +
-            "select count(*) from score sc left join student st on st.student_id=sc.student_id" +
+            " select count(distinct st.id) "+
+            " from  student st left join score sc on st.student_id=sc.student_id "+
             "    <where>" +
             "      <if test='examGroupId != null'>" +
             "        and sc.exam_group_id = #{examGroupId}" +
@@ -122,7 +122,7 @@ public interface ScoreMapper extends BaseMapper<Score> {
             "        and st.student_id = #{student.studentId}" +
             "      </if>" +
             "      <if test='student.studentName != null'>" +
-            "        and st.student_name like '%'||#{student.studentName}||'%'" +
+            "        and st.student_name like concat('%',#{student.studentName},'%')" +
             "      </if>" +
             "      <if test='student.toSchoolYear != null'>" +
             "        and st.to_school_year = #{student.toSchoolYear}" +
