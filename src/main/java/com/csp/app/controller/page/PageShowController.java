@@ -99,6 +99,14 @@ public class PageShowController {
     public String showScoreGradeList() {
         return "score/list-grade-score";
     }
+    @RequestMapping("/score/listScoreScale")
+    public String showScoreScaleList() {
+        return "score/list-score-scale";
+    }
+    @RequestMapping("/score/listTotalScoreScale")
+    public String showTotalScoreScaleList() {
+        return "score/list-total-score-scale";
+    }
 
     @RequestMapping("/examGroup/add")
     public String showExamGroupAdd() {

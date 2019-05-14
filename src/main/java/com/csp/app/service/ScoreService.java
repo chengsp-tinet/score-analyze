@@ -132,4 +132,19 @@ public interface ScoreService extends IService<Score>{
      * @return
      */
     JSONArray getScoreShowTemplate(Integer examGroupId);
+
+    /**
+     * 分析班级或年级某课程分数段分布情况
+     * @param examGroupId
+     * @param classId
+     * @param courseId
+     * @param minScore
+     * @param maxScore
+     * @param granularity
+     * @return
+     */
+    List analyzeCourseScoreScale(Integer examGroupId, Integer classId, Integer courseId, Integer minScore, Integer maxScore, Integer granularity);
+
+    List analyzeTotalScoreScale(Integer examGroupId, Integer classId, Integer minScore
+            , Integer maxScore, Integer granularity);
 }

@@ -22,6 +22,7 @@ import com.csp.app.service.ExamService;
 import com.csp.app.service.RedisService;
 import com.csp.app.service.ScoreService;
 import com.csp.app.service.StudentService;
+import com.csp.app.service.SystemSettingService;
 import com.csp.app.util.ContextUtil;
 import com.csp.app.util.DateUtil;
 import org.apache.ibatis.annotations.Param;
@@ -34,6 +35,7 @@ import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.util.StringUtil;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -63,13 +65,15 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     @Autowired
     private ScoreMapper scoreMapper;
     @Autowired
+    private SystemSettingService systemSettingService;
+    @Autowired
     private ExamGroupService examGroupService;
     private ScoreService scoreService;
 
     @CacheEvict(value = {"getClassScore", "selectCourseScoreAvgByExamId", "selectCourseScoreTotalByExamId"
             , "searchCourseScoreAvgOrderMap", "searchCourseScoreTotalMap", "searchTotalScoreGradeOrderMap"
             , "searchTotalScoreClassOrderMap", "getScoreByStudentAndExamId", "getClassScoreOrderMap"
-            , "getGradeScoreOrderMap","getGradeScore"}, allEntries = true)
+            , "getGradeScoreOrderMap", "getGradeScore"}, allEntries = true)
     @Override
     public boolean add(Score score) {
         completeEntity(score);
@@ -79,7 +83,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     @CacheEvict(value = {"getClassScore", "selectCourseScoreAvgByExamId", "selectCourseScoreTotalByExamId"
             , "searchCourseScoreAvgOrderMap", "searchCourseScoreTotalMap", "searchTotalScoreGradeOrderMap"
             , "searchTotalScoreClassOrderMap", "getScoreByStudentAndExamId", "getClassScoreOrderMap"
-            , "getGradeScoreOrderMap","getGradeScore"}, allEntries = true)
+            , "getGradeScoreOrderMap", "getGradeScore"}, allEntries = true)
     @Override
     public boolean updateById(Score entity) {
         return super.updateById(entity);
@@ -147,7 +151,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     @CacheEvict(value = {"getClassScore", "selectCourseScoreAvgByExamId", "selectCourseScoreTotalByExamId"
             , "searchCourseScoreAvgOrderMap", "searchCourseScoreTotalMap", "searchTotalScoreGradeOrderMap"
             , "searchTotalScoreClassOrderMap", "getScoreByStudentAndExamId", "getClassScoreOrderMap"
-            , "getGradeScoreOrderMap","getGradeScore"}, allEntries = true)
+            , "getGradeScoreOrderMap", "getGradeScore"}, allEntries = true)
     public boolean batchAdd(List<Score> scores) {
         if (CollectionUtils.isNotEmpty(scores)) {
             for (Score score : scores) {
@@ -161,7 +165,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     /**
      * 各科目成绩，班级科目名次，年级科目名次，总分，班级总分名次，年级总分名次
      *
-     * @param student 学号
+     * @param student    学号
      * @param page
      * @param limit
      * @param orderField
@@ -178,7 +182,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         if (examGroup == null) {
             throw new RuntimeException("考试组不存在,考试组id:" + examGroupId);
         }
-        Page<Student> studentPage = searchScoreJoinStudentPage(student,page,limit,examGroupId);
+        Page<Student> studentPage = searchScoreJoinStudentPage(student, page, limit, examGroupId);
         for (Student recorder : studentPage.getRecords()) {
             calculateStudentsScore(recorder, examGroupId, personScores, examGroup);
         }
@@ -311,9 +315,9 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         for (Map totalAvg : totalAvgs) {
             JSONObject jsonObject = new JSONObject();
             Object classId = totalAvg.get("class_id");
-            jsonObject.put("avgOrder",orderMap.get(classId.toString()));
-            jsonObject.put("avg",totalAvg.get("avg"));
-            jsonObject.put("studentCount",totalAvg.get("st_count"));
+            jsonObject.put("avgOrder", orderMap.get(classId.toString()));
+            jsonObject.put("avg", totalAvg.get("avg"));
+            jsonObject.put("studentCount", totalAvg.get("st_count"));
             jsonObject.put("classId", classId);
             objects.add(jsonObject);
         }
@@ -515,7 +519,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         return scoreService;
     }
 
-    private Page<Student> searchScoreJoinStudentPage(Student student, Integer page, Integer limit,Integer examGroupId) {
+    private Page<Student> searchScoreJoinStudentPage(Student student, Integer page, Integer limit, Integer examGroupId) {
         if (page == null) {
             page = 1;
         }
@@ -529,5 +533,112 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         studentPage.setRecords(students);
         studentPage.setTotal(count);
         return studentPage;
+    }
+
+    @Override
+    public List analyzeCourseScoreScale(Integer examGroupId, Integer classId, Integer courseId, Integer minScore, Integer maxScore, Integer granularity) {
+        if (minScore == null) {
+            minScore = 0;
+        }
+        if (maxScore == null) {
+            maxScore = 100;
+        }
+        if (granularity == null) {
+            granularity = 10;
+        }
+        List list = new ArrayList();
+        Course course = courseService.getEntityFromLocalCacheByKey(String.format(CacheKey.COURSE_ID_COURSE, courseId));
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("courseName", course.getCourseName());
+        jsonObject.put("courseId", courseId);
+        jsonObject.put("examGroupId", examGroupId);
+        ExamGroup examGroup = examGroupService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_GROUP_ID_EXAM_GROUP, examGroupId));
+        jsonObject.put("examGroupName", examGroup.getExamGroupName());
+        int tempScore = minScore;
+        while (tempScore < maxScore) {
+            int ltScore = tempScore + granularity;
+            jsonObject.put("scale" + tempScore + ltScore, scoreMapper.selectCountBetweenByExamGroupIdAndClassId(
+                    examGroupId, courseId, classId, tempScore, ltScore));
+            tempScore += granularity;
+        }
+        List templateList = new ArrayList();
+        String[] fields = {"courseName", "examGroupName", "examGroupId"};
+        String[] fieldName = {"课程名称", "考试组名", "考试组编号"};
+
+        for (int i = 0; i < fields.length; i++) {
+            JSONObject tempalteJsonObject = new JSONObject();
+            tempalteJsonObject.put("field", fields[i]);
+            tempalteJsonObject.put("title", fieldName[i]);
+            tempalteJsonObject.put("align", "center");
+            tempalteJsonObject.put("width", 120);
+            templateList.add(tempalteJsonObject);
+        }
+        tempScore = minScore;
+        while (tempScore < maxScore) {
+            JSONObject object = new JSONObject();
+            object.put("field", "scale" + tempScore + (tempScore + granularity));
+            object.put("title", tempScore + "~" + (tempScore + granularity));
+            object.put("align", "center");
+            object.put("width", 120);
+            tempScore += granularity;
+            templateList.add(object);
+        }
+        list.add(templateList);
+        list.add(new Object[]{jsonObject});
+        return list;
+
+    }
+
+    @Override
+    public List analyzeTotalScoreScale(Integer examGroupId, Integer classId, Integer minScore
+            , Integer maxScore, Integer granularity) {
+        if (minScore == null) {
+            minScore = 0;
+        }
+        if (maxScore == null) {
+            maxScore = 300;
+        }
+        if (granularity == null) {
+            granularity = 10;
+        }
+        List list = new ArrayList();
+        ExamGroup examGroup = examGroupService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_GROUP_ID_EXAM_GROUP, examGroupId));
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("examGroupId", examGroupId);
+        jsonObject.put("examGroupName", examGroup.getExamGroupName());
+        int tempScore = minScore;
+        while (tempScore < maxScore) {
+            int ltScore = tempScore + granularity;
+            int count = scoreMapper.selectTotalScoreCountBetweenByExamGroupIdAndClassId(examGroupId, classId, tempScore
+                    , ltScore);
+            jsonObject.put("scale" + tempScore + ltScore, count);
+            tempScore += granularity;
+        }
+
+        List templateList = new ArrayList();
+        String[] fields = {"examGroupName", "examGroupId"};
+        String[] fieldName = {"考试组名", "考试组编号"};
+
+        for (int i = 0; i < fields.length; i++) {
+            JSONObject tempalteJsonObject = new JSONObject();
+            tempalteJsonObject.put("field", fields[i]);
+            tempalteJsonObject.put("title", fieldName[i]);
+            tempalteJsonObject.put("align", "center");
+            tempalteJsonObject.put("width", 120);
+            templateList.add(tempalteJsonObject);
+        }
+        tempScore = minScore;
+        while (tempScore < maxScore) {
+            JSONObject object = new JSONObject();
+            object.put("field", "scale" + tempScore + (tempScore + granularity));
+            object.put("title", tempScore + "~" + (tempScore + granularity));
+            object.put("align", "center");
+            object.put("width", 120);
+            tempScore += granularity;
+            templateList.add(object);
+        }
+        list.add(templateList);
+        list.add(new Object[]{jsonObject});
+        return list;
     }
 }

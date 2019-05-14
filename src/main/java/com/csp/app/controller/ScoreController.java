@@ -119,7 +119,7 @@ public class ScoreController extends BaseController {
             if (StringUtil.isEmpty(orderFiled)) {
                 orderFiled = "id";
             }
-            wrapper.orderBy(orderFiled,orderTypeBoo);
+            wrapper.orderBy(orderFiled, orderTypeBoo);
             Page<Score> scorePage = new Page<>(page, limit);
             scorePage.setTotal(count);
             scoreService.selectPage(scorePage, wrapper);
@@ -234,8 +234,38 @@ public class ScoreController extends BaseController {
             JSONArray scoreShowTemplate = scoreService.getScoreShowTemplate(examGroupId);
             return ResponseBuilder.buildSuccess("成功", scoreShowTemplate);
         } catch (Exception e) {
-            logger.error("getScoreShowTemplate erro :{}", e);
+            logger.error("getScoreShowTemplate error :{}", e);
             return ResponseBuilder.buildError("失败,系统异常:" + e.getMessage());
         }
     }
+
+    @RequestMapping(value = "/inside/analyzeScale")
+    @ResponseBody
+    public ResponseBuilder analyzeScale(Integer examGroupId, Integer classId, Integer courseId, Integer minScore
+            , Integer maxScore, Integer granularity) {
+        try {
+            if (examGroupId == null || courseId == null) {
+                return ResponseBuilder.buildFail("失败,考试组号/科目编号不可为空");
+            }
+            List list = scoreService.analyzeCourseScoreScale(examGroupId, classId, courseId, minScore, maxScore, granularity);
+            return ResponseBuilder.buildSuccess("成功", list);
+        } catch (Exception e) {
+            logger.error("analyzeScale error :{}", e);
+            return ResponseBuilder.buildError("失败,系统异常:" + e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/inside/analyzeTotalScoreScale")
+    @ResponseBody
+    public ResponseBuilder analyzeTotalScoreScale(Integer examGroupId, Integer classId, Integer minScore
+            , Integer maxScore, Integer granularity) {
+        try {
+            List list = scoreService.analyzeTotalScoreScale(examGroupId, classId, minScore, maxScore, granularity);
+            return ResponseBuilder.buildSuccess("成功", list);
+        } catch (Exception e) {
+            logger.error("analyzeTotalScoreScale error :{}", e);
+            return ResponseBuilder.buildError("失败,系统异常:" + e.getMessage());
+        }
+    }
+
 }

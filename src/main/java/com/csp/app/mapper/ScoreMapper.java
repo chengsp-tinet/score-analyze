@@ -19,7 +19,7 @@ public interface ScoreMapper extends BaseMapper<Score> {
      * @param examGroupId
      * @return
      */
-    @Select("SELECT sum(score) total,student_id studentId FROM score WHERE exam_group_id =#{examGroupId} GROUP BY student_id ORDER BY total DESC")
+    @Select("select sum(score) total,student_id studentId from score WHERE exam_group_id =#{examGroupId} group by student_id order by total desc")
     List<Map> searchTotalScoreGradeOrder(@Param("examGroupId") Integer examGroupId);
 
     /**
@@ -29,7 +29,7 @@ public interface ScoreMapper extends BaseMapper<Score> {
      * @param classId
      * @return
      */
-    @Select("SELECT sum(score) total,student_id studentId FROM score WHERE exam_group_id =#{examGroupId} and class_id=#{classId} GROUP BY student_id ORDER BY total DESC")
+    @Select("select sum(score) total,student_id studentId FROM score where exam_group_id =#{examGroupId} and class_id=#{classId} group by student_id order by total desc")
     List<Map> searchTotalScoreClassOrder(@Param("examGroupId") Integer examGroupId, @Param("classId") Integer classId);
 
     /**
@@ -45,7 +45,7 @@ public interface ScoreMapper extends BaseMapper<Score> {
      * @param examId
      * @return
      */
-    @Select("SELECT sum(score) total_score,class_id FROM score WHERE exam_id = #{examId} GROUP BY class_id")
+    @Select("select sum(score) total_score,class_id FROM score WHERE exam_id = #{examId} GROUP BY class_id")
     List<Map> selectCourseScoreTotalByExamId(@Param("examId") Integer examId);
 
     /**
@@ -69,7 +69,7 @@ public interface ScoreMapper extends BaseMapper<Score> {
      * @return
      */
     @Select("<script>" +
-            " select DISTINCT st.id, st.class_id classId, st.create_time creatTime,st.student_name studentName,st.student_id studentId "+
+            " select distinct st.id, st.class_id classId, st.create_time creatTime,st.student_name studentName,st.student_id studentId "+
             ",st.to_school_year toSchoolYear,st.type from  student st left join score sc on st.student_id=sc.student_id "+
             "    <where>" +
             "      <if test='examGroupId != null'>" +
@@ -133,4 +133,36 @@ public interface ScoreMapper extends BaseMapper<Score> {
             "    </where>" +
             "</script>")
     int searchScoreJoinStudentPageCount(Student student,@Param("examGroupId") Integer examGroupId);
+
+
+    /**
+     * 查询班级或者年级某考试某科目分数在某范围内的个数
+     * @param examGroupId
+     * @param courseId
+     * @param classId
+     * @param gtScore
+     * @param ltScore
+     * @return
+     */
+    @Select("<script> select count(*) from score where exam_group_id=#{examGroupId} and course_id=#{courseId} " +
+            "<if test='classId != null'> and class_id=#{classId} </if> " +
+            "and score>=#{gtScore} and score<![CDATA[<]]>#{ltScore} </script> ")
+    int selectCountBetweenByExamGroupIdAndClassId(@Param("examGroupId") Integer examGroupId, @Param("courseId") Integer courseId
+            , @Param("classId") Integer classId, @Param("gtScore") Integer gtScore, @Param("ltScore") Integer ltScore);
+
+    /**
+     * 查询班级或者年级某考试总分在某范围内的个数
+     * @param examGroupId
+     * @param classId
+     * @param gtScore
+     * @param ltScore
+     * @return
+     */
+    @Select("<script> select count(*) from (select sum(score) total_score  from score where exam_group_id = #{examGroupId} " +
+            " <if test='classId != null'> and class_id=#{classId} </if> "+
+            "group by student_id) ts where ts.total_score>=#{gtScore} and " +
+            "ts.total_score<![CDATA[<]]>#{ltScore} " +
+            " </script>")
+    int selectTotalScoreCountBetweenByExamGroupIdAndClassId(@Param("examGroupId") Integer examGroupId
+            , @Param("classId") Integer classId, @Param("gtScore") Integer gtScore, @Param("ltScore") Integer ltScore);
 }
