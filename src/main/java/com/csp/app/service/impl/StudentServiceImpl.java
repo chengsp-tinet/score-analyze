@@ -81,6 +81,9 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         Integer classId = student.getClassId();
         Clasz clasz = claszService.getEntityFromLocalCacheByKey(String.format(CacheKey.CLASS_ID_CLASS
                 , classId));
+        if (student.getStudentId() != null) {
+            return;
+        }
         if (clasz == null) {
             throw new RuntimeException("不存在这样的班级,班级id" + classId);
         } else {

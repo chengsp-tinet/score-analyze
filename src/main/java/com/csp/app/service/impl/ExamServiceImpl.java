@@ -96,11 +96,13 @@ public class ExamServiceImpl extends ServiceImpl<ExamMapper, Exam> implements Ex
     @Override
     @CacheEvict(value = "getExamsByGroupId")
     public boolean add(Exam entity) {
-        Integer maxExamId = examMapper.selectMaxExamId();
-        if (maxExamId == null) {
-            entity.setExamId(Const.INIT_EXAM_ID);
-        } else {
-            entity.setExamId(maxExamId + 1);
+        if (entity.getExamId() == null) {
+            Integer maxExamId = examMapper.selectMaxExamId();
+            if (maxExamId == null) {
+                entity.setExamId(Const.INIT_EXAM_ID);
+            } else {
+                entity.setExamId(maxExamId + 1);
+            }
         }
         completeEntity(entity);
         return super.insert(entity);
@@ -119,14 +121,17 @@ public class ExamServiceImpl extends ServiceImpl<ExamMapper, Exam> implements Ex
             }
             int i = 0;
             for (Exam exam : exams) {
-                completeEntity(exam);
-                exam.setExamId(examId + i);
-                i++;
+                if (exam.getExamId() == null) {
+                    completeEntity(exam);
+                    exam.setExamId(examId + i);
+                    i++;
+                }
             }
             return insertBatch(exams);
         }
         return true;
     }
+
     @Cacheable("getExamsByGroupId")
     @Override
     public List<Exam> getExamsByGroupId(Integer groupId) {

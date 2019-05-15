@@ -65,8 +65,6 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     @Autowired
     private ScoreMapper scoreMapper;
     @Autowired
-    private SystemSettingService systemSettingService;
-    @Autowired
     private ExamGroupService examGroupService;
     private ScoreService scoreService;
 
@@ -213,7 +211,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
             Map<Object, Integer> classOrderMap = scoreService.getClassScoreOrderMap(examId, student.getClassId());
             Map<Object, Integer> gradeOrderMap = scoreService.getGradeScoreOrderMap(examId);
             score = getScoreByStudentAndExamId(studentId, examId);
-            Integer scoreValue = 0;
+            double scoreValue = 0;
             if (score == null) {
                 jsonObject.put("score" + examId, scoreValue);
             } else {

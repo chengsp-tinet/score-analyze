@@ -93,6 +93,9 @@ public class ClaszServiceImpl extends ServiceImpl<ClaszMapper, Clasz> implements
     }
 
     private void completeEntity(Clasz clasz) {
+        if (clasz.getClassId() != null) {
+            return;
+        }
         Integer toSchoolYear = clasz.getToSchoolYear();
         Integer classNum = clasz.getClassNum();
         Integer type = clasz.getType();

@@ -1,13 +1,10 @@
 package com.csp.app.controller.page;
 
-import com.csp.app.entity.Admin;
 import com.csp.app.service.ExamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import javax.servlet.http.HttpSession;
 
 
 /**

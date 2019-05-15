@@ -39,7 +39,7 @@ public class Score extends BaseEntity {
      * 分数
      */
     @Column
-    private Integer score;
+    private Double score;
     /**
      * 考试唯一标识
      */
@@ -114,7 +114,7 @@ public class Score extends BaseEntity {
         this.gradeNum = gradeNum;
     }
 
-    public Integer getScore() {
+    public Double getScore() {
         return score;
     }
 
@@ -150,7 +150,7 @@ public class Score extends BaseEntity {
         this.examName = examName;
     }
 
-    public void setScore(Integer score) {
+    public void setScore(Double score) {
         this.score = score;
     }
 

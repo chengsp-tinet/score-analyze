@@ -55,7 +55,7 @@ public class ScoreController extends BaseController {
             if (examId == null && score.getExamName() == null) {
                 return ResponseBuilder.buildFail("添加成绩失败,考试编号和考试名称不可全为空");
             }
-            Integer scoreValue = score.getScore();
+            Double scoreValue = score.getScore();
             if (scoreValue == null) {
                 return ResponseBuilder.buildFail("添加成绩失败,成绩不可为空");
             }
