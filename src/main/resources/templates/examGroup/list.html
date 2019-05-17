@@ -19,14 +19,14 @@
 <body>
 <form class="layui-form form-padding" id="search-form">
     <div class="layui-form-item">
-        <label class="layui-form-label">班级id</label>
+        <label class="layui-form-label">考试组号</label>
         <div class="layui-input-inline">
-            <input type="text" name="classId" autocomplete="on"
+            <input type="text" name="examGroupId" autocomplete="on"
                    class="layui-input">
         </div>
-        <label class="layui-form-label">班号</label>
+        <label class="layui-form-label">考试组名</label>
         <div class="layui-input-inline">
-            <input type="text" name="classNum" required autocomplete="on"
+            <input type="text" name="examGroupName" required autocomplete="on"
                    class="layui-input">
         </div>
         <div class="layui-input-inline">
@@ -34,7 +34,10 @@
         </div>
     </div>
 </form>
-<table id="list"></table>
+<table id="list" lay-filter="data-table"></table>
+<script type="text/html" id="toolBar">
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="eve1">添加考试</a>
+</script>
 <script type="application/javascript" th:inline="none">
     (function () {
         let layer;
@@ -70,11 +73,12 @@
                     , cellMinWidth: 80
                     , cols: [[
                         {field: 'id', title: '流水号', align: 'center'}
-                        , {field: 'examGroupId', title: '考试id', align: 'center'}
+                        , {field: 'examGroupId', title: '考试组编号', align: 'center'}
                         , {field: 'examGroupName', title: '考试组名', align: 'center',width:250}
                         , {field: 'createTime', title: '创建时间', align: 'center'}
+                        , {fixed: 'right', title: '操作', toolbar: '#toolBar', align: 'center',width:120}
                     ]]
-                    , url: '/examGroup/inside/searchSelectivePage'
+                    , url: '/inside/examGroup/inside/searchSelectivePage'
                     , response: {
                         statusName: 'status' //规定数据状态的字段名称，默认：code
                         , statusCode: 0 //规定成功的状态码，默认：0
@@ -90,6 +94,16 @@
                     , page: true //是否显示分页
                     //, limits: [3, 5, 10]
                     , loading: true //请求数据时，是否显示loading
+                });
+                table.on('tool(data-table)', function (obj) {
+                    let value = obj.value //得到修改后的值
+                        , data = obj.data //得到所在行所有键值
+                        , field = obj.field; //得到字段
+                    if (obj.event === 'eve1') {
+                        window.open('/page/exam/add?examGroupId='+data.examGroupId)
+                    } else if(obj.event === 'add-video') {
+
+                    }
                 });
             });
         };

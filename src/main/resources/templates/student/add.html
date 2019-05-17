@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
 <meta charset="UTF-8">
-<title>成绩添加</title>
+<title>学生添加</title>
 <meta name="renderer" content="webkit">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <link rel="stylesheet" href="../../static/lib/layui/css/layui.css" th:href="@{/lib/layui/css/layui.css}" media="all">
@@ -27,16 +27,24 @@
 <body>
 <form class="layui-form form-padding" id="add-form">
     <div class="layui-form-item">
-        <label class="layui-form-label">班级id</label>
+        <label class="layui-form-label">班级编号</label>
         <div class="layui-input-inline">
-            <input type="text" name="classId" required lay-verify="required" placeholder="请输入班级id" autocomplete="on"
-                   class="layui-input">
+            <input type="text" name="classId" required lay-verify="required" placeholder="请输入班级编号" autocomplete="on"
+                   class="layui-input" th:value="${classId}">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">学生姓名</label>
         <div class="layui-input-inline">
             <input type="text" name="studentName" required lay-verify="required" placeholder="请输入学生姓名"
+                   autocomplete="on"
+                   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">学号</label>
+        <div class="layui-input-inline">
+            <input type="text" name="studentId" required lay-verify="required" placeholder="请输入学号"
                    autocomplete="on"
                    class="layui-input">
         </div>
@@ -63,22 +71,23 @@
                 return false;
             });*/
         });
+        layui.use('layer', function () {
+            layer = layui.layer;
+        });
         layui.use('upload', function () {
             var upload = layui.upload; //得到 upload 对象
             upload.render({
                 elem: '.upload'
-                ,url:'/student/inside/addBatch'
+                ,url:'/inside/student/inside/addBatch'
                 ,bindAction:'#upload'
                 , done: function (res, index, upload) {
                     var item = this.item;
+                    layer.msg(res.description)
                 }
-                , drog: true
+                , drag: true
                 ,accept: 'file'
             })
         })
-        layui.use('layer', function () {
-            layer = layui.layer;
-        });
         function bindAction(){
             $('#submit').click(function () {
                 add(constructArgs($('#add-form')))
@@ -86,7 +95,7 @@
         }
         function add(param) {
             $.ajax({
-                url: '/student/inside/add',
+                url: '/inside/student/inside/add',
                 type: 'post',
                 data: param,
                 success: function (data) {

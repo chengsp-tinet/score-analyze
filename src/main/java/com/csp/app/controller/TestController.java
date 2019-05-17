@@ -3,6 +3,8 @@ package com.csp.app.controller;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.csp.app.common.BaseController;
+import com.csp.app.common.CacheService;
+import com.csp.app.common.Const;
 import com.csp.app.common.ResponseBuilder;
 import com.csp.app.common.es.EsQueryCondition;
 import com.csp.app.common.es.EsQueryResult;
@@ -35,7 +37,7 @@ import java.util.Map;
 /**
  * @author chengsp on 2019年1月14日12:00:42
  */
-@RequestMapping("/cdr")
+@RequestMapping("/inside/cdr")
 @Controller
 public class TestController extends BaseController {
     @Autowired
@@ -45,6 +47,8 @@ public class TestController extends BaseController {
     private TestService cdrService;
     @Autowired
     private RedisService redisService;
+    @Autowired
+    private List<CacheService> cacheServices;
 
     @PostMapping("/importCdr")
     @ResponseBody
@@ -155,4 +159,13 @@ public class TestController extends BaseController {
         return Integer.parseInt(num);
     }
 
+    @RequestMapping("/reLoadCache")
+    @ResponseBody
+    public void reLoadCache() {
+        redisService.flushDB(Const.DEFAULT_INDEX);
+        for (CacheService cacheService : cacheServices) {
+            cacheService.loadCache();
+            cacheService.flushLocalCache();
+        }
+    }
 }

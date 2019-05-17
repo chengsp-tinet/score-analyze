@@ -84,14 +84,16 @@ public class ExamGroupServiceImpl extends ServiceImpl<ExamGroupMapper, ExamGroup
 
     @Override
     public boolean add(ExamGroup examGroup) {
-        Integer maxExamGroupId = examGroupMapper.selectMaxExamGroupId();
-        Integer examGroupId;
-        if (maxExamGroupId == null) {
-            examGroupId = Const.INIT_EXAM_GROUP_ID;
-        } else {
-            examGroupId = maxExamGroupId + 1;
+        if (examGroup.getExamGroupId() == null) {
+            Integer maxExamGroupId = examGroupMapper.selectMaxExamGroupId();
+            Integer examGroupId;
+            if (maxExamGroupId == null) {
+                examGroupId = Const.INIT_EXAM_GROUP_ID;
+            } else {
+                examGroupId = maxExamGroupId + 1;
+            }
+            examGroup.setExamGroupId(examGroupId);
         }
-        examGroup.setExamGroupId(examGroupId);
         return insert(examGroup);
     }
 
@@ -107,6 +109,9 @@ public class ExamGroupServiceImpl extends ServiceImpl<ExamGroupMapper, ExamGroup
             }
             int i = 0;
             for (ExamGroup examGroup : examGroups) {
+                if (examGroup.getExamGroupId() != null) {
+                    continue;
+                }
                 examGroup.setExamGroupId(examGroupId + i);
                 i++;
             }

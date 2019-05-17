@@ -19,19 +19,34 @@
 <body>
 <form class="layui-form form-padding" id="search-form">
     <div class="layui-form-item">
-        <label class="layui-form-label">班级id</label>
+        <label class="layui-form-label">学号</label>
+        <div class="layui-input-inline">
+            <input type="text" name="studentId" autocomplete="on"
+                   class="layui-input">
+        </div>
+        <label class="layui-form-label">姓名</label>
+        <div class="layui-input-inline">
+            <input type="text" name="studentName" autocomplete="on"
+                   class="layui-input">
+        </div>
+        <label class="layui-form-label">班级编号</label>
         <div class="layui-input-inline">
             <input type="text" name="classId" autocomplete="on"
                    class="layui-input">
         </div>
-        <label class="layui-form-label">班号</label>
+        <!--<label class="layui-form-label">班级编号</label>
         <div class="layui-input-inline">
             <input type="text" name="classNum" required autocomplete="on"
                    class="layui-input">
-        </div>
+        </div>-->
         <label class="layui-form-label">入学年份</label>
         <div class="layui-input-inline">
             <input type="text" name="toSchoolYear" autocomplete="on"
+                   class="layui-input">
+        </div>
+        <label class="layui-form-label">学校类型</label>
+        <div class="layui-input-inline">
+            <input type="text" name="type" autocomplete="on"
                    class="layui-input">
         </div>
         <div class="layui-input-inline">
@@ -39,7 +54,10 @@
         </div>
     </div>
 </form>
-<table id="list"></table>
+<table id="list" lay-filter="data-table"></table>
+<script type="text/html" id="toolBar">
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">更新</a>
+</script>
 <script type="application/javascript" th:inline="none">
     (function () {
         let layer;
@@ -64,25 +82,44 @@
                 render(constructArgs($('#search-form')))
             })
         }
+
+        /*function update(param) {
+            $.ajax({
+                url: '/student/inside/updateSelective'
+                , type: 'PUT'
+                , data: param
+                , success: function (data) {
+                    if (data.status == 0) {
+                        layer.msg("信息修改成功")
+                    }
+                }
+            })
+        }*/
+
         function render(param) {
             var table = null;
             layui.use('table', function () {
                 table = layui.table;
                 table.render({
                     elem: '#list'
+                    , autoSort: false
+                    , initSort: {
+                        field: 'id' //排序字段，对应 cols 设定的各字段名
+                        , type: 'desc' //排序方式  asc: 升序、desc: 降序、null: 默认排序
+                    }
+                    ,defaultToolbar:['filter', 'print']
                     //,width: 900
                     //,height: 274
                     , cellMinWidth: 80
                     , cols: [[
-                        {field: 'id', title: '流水号', align: 'center'}
-                        , {field: 'classId', title: '班级id', align: 'center'}
-                        , {field: 'studentId', title: '学号', align: 'center'}
-                        , {field: 'studentName', title: '姓名', align: 'center'}
-                        , {field: 'toSchoolYear', title: '入学年份', align: 'center'}
-                        , {field: 'type', title: '学校类型', align: 'center'}
-                        , {field: 'createTime', title: '创建时间', align: 'center'}
+                        {field: 'classId', title: '班级编号', align: 'center', sort: true}
+                        , {field: 'studentId', title: '学号', align: 'center', sort: true}
+                        , {field: 'studentName', title: '姓名', align: 'center', sort: true}
+                        , {field: 'toSchoolYear', title: '入学年份', align: 'center', sort: true}
+                        , {field: 'type', title: '学校类型', align: 'center', sort: true}
+                        , {field: 'createTime', title: '创建时间', align: 'center', sort: true}
                     ]]
-                    , url: '/student/inside/searchSelectivePage'
+                    , url: '/inside/student/inside/searchSelectivePage'
                     , response: {
                         statusName: 'status' //规定数据状态的字段名称，默认：code
                         , statusCode: 0 //规定成功的状态码，默认：0
@@ -99,6 +136,30 @@
                     //, limits: [3, 5, 10]
                     , loading: true //请求数据时，是否显示loading
                 });
+                table.on('sort(data-table)', function (obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+                    console.log(obj.field); //当前排序的字段名
+                    console.log(obj.type); //当前排序类型：desc（降序）、asc（升序）、null（空对象，默认排序）
+                    console.log(this); //当前排序的 th 对象
+
+                    //尽管我们的 table 自带排序功能，但并没有请求服务端。
+                    //有些时候，你可能需要根据当前排序的字段，重新向服务端发送请求，从而实现服务端排序，如：
+                    table.reload('list', {
+                        initSort: obj //记录初始排序，如果不设的话，将无法标记表头的排序状态。
+                        , where: { //请求参数（注意：这里面的参数可任意定义，并非下面固定的格式）
+                            orderFiled: obj.field //排序字段
+                            , orderType: obj.type //排序方式
+                        }
+                    });
+                });
+                /*table.on('edit(data-table)', function (obj) {
+                    var value = obj.value //得到修改后的值
+                        , data = obj.data //得到所在行所有键值
+                        , field = obj.field; //得到字段
+                    layer.confirm('确定更改?', function () {
+                        update(obj.data);
+                    })
+
+                })*/
             });
         };
         bindAction();

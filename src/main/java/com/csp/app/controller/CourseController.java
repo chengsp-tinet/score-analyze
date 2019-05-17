@@ -1,5 +1,6 @@
 package com.csp.app.controller;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.csp.app.common.BaseController;
 import com.csp.app.common.Const;
 import com.csp.app.common.ResponseBuilder;
@@ -15,22 +16,31 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import tk.mybatis.mapper.util.StringUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
 @RestController
-@RequestMapping("/course")
+@RequestMapping("/inside/course")
 public class CourseController extends BaseController {
     private final static Logger logger = LoggerFactory.getLogger(CourseController.class);
     @Autowired
     private CourseService courseService;
 
-    @RequestMapping("/inside/searchAll")
-    public ResponseBuilder searchAll() {
+    @RequestMapping("/inside/search")
+    public ResponseBuilder search(String courseName,String courseId) {
         try {
-            List<Course> courseList = courseService.searchAll();
+            EntityWrapper<Course> wrapper = new EntityWrapper<>();
+            if (StringUtil.isNotEmpty(courseName)) {
+                wrapper.like("course_name", "%" + courseName + "%");
+            }
+            if (courseId != null) {
+                wrapper.eq("course_id", courseId);
+            }
+            wrapper.orderBy("create_time", false);
+            List<Course> courseList = courseService.selectList(wrapper);
             return ResponseBuilder.buildSuccess("查询成功", courseList);
         } catch (Exception e) {
             logger.error("searchAll error: {}", e);
@@ -59,7 +69,7 @@ public class CourseController extends BaseController {
         }
     }
 
-    @RequestMapping("/inside/addBatch")
+    @RequestMapping(value = "/inside/addBatch",method = RequestMethod.POST)
     @ResponseBody
     public ResponseBuilder addBatch(@RequestParam("file") MultipartFile file) {
         InputStream is = null;

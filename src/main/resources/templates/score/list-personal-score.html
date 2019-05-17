@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+<meta charset="UTF-8">
+<title>考试添加</title>
+<meta name="renderer" content="webkit">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<link rel="stylesheet" href="../../static/lib/layui/css/layui.css" th:href="@{/lib/layui/css/layui.css}" media="all">
+<script src="../../static/lib/layui/layui.js" th:src="@{/lib/layui/layui.js}" charset="utf-8"></script>
+<script src="../../static/lib/jquery/jquery-3.2.1.min.js" th:src="@{/lib/jquery/jquery-3.2.1.min.js}"></script>
+<script src="../../static/js/common/public.js" th:src="@{/js/common/public.js}"></script>
+<style type="text/css">
+    .form-padding {
+        padding: 10px;
+    }
+
+</style>
+</head>
+<body>
+<form class="layui-form form-padding" id="search-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">学号</label>
+        <div class="layui-input-inline">
+            <input type="text" name="studentId" autocomplete="on"
+                   class="layui-input">
+        </div>
+        <label class="layui-form-label">姓名</label>
+        <div class="layui-input-inline">
+            <input type="text" name="studentName" autocomplete="on"
+                   class="layui-input">
+        </div>
+        <label class="layui-form-label">班级编号</label>
+        <div class="layui-input-inline">
+            <input type="text" name="classId" autocomplete="on"
+                   class="layui-input">
+        </div>
+        <!--<label class="layui-form-label">班级编号</label>
+        <div class="layui-input-inline">
+            <input type="text" name="classNum" required autocomplete="on"
+                   class="layui-input">
+        </div>-->
+        <label class="layui-form-label">入学年份</label>
+        <div class="layui-input-inline">
+            <input type="text" name="toSchoolYear" autocomplete="on"
+                   class="layui-input">
+        </div>
+        <label class="layui-form-label">考试组号</label>
+        <div class="layui-input-inline">
+            <input type="text" name="examGroupId" required autocomplete="on"
+                   class="layui-input">
+        </div>
+        <div class="layui-input-inline">
+            <div class="layui-btn" id="submit">搜索</div>
+        </div>
+    </div>
+</form>
+<table id="list" lay-filter="data-table"></table>
+</body>
+<script type="application/javascript" th:inline="none">
+    (function () {
+        let layer;
+        let template = {};
+        layui.use('element', function () {
+            var element = layui.element;
+        });
+        layui.use('form', function () {
+            /*var form = layui.form;
+            //监听提交
+            form.on('submit(formDemo)', function (data) {
+                layer.msg(JSON.stringify(data.field));
+                return false;
+            });*/
+        });
+
+        layui.use('layer', function () {
+            layer = layui.layer;
+        });
+
+        function bindAction() {
+            $('#submit').click(function () {
+                let param = constructArgs($('#search-form'));
+                let templateElement = template['egi'+param.examGroupId];
+                if (templateElement == null || !templateElement) {
+                    getTemplate(param);
+                } else {
+                    render(param,templateElement)
+                }
+
+            })
+        }
+        function getTemplate(param) {
+            $.ajax({
+                url: '/inside/score/inside/getScoreShowTemplate'
+                , data: param
+                , success: function (data) {
+                    if (data.status == 0) {
+                        template['egi'+param.examGroupId] = data.data
+                        render(param,data.data);
+                    } else {
+                        layer.msg(data.description)
+                    }
+                }
+            })
+        }
+        function search(param) {
+            $.ajax({
+                url: '/inside/score/inside/searchPersonalScore'
+                , data: param
+                , success: function (data) {
+                    if (data.status == 0) {
+                        let scoreData = data.data;
+                        scoreData.forEach(function (i, index) {
+                            if (i.isPass) {
+                                i.isPass = '是'
+                            } else {
+                                i.isPass = '否'
+                            }
+                        })
+                        render(scoreData,template);
+                    } else {
+                        layer.msg(data.description)
+                    }
+                }
+            })
+        }
+
+        function render(param,template) {
+            let table = null;
+            layui.use('table', function () {
+                table = layui.table;
+                table.render({
+                    elem: '#list'
+                    , autoSort: false
+                    , initSort: {
+                        field: 'id' //排序字段，对应 cols 设定的各字段名
+                        , type: 'desc' //排序方式  asc: 升序、desc: 降序、null: 默认排序
+                    }
+                    ,url:'/inside/score/inside/searchPersonalScore'
+                    , response: {
+                        statusName: 'status' //规定数据状态的字段名称，默认：code
+                        , statusCode: 0 //规定成功的状态码，默认：0
+                        , msgName: 'description' //规定状态信息的字段名称，默认：msg
+                        , countName: 'count' //规定数据总数的字段名称，默认：count
+                        , dataName: 'data' //规定数据列表的字段名称，默认：data
+                    }
+                    ,where:param
+                    //,width: 900
+                    //,height: 274
+                    , cellMinWidth: 100
+                    , cols: [template]
+
+                    , skin: 'row' //表格风格
+                    , even: true
+                    //,size: 'lg' //尺寸
+
+                    , page: true //是否显示分页
+                    //, limits: [3, 5, 10]
+                    , limit: 10 //每页默认显示的数量
+                    , loading: false //请求数据时，是否显示loading
+                });
+                table.on('sort(data-table)', function (obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+                    console.log(obj.field); //当前排序的字段名
+                    console.log(obj.type); //当前排序类型：desc（降序）、asc（升序）、null（空对象，默认排序）
+                    console.log(this); //当前排序的 th 对象
+
+                    //尽管我们的 table 自带排序功能，但并没有请求服务端。
+                    //有些时候，你可能需要根据当前排序的字段，重新向服务端发送请求，从而实现服务端排序，如：
+                    table.reload('list', {
+                        initSort: obj //记录初始排序，如果不设的话，将无法标记表头的排序状态。
+                        , where: { //请求参数（注意：这里面的参数可任意定义，并非下面固定的格式）
+                            orderFiled: obj.field //排序字段
+                            , orderType: obj.type //排序方式
+                        }
+                    });
+                });
+            });
+        };
+        bindAction();
+    })()
+
+</script>
+</body>
+</html>

@@ -93,6 +93,9 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
             }
             int i = 0;
             for (Course course : courses) {
+                if (course.getCourseId() != null) {
+                    continue;
+                }
                 course.setCourseId(courseId + i);
                 i++;
             }
@@ -103,11 +106,13 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 
     @Override
     public boolean insert(Course entity) {
-        Integer maxCourseId = courseMapper.selectMaxCourseId();
-        if (maxCourseId == null) {
-            maxCourseId = Const.INIT_COURSE_ID;
+        if (entity.getCourseId() == null) {
+            Integer maxCourseId = courseMapper.selectMaxCourseId();
+            if (maxCourseId == null) {
+                maxCourseId = Const.INIT_COURSE_ID;
+            }
+            entity.setCourseId(maxCourseId + 1);
         }
-        entity.setCourseId(maxCourseId + 1);
         return super.insert(entity);
     }
 }

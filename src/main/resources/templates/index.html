@@ -9,8 +9,6 @@
   <link rel="stylesheet" href="../static/lib/layui/css/layui.css" th:href="@{/lib/layui/css/layui.css}" media="all">
   <link rel="stylesheet" href="../static/css/admin/admin.css" th:href="@{/css/admin/admin.css}" media="all" >
   <link rel="stylesheet" href="../static/lib/layui/css/layer.css" th:href="@{/lib/layui/css/layer.css}" media="all">
-  <script src="../static/lib/layui/layui.js" th:src="@{/lib/layui/layui.js}"></script>
-  <script src="../static/lib/jquery/jquery-3.2.1.min.js" th:src="@{/lib/jquery/jquery-3.2.1.min.js}"></script>
 </head>
 <body class="layui-layout-body" layadmin-themealias="default">
   
@@ -25,7 +23,7 @@
             </a>
           </li>
           <li class="layui-nav-item layui-hide-xs" lay-unselect="">
-            <a href="http://www.layui.com/admin/" target="_blank" title="前台">
+            <a href="/page/loginPage" target="_blank" title="登录">
               <i class="layui-icon layui-icon-website"></i>
             </a>
           </li>
@@ -34,9 +32,9 @@
               <i class="layui-icon layui-icon-refresh-3"></i>
             </a>
           </li>
-          <li class="layui-nav-item layui-hide-xs" lay-unselect="">
+          <!--<li class="layui-nav-item layui-hide-xs" lay-unselect="">
             <input type="text" placeholder="搜索..." autocomplete="off" class="layui-input layui-input-search" layadmin-event="serach" lay-action="template/search.html?keywords="> 
-          </li>
+          </li>-->
         <span class="layui-nav-bar"></span>
         </ul>
       </div>
@@ -53,6 +51,12 @@
               <a class="">成绩管理</a>
               <dl class="layui-nav-child">
                 <dd><a lay-href="/page/score/add">添加成绩</a></dd>
+                <dd><a lay-href="/page/score/list">查询所有成绩</a></dd>
+                <dd><a lay-href="/page/score/listPersonalScore">学生成绩单</a></dd>
+                <dd><a lay-href="/page/score/listClassScore">班级成绩单</a></dd>
+                <dd><a lay-href="/page/score/listGradeScore">年级成绩单</a></dd>
+                <dd><a lay-href="/page/score/listScoreScale">单科分数段分布</a></dd>
+                <dd><a lay-href="/page/score/listTotalScoreScale">总分分数段分布</a></dd>
               </dl>
             </li>
             <li class="layui-nav-item">
@@ -81,6 +85,13 @@
               <dl class="layui-nav-child">
                 <dd><a lay-href="/page/student/add">添加学生</a></dd>
                 <dd><a lay-href="/page/student/list">查询学生</a></dd>
+              </dl>
+            </li>
+            <li class="layui-nav-item">
+              <a class="">科目管理</a>
+              <dl class="layui-nav-child">
+                <dd><a lay-href="/page/course/list">查询科目</a></dd>
+                <dd><a lay-href="/page/course/add">添加科目</a></dd>
               </dl>
             </li>
           </ul>
@@ -123,6 +134,9 @@
       <div class="layadmin-body-shade" layadmin-event="shade"></div>
     </div>
   </div>
+
+  <script src="../static/lib/layui/layui.js" th:src="@{/lib/layui/layui.js}"></script>
+  <script src="../static/lib/jquery/jquery-3.2.1.min.js" th:src="@{/lib/jquery/jquery-3.2.1.min.js}"></script>
   <script>
   layui.config({
     base: '/js/admin/' //静态资源所在路径

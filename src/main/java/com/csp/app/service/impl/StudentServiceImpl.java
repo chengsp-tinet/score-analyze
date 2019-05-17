@@ -1,19 +1,24 @@
 package com.csp.app.service.impl;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.csp.app.common.CacheKey;
 import com.csp.app.common.Const;
 import com.csp.app.entity.Clasz;
 import com.csp.app.entity.Student;
 import com.csp.app.mapper.StudentMapper;
-import com.csp.app.service.ClassService;
+import com.csp.app.service.ClaszService;
 import com.csp.app.service.RedisService;
 import com.csp.app.service.StudentService;
+import com.google.common.collect.ArrayListMultimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tk.mybatis.mapper.util.StringUtil;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,7 +36,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     @Autowired
     private RedisService redisService;
     @Autowired
-    private ClassService classService;
+    private ClaszService claszService;
 
     @Override
     public Student getEntityFromLocalCacheByKey(String key) {
@@ -68,13 +73,17 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
 
     @Override
     public boolean add(Student student) {
-        return completeEntity(student);
+        completeEntity(student);
+        return insert(student);
     }
 
-    private boolean completeEntity(Student student) {
+    private void completeEntity(Student student) {
         Integer classId = student.getClassId();
-        Clasz clasz = classService.getEntityFromLocalCacheByKey(String.format(CacheKey.CLASS_ID_CLASS
+        Clasz clasz = claszService.getEntityFromLocalCacheByKey(String.format(CacheKey.CLASS_ID_CLASS
                 , classId));
+        if (student.getStudentId() != null) {
+            return;
+        }
         if (clasz == null) {
             throw new RuntimeException("不存在这样的班级,班级id" + classId);
         } else {
@@ -88,15 +97,70 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
             student.setStudentId(insertStudentId);
             student.setToSchoolYear(clasz.getToSchoolYear());
             student.setType(clasz.getType());
-            return insert(student);
         }
     }
 
     @Override
     public boolean batchAdd(List<Student> students) {
+        ArrayListMultimap<Integer, Student> multiMap = ArrayListMultimap.create();
         for (Student student : students) {
-            completeEntity(student);
+            multiMap.put(student.getClassId(), student);
         }
+        Map<Integer, Collection<Student>> classfyMap = multiMap.asMap();
+        classfyMap.forEach((classId, studentList) -> {
+            Clasz clasz = claszService.getEntityFromLocalCacheByKey(String.format(CacheKey.CLASS_ID_CLASS
+                , classId));
+            Long maxStudentId = studentMapper.selectMaxStudentIdByClassId(classId);
+            Long insertStudentId;
+            if (maxStudentId == null) {
+                insertStudentId = classId * 1000L;
+            } else {
+                insertStudentId = maxStudentId + 1;
+            }
+            int i = 1;
+            for (Student student : studentList) {
+                student.setStudentId(insertStudentId + i);
+                student.setToSchoolYear(clasz.getToSchoolYear());
+                student.setType(clasz.getType());
+                i++;
+            }
+        });
         return insertBatch(students);
+    }
+
+    @Override
+    public List<Object> selectStudentsByExamGroupId(Integer examGroupId){
+        EntityWrapper<Student> wrapper = new EntityWrapper<>();
+        wrapper.setSqlSelect("student_id");
+        return selectObjs(wrapper);
+    }
+
+    @Override
+    public Page<Student> searchSelectivePage(Student student, Integer page, Integer limit, String studentName
+            , String orderFiled, String orderType){
+        if (page == null) {
+            page = 1;
+        }
+        if (limit == null) {
+            limit = 10;
+        }
+        student.setStudentName(null);
+        EntityWrapper<Student> wrapper = new EntityWrapper<>(student);
+        if (StringUtil.isNotEmpty(studentName)) {
+            wrapper.like("student_name", "%" + studentName + "%");
+        }
+        boolean orderTypeBoo = false;
+        if (StringUtil.isNotEmpty(orderType) && orderType.equals("asc")) {
+            orderTypeBoo = true;
+        }
+        if (StringUtil.isEmpty(orderFiled)) {
+            orderFiled = "id";
+        }
+        int count = selectCount(wrapper);
+        wrapper.orderBy(orderFiled,orderTypeBoo);
+        Page<Student> studentPage = new Page<>(page,limit);
+        studentPage.setTotal(count);
+        selectPage(studentPage, wrapper);
+        return studentPage;
     }
 }

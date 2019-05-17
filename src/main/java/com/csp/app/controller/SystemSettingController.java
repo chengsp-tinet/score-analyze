@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * @author chengsp on 2019年1月14日12:00:42
  */
-@RequestMapping("/systemSetting")
+@RequestMapping("/inside/systemSetting")
 @Controller
 public class SystemSettingController extends BaseController {
     @Autowired

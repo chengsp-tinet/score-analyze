@@ -21,7 +21,7 @@ public class Score extends BaseEntity {
      * 学生
      */
     @Column
-    private Integer studentId;
+    private Long studentId;
     @Column
     private String studentName;
     /**
@@ -39,7 +39,7 @@ public class Score extends BaseEntity {
      * 分数
      */
     @Column
-    private Integer score;
+    private Double score;
     /**
      * 考试唯一标识
      */
@@ -50,6 +50,16 @@ public class Score extends BaseEntity {
      */
     @Column
     private String examName;
+    /**
+     * 考试组id
+     */
+    @Column
+    private Integer examGroupId;
+    /**
+     * 考试组名
+     */
+    @Column
+    private String examGroupName;
     /**
      * 科目id
      */
@@ -72,11 +82,11 @@ public class Score extends BaseEntity {
         this.id = id;
     }
 
-    public Integer getStudentId() {
+    public Long getStudentId() {
         return studentId;
     }
 
-    public void setStudentId(Integer studentId) {
+    public void setStudentId(Long studentId) {
         this.studentId = studentId;
     }
 
@@ -104,12 +114,28 @@ public class Score extends BaseEntity {
         this.gradeNum = gradeNum;
     }
 
-    public Integer getScore() {
+    public Double getScore() {
         return score;
     }
 
     public Integer getExamId() {
         return examId;
+    }
+
+    public Integer getExamGroupId() {
+        return examGroupId;
+    }
+
+    public void setExamGroupId(Integer examGroupId) {
+        this.examGroupId = examGroupId;
+    }
+
+    public String getExamGroupName() {
+        return examGroupName;
+    }
+
+    public void setExamGroupName(String examGroupName) {
+        this.examGroupName = examGroupName;
     }
 
     public void setExamId(Integer examId) {
@@ -124,7 +150,7 @@ public class Score extends BaseEntity {
         this.examName = examName;
     }
 
-    public void setScore(Integer score) {
+    public void setScore(Double score) {
         this.score = score;
     }
 

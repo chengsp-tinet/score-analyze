@@ -10,7 +10,7 @@
 <script src="../../static/lib/jquery/jquery-3.2.1.min.js" th:src="@{/lib/jquery/jquery-3.2.1.min.js}"></script>
 <script src="../../static/js/common/public.js" th:src="@{/js/common/public.js}"></script>
 <style type="text/css">
-    .form-padding{
+    .form-padding {
         padding: 10px;
     }
 
@@ -30,19 +30,25 @@
         <label class="layui-form-label">考试组名</label>
         <div class="layui-input-inline">
             <input type="text" name="examGroupName" required lay-verify="required" placeholder="请输入考试组名"
-                   autocomplete="on"
-                   class="layui-input">
+                   autocomplete="on" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">考试组编号</label>
+        <div class="layui-input-inline">
+            <input type="text" name="examGroupId" required lay-verify="required" placeholder="请输入考试组编号"
+                   autocomplete="on" class="layui-input">
         </div>
     </div>
 
     <div class="layui-form-item">
         <div class="layui-input-block">
-            <div class="layui-btn"  id="submit">立即提交</div>
+            <div class="layui-btn" id="submit">立即提交</div>
             <button type="reset" class="layui-btn layui-btn-primary">重置</button>
         </div>
     </div>
 </form>
-<div class="layui-btn upload upload-file"  id="#upload">点击或拖拽至此上传</div>
+<div class="layui-btn upload upload-file" id="#upload">点击或拖拽至此上传</div>
 <script type="application/javascript" th:inline="none">
     (function () {
         let layer;
@@ -58,30 +64,34 @@
             });*/
         });
 
+        layui.use('layer', function () {
+            layer = layui.layer;
+        });
+
         layui.use('upload', function () {
             var upload = layui.upload; //得到 upload 对象
             upload.render({
                 elem: '.upload'
-                ,url:'/examGroup/inside/addBatch'
-                ,bindAction:'#upload'
+                , url: '/examGroup/inside/addBatch'
+                , bindAction: '#upload'
                 , done: function (res, index, upload) {
                     var item = this.item;
+                    layer.msg(res.description)
                 }
-                , drog: true
-                ,accept: 'file'
+                , drag: true
+                , accept: 'file'
             })
         })
-        layui.use('layer', function () {
-            layer = layui.layer;
-        });
-        function bindAction(){
+
+        function bindAction() {
             $('#submit').click(function () {
                 add(constructArgs($('#add-form')))
             })
         }
+
         function add(param) {
             $.ajax({
-                url: '/examGroup/inside/add',
+                url: '/inside/examGroup/inside/add',
                 type: 'post',
                 data: param,
                 success: function (data) {
@@ -94,6 +104,7 @@
                 }
             })
         }
+
         bindAction();
     })()
 

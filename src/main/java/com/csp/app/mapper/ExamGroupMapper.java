@@ -12,6 +12,6 @@ public interface ExamGroupMapper extends BaseMapper<ExamGroup> {
      * 查询最大的考试id
      * @return
      */
-    @Select("select max(exam_group_id) from exam")
+    @Select("select max(exam_group_id) from exam_group")
     Integer selectMaxExamGroupId();
 }

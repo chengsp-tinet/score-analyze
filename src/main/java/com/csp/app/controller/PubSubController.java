@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author chengsp on 2019年3月25日16:38:33
  */
 @RestController
-@RequestMapping("pubsub")
+@RequestMapping("/inside/pubsub")
 public class PubSubController {
     @Autowired
     private RedisService redisService;

@@ -19,19 +19,29 @@
 <body>
 <form class="layui-form form-padding" id="search-form">
     <div class="layui-form-item">
-        <label class="layui-form-label">班级id</label>
+        <label class="layui-form-label">考试编号</label>
         <div class="layui-input-inline">
-            <input type="text" name="classId" autocomplete="on"
+            <input type="text" name="examId" autocomplete="on"
                    class="layui-input">
         </div>
-        <label class="layui-form-label">班号</label>
+        <label class="layui-form-label">考试名称</label>
         <div class="layui-input-inline">
-            <input type="text" name="classNum" required autocomplete="on"
+            <input type="text" name="examName" required autocomplete="on"
                    class="layui-input">
         </div>
-        <label class="layui-form-label">入学年份</label>
+        <label class="layui-form-label">考试组编号</label>
         <div class="layui-input-inline">
-            <input type="text" name="toSchoolYear" autocomplete="on"
+            <input type="text" name="examGroupId" autocomplete="on"
+                   class="layui-input">
+        </div>
+        <label class="layui-form-label">科目</label>
+        <div class="layui-input-inline">
+            <input type="text" name="courseName" autocomplete="on"
+                   class="layui-input">
+        </div>
+        <label class="layui-form-label">科目编号</label>
+        <div class="layui-input-inline">
+            <input type="text" name="courseId" autocomplete="on"
                    class="layui-input">
         </div>
         <div class="layui-input-inline">
@@ -39,7 +49,10 @@
         </div>
     </div>
 </form>
-<table id="list"></table>
+<table id="list" lay-filter="data-table"></table>
+<script type="text/html" id="toolBar">
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="eve1">添加成绩</a>
+</script>
 <script type="application/javascript" th:inline="none">
     (function () {
         let layer;
@@ -75,17 +88,18 @@
                     , cellMinWidth: 80
                     , cols: [[
                         {field: 'id', title: '流水号', align: 'center',width:100}
-                        , {field: 'examId', title: '考试id', align: 'center'}
+                        , {field: 'examId', title: '考试编号', align: 'center'}
                         , {field: 'examName', title: '考试名称', align: 'center',width:320}
                         , {field: 'examGroupName', title: '考试组名', align: 'center'}
-                        , {field: 'courseId', title: '科目id', align: 'center'}
+                        , {field: 'courseId', title: '科目编号', align: 'center'}
                         , {field: 'courseName', title: '科目名称', align: 'center'}
                         , {field: 'startTime', title: '开考时间', align: 'center'}
                         , {field: 'endTime', title: '结束时间', align: 'center'}
                         , {field: 'studentCount', title: '参考人数', align: 'center'}
                         , {field: 'createTime', title: '创建时间', align: 'center'}
+                        , {fixed: 'right', title: '操作', toolbar: '#toolBar', align: 'center',width:120}
                     ]]
-                    , url: '/exam/inside/searchSelectivePage'
+                    , url: '/inside/exam/inside/searchSelectivePage'
                     , response: {
                         statusName: 'status' //规定数据状态的字段名称，默认：code
                         , statusCode: 0 //规定成功的状态码，默认：0
@@ -101,6 +115,16 @@
                     , page: true //是否显示分页
                     //, limits: [3, 5, 10]
                     , loading: true //请求数据时，是否显示loading
+                });
+                table.on('tool(data-table)', function (obj) {
+                    let value = obj.value //得到修改后的值
+                        , data = obj.data //得到所在行所有键值
+                        , field = obj.field; //得到字段
+                    if (obj.event === 'eve1') {
+                        window.open('/page/score/add?examId='+data.examId)
+                    } else if(obj.event === 'add-video') {
+
+                    }
                 });
             });
         };

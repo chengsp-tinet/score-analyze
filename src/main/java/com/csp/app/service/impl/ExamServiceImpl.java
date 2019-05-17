@@ -1,6 +1,7 @@
 package com.csp.app.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.toolkit.CollectionUtils;
 import com.csp.app.common.CacheKey;
@@ -16,6 +17,8 @@ import com.csp.app.service.RedisService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.util.StringUtil;
 
@@ -91,18 +94,22 @@ public class ExamServiceImpl extends ServiceImpl<ExamMapper, Exam> implements Ex
     }
 
     @Override
+    @CacheEvict(value = "getExamsByGroupId")
     public boolean add(Exam entity) {
-        Integer maxExamId = examMapper.selectMaxExamId();
-        if (maxExamId == null) {
-            entity.setExamId(Const.INIT_EXAM_ID);
-        } else {
-            entity.setExamId(maxExamId + 1);
+        if (entity.getExamId() == null) {
+            Integer maxExamId = examMapper.selectMaxExamId();
+            if (maxExamId == null) {
+                entity.setExamId(Const.INIT_EXAM_ID);
+            } else {
+                entity.setExamId(maxExamId + 1);
+            }
         }
         completeEntity(entity);
         return super.insert(entity);
     }
 
     @Override
+    @CacheEvict(value = "getExamsByGroupId")
     public boolean batchAdd(List<Exam> exams) {
         if (CollectionUtils.isNotEmpty(exams)) {
             Integer maxExamId = examMapper.selectMaxExamId();
@@ -114,13 +121,23 @@ public class ExamServiceImpl extends ServiceImpl<ExamMapper, Exam> implements Ex
             }
             int i = 0;
             for (Exam exam : exams) {
-                completeEntity(exam);
-                exam.setExamId(examId + i);
-                i++;
+                if (exam.getExamId() == null) {
+                    completeEntity(exam);
+                    exam.setExamId(examId + i);
+                    i++;
+                }
             }
             return insertBatch(exams);
         }
         return true;
+    }
+
+    @Cacheable("getExamsByGroupId")
+    @Override
+    public List<Exam> getExamsByGroupId(Integer groupId) {
+        EntityWrapper entityWrapper = new EntityWrapper<>();
+        entityWrapper.eq("exam_group_id",groupId);
+        return examMapper.selectList(entityWrapper);
     }
 
     private void completeEntity(Exam entity) {
@@ -161,6 +178,8 @@ public class ExamServiceImpl extends ServiceImpl<ExamMapper, Exam> implements Ex
         if (examGroupId == null || StringUtil.isEmpty(examGroupName)) {
             throw new RuntimeException("考试组信息有误");
         }
+        entity.setExamGroupName(examGroupName);
+        entity.setExamGroupId(examGroupId);
         entity.setCourseId(courseId);
         entity.setCourseName(courseName);
     }

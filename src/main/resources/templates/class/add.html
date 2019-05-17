@@ -12,6 +12,7 @@
 <style type="text/css">
 .form-padding{
     padding: 10px;
+    width: 320px;
 }
 
 .upload-file {
@@ -34,17 +35,26 @@
         </div>
     </div>
     <div class="layui-form-item">
+        <label class="layui-form-label">班级编号</label>
+        <div class="layui-input-inline">
+            <input type="text" name="classId" required lay-verify="required" placeholder="请输入班级编号" autocomplete="on"
+                   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
         <label class="layui-form-label">入学年份</label>
         <div class="layui-input-inline">
-            <input type="text" name="toSchoolYear" required lay-verify="required" placeholder="请输入考试id" autocomplete="on"
+            <input type="text" name="toSchoolYear" required lay-verify="required" placeholder="请输入入学年份" autocomplete="on"
                    class="layui-input">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">学校类型</label>
-        <div class="layui-input-inline">
-            <input type="text" name="type" required lay-verify="required" placeholder="请输入学校类型" autocomplete="on"
-                   class="layui-input">
+        <div class="layui-input-block" >
+            <select id="appId-select" name="type" lay-verify="required" lay-search  lay-filter="type">
+                <option value="1">小学</option>
+                <option value="2">中学</option>
+            </select>
         </div>
     </div>
     <div class="layui-form-item">
@@ -70,6 +80,10 @@
             });*/
         });
 
+        layui.use('layer', function () {
+            layer = layui.layer;
+        });
+
         layui.use('upload', function () {
             var upload = layui.upload; //得到 upload 对象
             upload.render({
@@ -78,14 +92,13 @@
                 ,bindAction:'#upload'
                 , done: function (res, index, upload) {
                     var item = this.item;
+                    layer.msg(res.description)
                 }
-                , drog: true
+                , drag: true
                 ,accept: 'file'
             })
         })
-        layui.use('layer', function () {
-            layer = layui.layer;
-        });
+
         function bindAction(){
             $('#submit').click(function () {
                 add(constructArgs($('#add-form')))
@@ -93,7 +106,7 @@
         }
         function add(param) {
             $.ajax({
-                url: '/class/inside/add',
+                url: '/inside/class/inside/add',
                 type: 'post',
                 data: param,
                 success: function (data) {

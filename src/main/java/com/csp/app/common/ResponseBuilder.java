@@ -38,6 +38,10 @@ public class ResponseBuilder implements Serializable {
         return new ResponseBuilder(SUCCESS_STATUS, description, data);
     }
 
+    public static ResponseBuilder buildSuccess(Object data) {
+        return new ResponseBuilder(SUCCESS_STATUS, "成功", data);
+    }
+
     public static ResponseBuilder buildPage(String description, Object data, int count) {
         return new ResponseBuilder(SUCCESS_STATUS, description, data, count);
     }

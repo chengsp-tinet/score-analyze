@@ -26,6 +26,11 @@ public class SqlFilter extends FilterEventAdapter {
     @Autowired
     private RedisService redisService;
 
+    @Override
+    protected void statementExecuteBefore(StatementProxy statement, String sql) {
+        super.statementExecuteBefore(statement, sql);
+    }
+
     /**
      * 根据sql执行结果判定是否更新缓存，做pub广播
      *
@@ -60,7 +65,6 @@ public class SqlFilter extends FilterEventAdapter {
     @Override
     protected void statementExecuteBatchAfter(StatementProxy statement, int[] result) {
         String batchSql = statement.getBatchSql();
-        //logger.info("批量操作sql:"+batchSql);
-        super.statementExecuteBatchAfter(statement, result);
+        statementExecuteAfter(statement,batchSql, false);
     }
 }

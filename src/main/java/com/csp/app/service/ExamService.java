@@ -3,6 +3,7 @@ package com.csp.app.service;
 import com.baomidou.mybatisplus.service.IService;
 import com.csp.app.common.CacheService;
 import com.csp.app.entity.Exam;
+import org.omg.PortableInterceptor.INACTIVE;
 
 import java.util.List;
 
@@ -22,4 +23,11 @@ public interface ExamService extends IService<Exam>, CacheService<Exam> {
      * @return
      */
     boolean batchAdd(List<Exam> exams);
+
+    /**
+     * 通过考试组查询考试
+      * @param groupId
+     * @return
+     */
+    List<Exam> getExamsByGroupId(Integer groupId);
 }

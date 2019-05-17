@@ -16,13 +16,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import tk.mybatis.mapper.util.StringUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
 @RestController
-@RequestMapping("/exam")
+@RequestMapping("/inside/exam")
 public class ExamController extends BaseController {
     private final static Logger logger = LoggerFactory.getLogger(ExamController.class);
     @Autowired
@@ -40,14 +41,20 @@ public class ExamController extends BaseController {
     }
 
     @RequestMapping("/inside/searchSelectivePage")
-    public ResponseBuilder searchSelectivePage(Exam exam, Integer page, Integer limit) {
+    public ResponseBuilder searchSelectivePage(Exam exam, Integer page, Integer limit,String examName,String courseName) {
         try {
+            exam.setExamName(null);
+            exam.setCourseName(null);
             EntityWrapper<Exam> wrapper = new EntityWrapper<>(exam);
+            if (StringUtil.isNotEmpty(examName)) {
+                wrapper.like("exam_name","%" + examName + "%");
+            }
+            if (StringUtil.isNotEmpty(courseName)) {
+                wrapper.like("course_name","%" + courseName + "%");
+            }
             int count = examService.selectCount(wrapper);
-            Page<Exam> conditionPage = new Page<>();
-            conditionPage.setCurrent(page);
-            conditionPage.setSize(limit);
-            Page<Exam> examPage = examService.selectPage(conditionPage, wrapper);
+            Page<Exam> examPage = new Page<>(page,limit,"id",false);
+            examService.selectPage(examPage, wrapper);
             return ResponseBuilder.buildPage("查询成功", examPage.getRecords(), count);
         } catch (Exception e) {
             logger.error("searchSelectivePage error: {}", e);
@@ -76,11 +83,11 @@ public class ExamController extends BaseController {
             }
         } catch (Exception e) {
             logger.error("add error: {}", e);
-            return ResponseBuilder.buildError("系统异常:" + e.toString());
+            return ResponseBuilder.buildError("系统异常:" + e.getMessage());
         }
     }
 
-    @RequestMapping("/inside/addBatch")
+    @RequestMapping(value = "/inside/addBatch" ,method = RequestMethod.POST)
     @ResponseBody
     public ResponseBuilder addBatch(@RequestParam("file") MultipartFile file) {
         InputStream is = null;
