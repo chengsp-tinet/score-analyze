@@ -93,17 +93,16 @@ public class ScoreController extends BaseController {
             String examName = score.getExamName();
             String examGroupName = score.getExamGroupName();
             score.setStudentName(null);
-            score.setStudentName(null);
             score.setExamName(null);
             score.setExamGroupName(null);
             if (StringUtil.isNotEmpty(studentName)) {
                 wrapper.like("student_name", "%" + studentName + "%");
             }
             if (StringUtil.isNotEmpty(examName)) {
-                wrapper.like("exam_name", "%" + studentName + "%");
+                wrapper.like("exam_name", "%" + examName + "%");
             }
             if (StringUtil.isNotEmpty(examGroupName)) {
-                wrapper.like("exam_group_name", "%" + studentName + "%");
+                wrapper.like("exam_group_name", "%" + examGroupName + "%");
             }
             if (ltScore != null) {
                 wrapper.lt("score", ltScore);

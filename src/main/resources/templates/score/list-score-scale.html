@@ -9,6 +9,8 @@
 <script src="../../static/lib/layui/layui.js" th:src="@{/lib/layui/layui.js}" charset="utf-8"></script>
 <script src="../../static/lib/jquery/jquery-3.2.1.min.js" th:src="@{/lib/jquery/jquery-3.2.1.min.js}"></script>
 <script src="../../static/js/common/public.js" th:src="@{/js/common/public.js}"></script>
+<script src="../../static/lib/jquery/easysector.1.0.0.js" th:src="@{/lib/jquery/easysector.1.0.0.js}"></script>
+
 <style type="text/css">
     .form-padding {
         padding: 10px;
@@ -54,8 +56,12 @@
         </div>
     </div>
 </form>
+
+<table id="list" lay-filter="data-table"></table>
+<div style="float:right;width:300px"><div id="easysector"></div>
 <script type="application/javascript" th:inline="none">
     (function () {
+        var colors = ['red','green','blue'];
         let layer;
         layui.use('element', function () {
             var element = layui.element;
@@ -86,13 +92,52 @@
                 , success: function (data) {
                     if (data.status == 0) {
                         render(data.data);
+                        $('#easysector').html('');
+                        let datum = data.data[1][0];
+                        let bili = new Array();
+                        let i = 0;
+                        for (let item in datum) {
+                            if (item.startsWith('scale')) {
+                                let o ={};
+                                o.h_title=item;
+                                o.h_amount=datum[item];
+                                // let hColor = yuv2rgb(Math.floor(Math.random()*256),Math.floor(Math.random()*256),Math.floor(Math.random()*256));
+                                let hColor = color16();
+                                o.h_color= hColor
+                                i++;
+                                bili.push(o);
+                            }
+                        }
+                        drawCircle(bili)
                     } else {
                         layer.msg(data.description)
                     }
                 }
             })
         }
+        function getColor(i,total){
 
+        }
+        function yuv2rgb(y,u,v){
+
+            let R = (y+1.14*v);
+            let G = (y-0.394*u-0.581*v);
+            let B = (y+2.028*u);
+            if (R<0) R=0;
+            if (G<0) G=0;
+            if (B<0) B=0;
+            if (R>255) R=255;
+            if (G>255) G=255;
+            if (B>255) B=255;
+            return 'rgb'+'('+R+','+G+','+B+')';
+        }
+        function color16(){//十六进制颜色随机
+            var r = Math.floor(Math.random()*256);
+            var g = Math.floor(Math.random()*256);
+            var b = Math.floor(Math.random()*256);
+            var color = '#'+r.toString(16)+g.toString(16)+b.toString(16);
+            return color;
+        }
         function render(data) {
             let table = null;
             layui.use('table', function () {
@@ -117,9 +162,23 @@
             });
         };
         bindAction();
+        function drawCircle(h_items) {
+            $("#easysector").easysector({
+                "h_items": h_items,
+                "h_title": "Browser Percent",
+                "h_width": 260,
+                "h_borderColor":"silver",
+                "h_poindlength": 0,
+                //"h_showamount": true,
+                "h_backColor":"#eee",
+                "h_recwidth": 20,
+                "h_titlesize": 24,
+                "h_Radii": 125,
+                "h_infosize":16
+            });
+        }
     })()
 
 </script>
-<table id="list" lay-filter="data-table"></table>
 </body>
 </html>

@@ -71,7 +71,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     @CacheEvict(value = {"getClassScore", "selectCourseScoreAvgByExamId", "selectCourseScoreTotalByExamId"
             , "searchCourseScoreAvgOrderMap", "searchCourseScoreTotalMap", "searchTotalScoreGradeOrderMap"
             , "searchTotalScoreClassOrderMap", "getScoreByStudentAndExamId", "getClassScoreOrderMap"
-            , "getGradeScoreOrderMap", "getGradeScore"}, allEntries = true)
+            , "getGradeScoreOrderMap", "getGradeScore","analyzeCourseScoreScale","analyzeTotalScoreScale"}, allEntries = true)
     @Override
     public boolean add(Score score) {
         completeEntity(score);
@@ -81,7 +81,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     @CacheEvict(value = {"getClassScore", "selectCourseScoreAvgByExamId", "selectCourseScoreTotalByExamId"
             , "searchCourseScoreAvgOrderMap", "searchCourseScoreTotalMap", "searchTotalScoreGradeOrderMap"
             , "searchTotalScoreClassOrderMap", "getScoreByStudentAndExamId", "getClassScoreOrderMap"
-            , "getGradeScoreOrderMap", "getGradeScore"}, allEntries = true)
+            , "getGradeScoreOrderMap", "getGradeScore","analyzeCourseScoreScale","analyzeTotalScoreScale"}, allEntries = true)
     @Override
     public boolean updateById(Score entity) {
         return super.updateById(entity);
@@ -149,7 +149,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     @CacheEvict(value = {"getClassScore", "selectCourseScoreAvgByExamId", "selectCourseScoreTotalByExamId"
             , "searchCourseScoreAvgOrderMap", "searchCourseScoreTotalMap", "searchTotalScoreGradeOrderMap"
             , "searchTotalScoreClassOrderMap", "getScoreByStudentAndExamId", "getClassScoreOrderMap"
-            , "getGradeScoreOrderMap", "getGradeScore"}, allEntries = true)
+            , "getGradeScoreOrderMap", "getGradeScore","analyzeCourseScoreScale","analyzeTotalScoreScale"}, allEntries = true)
     public boolean batchAdd(List<Score> scores) {
         if (CollectionUtils.isNotEmpty(scores)) {
             for (Score score : scores) {
@@ -184,11 +184,11 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         for (Student recorder : studentPage.getRecords()) {
             calculateStudentsScore(recorder, examGroupId, personScores, examGroup);
         }
-        personScores.sort((o1, o2) -> {
+        /*personScores.sort((o1, o2) -> {
             JSONObject obj1 = (JSONObject) o1;
             JSONObject obj2 = (JSONObject) o2;
             return obj2.getIntValue("score") - obj1.getIntValue("score");
-        });
+        });*/
         Page scorePage = new Page();
         scorePage.setRecords(personScores);
         scorePage.setTotal(studentPage.getTotal());
@@ -532,7 +532,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         studentPage.setTotal(count);
         return studentPage;
     }
-
+    @Cacheable("analyzeCourseScoreScale")
     @Override
     public List analyzeCourseScoreScale(Integer examGroupId, Integer classId, Integer courseId, Integer minScore, Integer maxScore, Integer granularity) {
         if (minScore == null) {
@@ -546,11 +546,17 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         }
         List list = new ArrayList();
         Course course = courseService.getEntityFromLocalCacheByKey(String.format(CacheKey.COURSE_ID_COURSE, courseId));
+        if (course == null) {
+            throw new RuntimeException("不存在这样的科目,id:"+courseId);
+        }
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("courseName", course.getCourseName());
         jsonObject.put("courseId", courseId);
         jsonObject.put("examGroupId", examGroupId);
         ExamGroup examGroup = examGroupService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_GROUP_ID_EXAM_GROUP, examGroupId));
+        if (examGroup == null) {
+            throw new RuntimeException("不存在这样的考试组,id:"+examGroupId);
+        }
         jsonObject.put("examGroupName", examGroup.getExamGroupName());
         int tempScore = minScore;
         while (tempScore < maxScore) {
@@ -587,6 +593,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
 
     }
 
+    @Cacheable("analyzeCourseScoreScale")
     @Override
     public List analyzeTotalScoreScale(Integer examGroupId, Integer classId, Integer minScore
             , Integer maxScore, Integer granularity) {
@@ -601,6 +608,9 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         }
         List list = new ArrayList();
         ExamGroup examGroup = examGroupService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_GROUP_ID_EXAM_GROUP, examGroupId));
+        if (examGroup == null) {
+            throw new RuntimeException("不存在这样的考试组,id:"+examGroupId);
+        }
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("examGroupId", examGroupId);
         jsonObject.put("examGroupName", examGroup.getExamGroupName());
