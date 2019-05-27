@@ -593,7 +593,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
 
     }
 
-    @Cacheable("analyzeCourseScoreScale")
+    @Cacheable("analyzeTotalScoreScale")
     @Override
     public List analyzeTotalScoreScale(Integer examGroupId, Integer classId, Integer minScore
             , Integer maxScore, Integer granularity) {
