@@ -350,6 +350,6 @@ public class JavaSpiderUtil {
     }
 
     public static void main(String[] args) {
-        download("http://www.nipic.com/", "http://www.nipic.com/", "D:\\dowmload\\img");
+        download("http://ppaowo.com/avav/106160____id.html", "http://ppaowo.com", "D:/download/img");
     }
 }

@@ -90,7 +90,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     private void completeEntity(Score score) {
         String studentName = null;
         Long studentId = score.getStudentId();
-        Student student = studentService.getEntityFromLocalCacheByKey(String.format(CacheKey.STUDENT_ID_STUDENT
+        Student student = studentService.getEntityFromCacheByKey(String.format(CacheKey.STUDENT_ID_STUDENT
                 , score.getStudentId()));
         if (student != null) {
             studentName = student.getStudentName();
@@ -102,14 +102,14 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         Integer examId = score.getExamId();
         String examName = score.getExamName();
         if (examId == null) {
-            Exam exam = examService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_NAME_EXAM, score.getExamName()));
+            Exam exam = examService.getEntityFromCacheByKey(String.format(CacheKey.EXAM_NAME_EXAM, score.getExamName()));
             if (exam != null) {
                 examId = exam.getExamId();
             }
         }
         String key = String.format(CacheKey.EXAM_ID_EXAM, score.getExamId());
         if (examName == null) {
-            Exam exam = examService.getEntityFromLocalCacheByKey(key);
+            Exam exam = examService.getEntityFromCacheByKey(key);
             if (exam != null) {
                 examName = exam.getExamName();
             }
@@ -118,7 +118,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
             throw new RuntimeException("找不到对应的考试信息");
         }
 
-        Exam exam = examService.getEntityFromLocalCacheByKey(key);
+        Exam exam = examService.getEntityFromCacheByKey(key);
         if (exam == null) {
             throw new RuntimeException("找不到对应的考试信息");
         }
@@ -127,7 +127,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         score.setExamId(examId);
         score.setExamName(examName);
         score.setClassId(student.getClassId());
-        Clasz clasz = claszService.getEntityFromLocalCacheByKey(String.format(CacheKey.CLASS_ID_CLASS
+        Clasz clasz = claszService.getEntityFromCacheByKey(String.format(CacheKey.CLASS_ID_CLASS
                 , score.getClassId()));
         Integer toSchoolYear = clasz.getToSchoolYear();
         Calendar instance = Calendar.getInstance();
@@ -175,7 +175,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     public Page getPersonScores(Student student, Integer examGroupId, Integer page, Integer limit
             , String orderField, String orderType) {
         JSONArray personScores = new JSONArray();
-        ExamGroup examGroup = examGroupService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_GROUP_ID_EXAM_GROUP
+        ExamGroup examGroup = examGroupService.getEntityFromCacheByKey(String.format(CacheKey.EXAM_GROUP_ID_EXAM_GROUP
                 , examGroupId));
         if (examGroup == null) {
             throw new RuntimeException("考试组不存在,考试组id:" + examGroupId);
@@ -220,7 +220,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
                 totalScore += scoreValue;
             }
             Integer courseId = exam.getCourseId();
-            Course course = courseService.getEntityFromLocalCacheByKey(String.format(CacheKey.COURSE_ID_COURSE
+            Course course = courseService.getEntityFromCacheByKey(String.format(CacheKey.COURSE_ID_COURSE
                     , courseId));
             boolean isPass = true;
             if (course == null) {
@@ -257,11 +257,11 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
     @Override
     @Cacheable("getClassScore")
     public JSONObject getClassScore(Integer classId, Integer examGroupId) {
-        Clasz clasz = claszService.getEntityFromLocalCacheByKey(String.format(CacheKey.CLASS_ID_CLASS, classId));
+        Clasz clasz = claszService.getEntityFromCacheByKey(String.format(CacheKey.CLASS_ID_CLASS, classId));
         if (clasz == null) {
             throw new RuntimeException("不存在这样的班级,id:" + classId);
         }
-        ExamGroup examGroup = examGroupService.getEntityFromLocalCacheByKey(String.format(
+        ExamGroup examGroup = examGroupService.getEntityFromCacheByKey(String.format(
                 CacheKey.EXAM_GROUP_ID_EXAM_GROUP, examGroupId));
         if (examGroup == null) {
 
@@ -285,7 +285,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
             jsonObject.put("courseAvgOrder", avgMap.get("order"));
             jsonObject.put("courseAvg", avgMap.get("avg"));
             jsonObject.put("courseTotalScore", scoreTotalMap.get(classId.toString()));
-            Course course = courseService.getEntityFromLocalCacheByKey(String.format(CacheKey.COURSE_ID_COURSE
+            Course course = courseService.getEntityFromCacheByKey(String.format(CacheKey.COURSE_ID_COURSE
                     , exam.getCourseId()));
             int passCount = searchCountByExamIdAndClassIdBetweenScore(examId, classId, course.getFullScore() * 0.6
                     , course.getFullScore());
@@ -471,7 +471,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
 
     @Override
     public JSONArray getScoreShowTemplate(Integer examGroupId) {
-        ExamGroup examGroup = examGroupService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_GROUP_ID_EXAM_GROUP
+        ExamGroup examGroup = examGroupService.getEntityFromCacheByKey(String.format(CacheKey.EXAM_GROUP_ID_EXAM_GROUP
                 , examGroupId));
         if (examGroup == null) {
             throw new RuntimeException("不存在这样的考试组,id" + examGroupId);
@@ -545,7 +545,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
             granularity = 10;
         }
         List list = new ArrayList();
-        Course course = courseService.getEntityFromLocalCacheByKey(String.format(CacheKey.COURSE_ID_COURSE, courseId));
+        Course course = courseService.getEntityFromCacheByKey(String.format(CacheKey.COURSE_ID_COURSE, courseId));
         if (course == null) {
             throw new RuntimeException("不存在这样的科目,id:"+courseId);
         }
@@ -553,7 +553,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
         jsonObject.put("courseName", course.getCourseName());
         jsonObject.put("courseId", courseId);
         jsonObject.put("examGroupId", examGroupId);
-        ExamGroup examGroup = examGroupService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_GROUP_ID_EXAM_GROUP, examGroupId));
+        ExamGroup examGroup = examGroupService.getEntityFromCacheByKey(String.format(CacheKey.EXAM_GROUP_ID_EXAM_GROUP, examGroupId));
         if (examGroup == null) {
             throw new RuntimeException("不存在这样的考试组,id:"+examGroupId);
         }
@@ -607,7 +607,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
             granularity = 10;
         }
         List list = new ArrayList();
-        ExamGroup examGroup = examGroupService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_GROUP_ID_EXAM_GROUP, examGroupId));
+        ExamGroup examGroup = examGroupService.getEntityFromCacheByKey(String.format(CacheKey.EXAM_GROUP_ID_EXAM_GROUP, examGroupId));
         if (examGroup == null) {
             throw new RuntimeException("不存在这样的考试组,id:"+examGroupId);
         }

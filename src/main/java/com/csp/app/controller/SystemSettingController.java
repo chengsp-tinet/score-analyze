@@ -32,7 +32,7 @@ public class SystemSettingController extends BaseController {
     @RequestMapping("/queryByEntity")
     @ResponseBody
     public SystemSetting queryByEntity(String name) {
-        return systemSettingService.getEntityFromLocalCacheByKey(String.format(CacheKey.SYSTEM_SETTING_NAME_SYSTEM_SETTING, name));
+        return systemSettingService.getEntityFromCacheByKey(String.format(CacheKey.SYSTEM_SETTING_NAME_SYSTEM_SETTING, name));
     }
 
     @RequestMapping("/queryAll")

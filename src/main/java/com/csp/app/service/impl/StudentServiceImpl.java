@@ -39,7 +39,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     private ClaszService claszService;
 
     @Override
-    public Student getEntityFromLocalCacheByKey(String key) {
+    public Student getEntityFromCacheByKey(String key) {
         Student localEntity = localCache.get(key);
         if (localEntity == null) {
             Student redisEntity = redisService.getObject(key, Const.DEFAULT_INDEX, Student.class);
@@ -66,9 +66,14 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
     }
 
     @Override
-    public void flushLocalCache() {
-        localCache.clear();
-        logger.info("清空本地缓存{}条", localCache.size());
+    public void flushLocalCache(String key) {
+        if (StringUtil.isEmpty(key)) {
+            logger.info("刷新本地缓存{}条", localCache.size());
+            localCache.clear();
+        } else {
+            localCache.remove(key);
+            logger.info("刷新本地缓存,key:{}", key);
+        }
     }
 
     @Override
@@ -79,7 +84,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
 
     private void completeEntity(Student student) {
         Integer classId = student.getClassId();
-        Clasz clasz = claszService.getEntityFromLocalCacheByKey(String.format(CacheKey.CLASS_ID_CLASS
+        Clasz clasz = claszService.getEntityFromCacheByKey(String.format(CacheKey.CLASS_ID_CLASS
                 , classId));
         if (student.getStudentId() != null) {
             return;
@@ -108,7 +113,7 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         }
         Map<Integer, Collection<Student>> classfyMap = multiMap.asMap();
         classfyMap.forEach((classId, studentList) -> {
-            Clasz clasz = claszService.getEntityFromLocalCacheByKey(String.format(CacheKey.CLASS_ID_CLASS
+            Clasz clasz = claszService.getEntityFromCacheByKey(String.format(CacheKey.CLASS_ID_CLASS
                 , classId));
             Long maxStudentId = studentMapper.selectMaxStudentIdByClassId(classId);
             Long insertStudentId;

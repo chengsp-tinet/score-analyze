@@ -32,7 +32,7 @@ public class ClaszServiceImpl extends ServiceImpl<ClaszMapper, Clasz> implements
     private RedisService redisService;
 
     @Override
-    public Clasz getEntityFromLocalCacheByKey(String key) {
+    public Clasz getEntityFromCacheByKey(String key) {
         Clasz localEntity = localCache.get(key);
         if (localEntity == null) {
             Clasz redisEntity = redisService.getObject(key, Const.DEFAULT_INDEX, Clasz.class);
@@ -60,9 +60,14 @@ public class ClaszServiceImpl extends ServiceImpl<ClaszMapper, Clasz> implements
     }
 
     @Override
-    public void flushLocalCache() {
-        localCache.clear();
-        logger.info("清空本地缓存{}条", localCache.size());
+    public void flushLocalCache(String key) {
+        if (StringUtil.isEmpty(key)) {
+            logger.info("刷新本地缓存{}条", localCache.size());
+            localCache.clear();
+        } else {
+            localCache.remove(key);
+            logger.info("刷新本地缓存,key:{}", key);
+        }
     }
 
     @Override

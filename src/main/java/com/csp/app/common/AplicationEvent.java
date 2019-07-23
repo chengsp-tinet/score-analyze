@@ -1,6 +1,7 @@
 package com.csp.app.common;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.csp.app.service.CacheService;
 import com.csp.app.service.RedisService;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -35,5 +36,6 @@ public class AplicationEvent {
         for (CacheService cacheService : cacheServices){
             cacheService.loadCache();
         }
+        logger.info("缓存加载完毕,启动成功");
     }
 }

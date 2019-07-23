@@ -59,8 +59,8 @@ public class ScoreController extends BaseController {
             if (scoreValue == null) {
                 return ResponseBuilder.buildFail("添加成绩失败,成绩不可为空");
             }
-            Exam exam = examService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_ID_EXAM, examId));
-            Course course = courseService.getEntityFromLocalCacheByKey(String.format(CacheKey.COURSE_ID_COURSE
+            Exam exam = examService.getEntityFromCacheByKey(String.format(CacheKey.EXAM_ID_EXAM, examId));
+            Course course = courseService.getEntityFromCacheByKey(String.format(CacheKey.COURSE_ID_COURSE
                     , exam.getCourseId()));
             if (scoreValue > course.getFullScore()) {
                 return ResponseBuilder.buildFail("添加成绩失败,成绩不合法,大于满分:" + scoreValue);

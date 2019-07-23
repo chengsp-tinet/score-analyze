@@ -77,15 +77,12 @@
                 success: function (data) {
                     try {
                         if (data.status == 0) {
-                            layer.msg("登录成功,2秒后将自动关闭窗口")
-                            setTimeout(function () {
-                                window.close();
-                            },2000)
+                            location.href='/'
                         } else {
                             layer.msg(data.description)
                         }
                     } catch (e) {
-                        //location.href='/showLogin'
+                        layer.msg(data.description)
                     }
                 }
             })

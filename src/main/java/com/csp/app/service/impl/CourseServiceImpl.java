@@ -33,7 +33,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     private RedisService redisService;
 
     @Override
-    public Course getEntityFromLocalCacheByKey(String key) {
+    public Course getEntityFromCacheByKey(String key) {
         Course localEntity = localCache.get(key);
         if (localEntity == null) {
             Course redisEntity = redisService.getObject(key, Const.DEFAULT_INDEX, Course.class);
@@ -63,9 +63,14 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     }
 
     @Override
-    public void flushLocalCache() {
-        localCache.clear();
-        logger.info("清空本地缓存{}条", localCache.size());
+    public void flushLocalCache(String key) {
+        if (StringUtil.isEmpty(key)) {
+            logger.info("刷新本地缓存{}条", localCache.size());
+            localCache.clear();
+        } else {
+            localCache.remove(key);
+            logger.info("刷新本地缓存,key:{}", key);
+        }
     }
 
     @Override

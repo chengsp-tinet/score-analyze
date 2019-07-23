@@ -1,8 +1,8 @@
 package com.csp.app.controller;
 
-import com.csp.app.common.CacheService;
 import com.csp.app.common.Const;
 import com.csp.app.common.ResponseBuilder;
+import com.csp.app.service.CacheService;
 import com.csp.app.service.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,7 +24,7 @@ public class ReloadController {
         redisService.flushDB(Const.DEFAULT_INDEX);
         for (CacheService cacheService : cacheServices) {
             cacheService.loadCache();
-            cacheService.flushLocalCache();
+            cacheService.flushLocalCache(null);
         }
         return ResponseBuilder.buildSuccess("刷新缓存成功",null);
     }

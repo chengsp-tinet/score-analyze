@@ -44,7 +44,7 @@ public class ExamServiceImpl extends ServiceImpl<ExamMapper, Exam> implements Ex
     private ExamGroupService examGroupService;
 
     @Override
-    public Exam getEntityFromLocalCacheByKey(String key) {
+    public Exam getEntityFromCacheByKey(String key) {
         Exam localEntity = localCache.get(key);
         if (localEntity == null) {
             Exam redisEntity = redisService.getObject(key, Const.DEFAULT_INDEX, Exam.class);
@@ -74,9 +74,14 @@ public class ExamServiceImpl extends ServiceImpl<ExamMapper, Exam> implements Ex
     }
 
     @Override
-    public void flushLocalCache() {
-        localCache.clear();
-        logger.info("清空本地缓存{}条", localCache.size());
+    public void flushLocalCache(String key) {
+        if (StringUtil.isEmpty(key)) {
+            logger.info("刷新本地缓存{}条", localCache.size());
+            localCache.clear();
+        } else {
+            localCache.remove(key);
+            logger.info("刷新本地缓存,key:{}", key);
+        }
     }
 
     @Override
@@ -144,14 +149,14 @@ public class ExamServiceImpl extends ServiceImpl<ExamMapper, Exam> implements Ex
         Integer courseId = entity.getCourseId();
         String courseName = entity.getCourseName();
         if (courseId == null) {
-            Course course = courseService.getEntityFromLocalCacheByKey(String.format(CacheKey.COURSE_NAME_COURSE, courseName));
+            Course course = courseService.getEntityFromCacheByKey(String.format(CacheKey.COURSE_NAME_COURSE, courseName));
             if (course != null) {
                 courseId = course.getCourseId();
 
             }
         }
         if (StringUtil.isEmpty(courseName)) {
-            Course course = courseService.getEntityFromLocalCacheByKey(String.format(CacheKey.COURSE_ID_COURSE, courseId));
+            Course course = courseService.getEntityFromCacheByKey(String.format(CacheKey.COURSE_ID_COURSE, courseId));
             if (course != null) {
                 courseName = course.getCourseName();
             }
@@ -162,14 +167,14 @@ public class ExamServiceImpl extends ServiceImpl<ExamMapper, Exam> implements Ex
         Integer examGroupId = entity.getExamGroupId();
         String examGroupName = entity.getExamGroupName();
         if (examGroupId == null) {
-            ExamGroup examGroup = examGroupService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_GROUP_NAME_EXAM_GROUP
+            ExamGroup examGroup = examGroupService.getEntityFromCacheByKey(String.format(CacheKey.EXAM_GROUP_NAME_EXAM_GROUP
                     , examGroupName));
             if (examGroup != null) {
                 examGroupId = examGroup.getExamGroupId();
             }
         }
         if (StringUtil.isEmpty(examGroupName)) {
-            ExamGroup examGroup = examGroupService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_GROUP_ID_EXAM_GROUP
+            ExamGroup examGroup = examGroupService.getEntityFromCacheByKey(String.format(CacheKey.EXAM_GROUP_ID_EXAM_GROUP
                     , examGroupId));
             if (examGroup != null) {
                 examGroupName = examGroup.getExamGroupName();

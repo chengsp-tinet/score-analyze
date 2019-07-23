@@ -8,7 +8,7 @@
 	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
 			<charset>UTF-8</charset>
-			<pattern>%d %-5level %logger{36} %line - %msg%n</pattern>
+			<pattern>%yellow(%date{yyyy-MM-dd HH:mm:ss}) |%highlight(%-5level) |%blue(%thread) |%blue(%file:%line) |%cyan(%msg%n)</pattern>
 		</encoder>
 	</appender>
 	<!-- 输出到日志文件 -->
