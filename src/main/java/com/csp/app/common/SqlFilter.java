@@ -2,7 +2,9 @@ package com.csp.app.common;
 
 import com.alibaba.druid.filter.FilterEventAdapter;
 import com.alibaba.druid.proxy.jdbc.StatementProxy;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.toolkit.CollectionUtils;
+import com.csp.app.entity.SynMessage;
 import com.csp.app.service.CacheService;
 import com.csp.app.service.RedisService;
 import com.csp.app.util.ContextUtil;
@@ -78,18 +80,21 @@ public class SqlFilter extends FilterEventAdapter {
         if (sql.contains("select")) {
             return;
         }
-        if (!PATTERN.matcher(sql).find()) {
+        /*if (!PATTERN.matcher(sql).find()) {
             return;
-        }
+        }*/
         List<String> tables = getTables(sql);
         if (CollectionUtils.isEmpty(tables)) {
             return;
         }
         String  tableName = tables.get(0);
         String beanName = StringUtil.underlineToCamelhump(tableName) + "ServiceImpl";
-        CacheService cacheService = (CacheService) ContextUtil.getBean(beanName);
-        cacheService.loadCache();
-        redisService.publish(Const.DEFAULT_CHANNEL, beanName);
+/*        CacheService cacheService = (CacheService) ContextUtil.getBean(beanName);
+        cacheService.loadCache();*/
+        SynMessage synMessage = new SynMessage();
+        synMessage.setBeanName(beanName);
+        synMessage.setFlushType(FlushType.INSERT);
+        redisService.publish(Const.DEFAULT_CHANNEL, JSON.toJSONString(synMessage));
     }
 
     @Override

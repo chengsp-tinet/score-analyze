@@ -11,6 +11,7 @@ import com.csp.app.mapper.StudentMapper;
 import com.csp.app.service.ClaszService;
 import com.csp.app.service.RedisService;
 import com.csp.app.service.StudentService;
+import com.csp.app.util.ExcelUtil;
 import com.google.common.collect.ArrayListMultimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.util.StringUtil;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -161,11 +168,45 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         if (StringUtil.isEmpty(orderFiled)) {
             orderFiled = "id";
         }
-        int count = selectCount(wrapper);
         wrapper.orderBy(orderFiled,orderTypeBoo);
+        int count = selectCount(wrapper);
         Page<Student> studentPage = new Page<>(page,limit);
         studentPage.setTotal(count);
         selectPage(studentPage, wrapper);
         return studentPage;
+    }
+
+    @Override
+    public void export(Student student, HttpServletResponse response) {
+        try {
+            // 告诉浏览器用什么软件可以打开此文件
+            response.setHeader("content-Type", "application/vnd.ms-excel");
+            // 下载文件的默认名称
+            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode("test.csv", "utf-8"));
+            String studentName = student.getStudentName();
+            student.setStudentName(null);
+            EntityWrapper<Student> wrapper = new EntityWrapper<>(student);
+            if (StringUtil.isNotEmpty(studentName)) {
+                wrapper.like("student_name", "%" + studentName + "%");
+            }
+            int current = 1;
+            Page<Student> studentPage;
+            PrintWriter writer = response.getWriter();
+            BufferedWriter bw = new BufferedWriter(writer);
+            ExcelUtil.ExportByPageHelper pageHelper = new ExcelUtil.ExportByPageHelper(bw);
+            while (true) {
+                studentPage = new Page<>(current++, 2);
+                selectPage(studentPage, wrapper);
+                List<Student> records = studentPage.getRecords();
+                if (records.size() == 0) {
+                    break;
+                }
+                pageHelper.exportAsCscByPage(records, bw, null, null);
+                records.clear();
+            }
+            pageHelper.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -18,9 +18,9 @@ public class Subscriber extends JedisPubSub {
         try {
             if (Const.DEFAULT_CHANNEL.equals(channel)) {
                 SynMessage synMessage = JSON.parseObject(message, SynMessage.class);
-                CacheService cacheService = (CacheService) ContextUtil.getBean(synMessage.getBeanName());
-                synMessage.getFlushType().flush(synMessage.getKey(), synMessage.getData());
-                cacheService.flushLocalCache(synMessage.getKey());
+                synMessage.getFlushType().flush(synMessage);
+                /*CacheService cacheService = (CacheService) ContextUtil.getBean(message);
+                cacheService.flushLocalCache(null);*/
             }
         } catch (Exception e) {
             logger.error("刷新缓存异常:{}", e);

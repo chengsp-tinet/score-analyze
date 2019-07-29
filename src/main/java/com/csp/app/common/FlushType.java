@@ -3,6 +3,7 @@ package com.csp.app.common;
 import com.csp.app.common.flush.DeleteFlush;
 import com.csp.app.common.flush.InsertFlush;
 import com.csp.app.common.flush.UpdateFlush;
+import com.csp.app.entity.SynMessage;
 import com.csp.app.util.ContextUtil;
 
 public enum FlushType {
@@ -26,7 +27,7 @@ public enum FlushType {
         this.cacheFlush = cacheFlush;
     }
 
-    public void flush(String key, Object data) {
-        cacheFlush.doFlush(key, data);
+    public void flush(SynMessage synMessage) {
+        cacheFlush.doFlush(synMessage);
     }
 }

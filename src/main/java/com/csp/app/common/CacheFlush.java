@@ -1,5 +1,7 @@
 package com.csp.app.common;
 
+import com.csp.app.entity.SynMessage;
+
 public interface CacheFlush {
-    void doFlush(String key, Object data);
+    void doFlush(SynMessage synMessage);
 }
