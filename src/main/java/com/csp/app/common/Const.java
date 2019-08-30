@@ -16,4 +16,7 @@ public class Const {
      * 班级类型:中学
      */
     public static final int CLASS_TYPE_MIDDLE = 2;
+
+
+    public static final String DEFAUT_TOPIC = "test_topic";
 }
