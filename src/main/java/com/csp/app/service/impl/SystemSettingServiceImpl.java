@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tk.mybatis.mapper.util.StringUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,7 @@ public class SystemSettingServiceImpl extends ServiceImpl<SystemSettingMapper, S
     }
 
     @Override
-    public SystemSetting getEntityFromLocalCacheByKey(String key) {
+    public SystemSetting getEntityFromCacheByKey(String key) {
         SystemSetting localEntity = localCache.get(key);
         if (localEntity == null) {
             SystemSetting redisEntity = redisService.getObject(key, 1, SystemSetting.class);
@@ -64,9 +65,13 @@ public class SystemSettingServiceImpl extends ServiceImpl<SystemSettingMapper, S
     }
 
     @Override
-    public void flushLocalCache() {
-        localCache.clear();
-        logger.info("清空本地缓存{}条", localCache.size());
-
+    public void flushLocalCache(String key) {
+        if (StringUtil.isEmpty(key)) {
+            logger.info("刷新本地缓存{}条", localCache.size());
+            localCache.clear();
+        } else {
+            localCache.remove(key);
+            logger.info("刷新本地缓存,key:{}", key);
+        }
     }
 }

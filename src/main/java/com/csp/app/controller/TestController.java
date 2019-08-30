@@ -3,13 +3,13 @@ package com.csp.app.controller;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.csp.app.common.BaseController;
-import com.csp.app.common.CacheService;
 import com.csp.app.common.Const;
 import com.csp.app.common.ResponseBuilder;
 import com.csp.app.common.es.EsQueryCondition;
 import com.csp.app.common.es.EsQueryResult;
 import com.csp.app.common.es.JestService;
 import com.csp.app.entity.TestEntity;
+import com.csp.app.service.CacheService;
 import com.csp.app.service.RedisService;
 import com.csp.app.service.TestService;
 import com.csp.app.util.ExcelUtil;
@@ -165,7 +165,7 @@ public class TestController extends BaseController {
         redisService.flushDB(Const.DEFAULT_INDEX);
         for (CacheService cacheService : cacheServices) {
             cacheService.loadCache();
-            cacheService.flushLocalCache();
+            cacheService.flushLocalCache(null);
         }
     }
 }

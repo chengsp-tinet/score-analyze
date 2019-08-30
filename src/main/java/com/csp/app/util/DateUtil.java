@@ -51,7 +51,6 @@ public class DateUtil {
             long time2 = cal.getTimeInMillis();
             between_days = (time2 - time1) / (1000 * 3600 * 24);
         } catch (ParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return Integer.parseInt(String.valueOf(between_days));

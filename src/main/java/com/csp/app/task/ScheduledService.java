@@ -12,11 +12,11 @@ public class ScheduledService {
     public void scheduled(){
         logger.info("=====>>>>>使用cron  {}",System.currentTimeMillis());
     }
-    @Scheduled(fixedRate = 5000)
+//    @Scheduled(fixedRate = 5000)
     public void scheduled1() {
         logger.info("=====>>>>>使用fixedRate{}", System.currentTimeMillis());
     }
-    @Scheduled(fixedDelay = 5000)
+//    @Scheduled(fixedDelay = 5000)
     public void scheduled2() {
         logger.info("=====>>>>>fixedDelay{}",System.currentTimeMillis());
     }

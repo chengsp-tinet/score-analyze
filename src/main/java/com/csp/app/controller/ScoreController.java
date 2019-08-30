@@ -59,8 +59,8 @@ public class ScoreController extends BaseController {
             if (scoreValue == null) {
                 return ResponseBuilder.buildFail("添加成绩失败,成绩不可为空");
             }
-            Exam exam = examService.getEntityFromLocalCacheByKey(String.format(CacheKey.EXAM_ID_EXAM, examId));
-            Course course = courseService.getEntityFromLocalCacheByKey(String.format(CacheKey.COURSE_ID_COURSE
+            Exam exam = examService.getEntityFromCacheByKey(String.format(CacheKey.EXAM_ID_EXAM, examId));
+            Course course = courseService.getEntityFromCacheByKey(String.format(CacheKey.COURSE_ID_COURSE
                     , exam.getCourseId()));
             if (scoreValue > course.getFullScore()) {
                 return ResponseBuilder.buildFail("添加成绩失败,成绩不合法,大于满分:" + scoreValue);
@@ -93,17 +93,16 @@ public class ScoreController extends BaseController {
             String examName = score.getExamName();
             String examGroupName = score.getExamGroupName();
             score.setStudentName(null);
-            score.setStudentName(null);
             score.setExamName(null);
             score.setExamGroupName(null);
             if (StringUtil.isNotEmpty(studentName)) {
                 wrapper.like("student_name", "%" + studentName + "%");
             }
             if (StringUtil.isNotEmpty(examName)) {
-                wrapper.like("exam_name", "%" + studentName + "%");
+                wrapper.like("exam_name", "%" + examName + "%");
             }
             if (StringUtil.isNotEmpty(examGroupName)) {
-                wrapper.like("exam_group_name", "%" + studentName + "%");
+                wrapper.like("exam_group_name", "%" + examGroupName + "%");
             }
             if (ltScore != null) {
                 wrapper.lt("score", ltScore);

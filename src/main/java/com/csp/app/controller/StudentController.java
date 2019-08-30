@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -80,5 +81,10 @@ public class StudentController extends BaseController {
             logger.error("searchSelectivePage error: {}", e);
             return ResponseBuilder.buildError("系统异常:" + e.getMessage());
         }
+    }
+
+    @RequestMapping("/inside/export")
+    public void export(Student student, HttpServletResponse response) {
+        studentService.export(student,response);
     }
 }

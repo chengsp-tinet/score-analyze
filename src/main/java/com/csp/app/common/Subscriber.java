@@ -1,5 +1,8 @@
 package com.csp.app.common;
 
+import com.alibaba.fastjson.JSON;
+import com.csp.app.entity.SynMessage;
+import com.csp.app.service.CacheService;
 import com.csp.app.util.ContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,12 +17,13 @@ public class Subscriber extends JedisPubSub {
     public void onMessage(String channel, String message) {
         try {
             if (Const.DEFAULT_CHANNEL.equals(channel)) {
-                logger.info("刷新本地缓存...");
-                CacheService cacheService = (CacheService) ContextUtil.getBean(message);
-                cacheService.flushLocalCache();
+                SynMessage synMessage = JSON.parseObject(message, SynMessage.class);
+                synMessage.getFlushType().flush(synMessage);
+                /*CacheService cacheService = (CacheService) ContextUtil.getBean(message);
+                cacheService.flushLocalCache(null);*/
             }
         } catch (Exception e) {
-            logger.error("接受消息异常:{}", e);
+            logger.error("刷新缓存异常:{}", e);
         }
     }
 }

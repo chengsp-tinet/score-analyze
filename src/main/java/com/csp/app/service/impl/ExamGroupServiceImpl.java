@@ -34,7 +34,7 @@ public class ExamGroupServiceImpl extends ServiceImpl<ExamGroupMapper, ExamGroup
     private RedisService redisService;
 
     @Override
-    public ExamGroup getEntityFromLocalCacheByKey(String key) {
+    public ExamGroup getEntityFromCacheByKey(String key) {
         ExamGroup localEntity = localCache.get(key);
         if (localEntity == null) {
             ExamGroup redisEntity = redisService.getObject(key, Const.DEFAULT_INDEX, ExamGroup.class);
@@ -64,9 +64,14 @@ public class ExamGroupServiceImpl extends ServiceImpl<ExamGroupMapper, ExamGroup
     }
 
     @Override
-    public void flushLocalCache() {
-        localCache.clear();
-        logger.info("清空本地缓存 {}条", localCache.size());
+    public void flushLocalCache(String key) {
+        if (StringUtil.isEmpty(key)) {
+            logger.info("刷新本地缓存{}条", localCache.size());
+            localCache.clear();
+        } else {
+            localCache.remove(key);
+            logger.info("刷新本地缓存,key:{}", key);
+        }
     }
 
     @Override
