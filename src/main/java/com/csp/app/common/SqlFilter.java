@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.toolkit.CollectionUtils;
 import com.csp.app.entity.SynMessage;
 import com.csp.app.service.CacheService;
 import com.csp.app.service.RedisService;
-import com.csp.app.util.ContextUtil;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.schema.Table;
@@ -16,6 +15,7 @@ import net.sf.jsqlparser.statement.SetStatement;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.StatementVisitor;
 import net.sf.jsqlparser.statement.Statements;
+import net.sf.jsqlparser.statement.UseStatement;
 import net.sf.jsqlparser.statement.alter.Alter;
 import net.sf.jsqlparser.statement.create.index.CreateIndex;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
@@ -199,6 +199,11 @@ public class SqlFilter extends FilterEventAdapter {
 
         @Override
         public void visit(Upsert upsert) {
+
+        }
+
+        @Override
+        public void visit(UseStatement useStatement) {
 
         }
     }

@@ -1,5 +1,6 @@
 package com.csp.app.controller.page;
 
+import com.csp.app.entity.Student;
 import com.csp.app.service.ExamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,20 +16,12 @@ import javax.servlet.http.HttpSession;
 @Controller
 public class PageShowController {
     @RequestMapping("/")
-    public String showIndex(HttpSession session) {
-        Object user = session.getAttribute("user");
-        if (user == null) {
-            return "login";
-        }
+    public String showIndex(HttpSession session,Model model) {
         return "index";
     }
     @RequestMapping("/page/loginPage")
     public String showLogin(HttpSession session) {
-        Object user = session.getAttribute("user");
-        if (user == null) {
-            return "login";
-        }
-        return "index";
+        return "login";
     }
 
     @RequestMapping("/page/uploadPage")

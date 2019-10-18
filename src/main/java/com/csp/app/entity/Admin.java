@@ -11,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.util.Date;
 
+
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Admin extends BaseEntity {
@@ -65,5 +66,46 @@ public class Admin extends BaseEntity {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public static final class Builder {
+        private Admin admin;
+
+        public Builder() {
+            admin = new Admin();
+        }
+
+        public static Builder anAdmin() {
+            return new Builder();
+        }
+
+        public Builder id(Integer id) {
+            admin.setId(id);
+            return this;
+        }
+
+        public Builder adminId(Integer adminId) {
+            admin.setAdminId(adminId);
+            return this;
+        }
+
+        public Builder adminName(String adminName) {
+            admin.setAdminName(adminName);
+            return this;
+        }
+
+        public Builder password(String password) {
+            admin.setPassword(password);
+            return this;
+        }
+
+        public Builder createTime(Date createTime) {
+            admin.setCreateTime(createTime);
+            return this;
+        }
+
+        public Admin build() {
+            return admin;
+        }
     }
 }

@@ -23,10 +23,10 @@ spring:
         min-idle: 50
         max-total: 100
 #自动建表配置
-#  jpa:
-#    hibernate:
-#      ddl-auto: update
-#      show-sql: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+      show-sfql: true
 #jest
 jest:
   host: http://localhost:9200

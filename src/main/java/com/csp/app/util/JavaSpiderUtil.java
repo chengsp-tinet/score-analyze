@@ -349,7 +349,4 @@ public class JavaSpiderUtil {
         }
     }
 
-    public static void main(String[] args) {
-        download("http://ppaowo.com/avav/106160____id.html", "http://ppaowo.com", "D:/download/img");
-    }
 }

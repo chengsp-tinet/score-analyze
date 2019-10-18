@@ -12,6 +12,8 @@ import com.csp.app.service.ClaszService;
 import com.csp.app.service.RedisService;
 import com.csp.app.service.StudentService;
 import com.csp.app.util.ExcelUtil;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ArrayListMultimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> implements StudentService {
     private final static Logger logger = LoggerFactory.getLogger(StudentServiceImpl.class);
     private static final Student NULL_ENTITY = new Student();
+    private Cache<String,Student> cache = CacheBuilder.newBuilder().build();
     private static Map<String, Student> localCache = new ConcurrentHashMap<>(32);
     @Autowired
     private StudentMapper studentMapper;

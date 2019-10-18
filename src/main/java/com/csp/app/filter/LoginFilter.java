@@ -15,7 +15,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebFilter(urlPatterns = {"/inside/*"})
+//@WebFilter(urlPatterns = {"/inside/*"})
 public class LoginFilter implements Filter {
 
     private static String encoding = "UTF-8";

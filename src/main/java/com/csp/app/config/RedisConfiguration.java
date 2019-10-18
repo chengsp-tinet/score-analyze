@@ -30,7 +30,6 @@ public class RedisConfiguration {
 
     @Value("${spring.redis.database}")
     private int database;
-
     @Value("${spring.redis.port}")
     private int port;
 

@@ -13,12 +13,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 public class ScoreAnalyzeApplicationTests {
     private final static Logger logger = LoggerFactory.getLogger(ScoreAnalyzeApplicationTests.class);
-    @Autowired
-    DruidDataSource druidDataSource;
 
     @Test
     public void contextLoads() {
-        logger.info(druidDataSource.getUrl());
     }
 
 }
